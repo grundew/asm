@@ -45,7 +45,7 @@ A13 = K*(C_S - C_L)/rho/w^2;
 A22 = C2*C_L + 2*S^2*C_S;
 A12 = K*C2*d_L - 2*S*m_L/k_S;
 A11 = C2*C_S + S^2*C_L;
-A21 = -(K*C_2*d_S  2*S*m_L/k_S);
+A21 = -(K*C_2*d_S - 2*S*m_L/k_S);
 A31 = -rho*w^2*(C2*d_S + 4*S^2*m_L/(k_S)^2);
 
 % Put together the whole shebang
