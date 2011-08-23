@@ -9,6 +9,7 @@ function B = transformSolidMatrix(A)
 % media (liquids and solids)
 % Pierre Cervenka and Pascal Challande
 % Equation 24 pp. 1582
+
 B(1, 1) = A(2, 2) - A(2, 1)*A(4, 2)/A(4, 1);
 B(1, 2) = A(2, 3) - A(2, 1)*A(4, 3)/A(4, 1);
 B(2, 1) = A(3, 2) - A(3, 1)*A(4, 2)/A(4, 1);

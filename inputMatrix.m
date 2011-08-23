@@ -1,4 +1,4 @@
-function M = inputMatrix(rho, w, k_z)
+function M = inputMatrix(rho, w, k_z_L)
 % Function for calculating the input matrix for a fluid solid interface.
 % 
 % M = inputMatrix(rho, w, k_z)
@@ -10,6 +10,6 @@ function M = inputMatrix(rho, w, k_z)
 % Pierre Cervenka and Pascal Challande
 % Equation 31.
 a = -rho*w^2;
-M = [k_z, -k_z;...
+M = [k_z_L, -k_z_L;...
     a, a];
 end
