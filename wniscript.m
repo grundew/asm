@@ -63,8 +63,8 @@ for i = 1:n
     %% Calculate V and W
     G = output*B*input;
     
-    V(i) = -G(2, 1);
-    W(i) = G(1, 1) - G(1, 2)*G(2, 1);
+    V(i) = -G(2, 1)/G(2, 2);
+    W(i) = G(1, 1) - G(1, 2)*G(2, 1)/G(2, 2);
 end    
 [R, T] = reflectionTing(ff, theta);
 figure,plot(ff, abs(V))

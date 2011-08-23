@@ -1,7 +1,7 @@
 function M = inputMatrix(rho, w, k_z_L)
 % Function for calculating the input matrix for a fluid solid interface.
 % 
-% M = inputMatrix(rho, w, k_z)
+% M = inputMatrix(rho, w, k_z_L)
 %
 % J. AcoustS. oc.A m.8 9 (4), Pt. 1, April 1991
 % A new efficient algorithm to compute the exact reflection
