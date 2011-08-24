@@ -1,7 +1,7 @@
 clear all
 %% Define parameters
-theta = 10*pi/180; % Radians
-ff = 100e3:0.01e3:1e6;
+theta = 1*pi/180; % Radians
+ff = 100e3:2e3:1e6;
 n = length(ff);
 V = zeros(1, n);
 W = zeros(1, n);
@@ -48,7 +48,7 @@ for i = 1:n
     
     %% Step 2:
     % Calculate the matrices related to each layer
-    a = layerMatrix(rho_steel, w, k_z_S, k_z_L, K, k_S, d);
+    %a = layerMatrix(rho_steel, w, k_z_S, k_z_L, K, k_S, d);
     
     %% Step 3:
     % Calculate the output matrix
@@ -63,13 +63,13 @@ for i = 1:n
     % end
     
     % Single layer
-    A = a;
-    deta(i) = det(A);
+    %A = a;
+    %deta(i) = det(A);
     
     %% Step 5:
     % Reduceing of the liquid-solid-liquid sandwiches.
-    %BB = bDirectly(rho_steel, w, k_z_S, k_z_L, K, k_S, d);
-    B = transformSolidMatrix(A);
+    B = bDirectly(rho_steel, w, k_z_S, k_z_L, K, k_S, d);
+    %B = transformSolidMatrix(A);
     
     %% Calculate V and W
     G = output*B*input;
@@ -78,25 +78,40 @@ for i = 1:n
     W(i) = G(1, 1) - G(1, 2)*G(2, 1)/G(2, 2);
 end
 
+% Plotting
+
+% % Reflection coefficient
+% figure
+% subplot(211)
+% plot(ff, real(V))
+% subplot(212)
+% plot(ff, imag(V))
+% 
+% % Transmission coefficient
+% figure
+% subplot(211)
+% plot(ff, real(W))
+% subplot(212)
+% plot(ff, imag(W))
 
 %% Use Brekhovkikh to compare with
-fluid = struct();                       % Define materials
-layer = struct();                       % Define materials
-fluid(1).cp = 1500;                     % Coupling medium, VOS
-fluid(1).rho = 1000;                    % Coupling medium
-cLayer = 1;
-
-layer(cLayer).cp = solid.v;                % Solid layer, VOS
-layer(cLayer).rho = solid.density;         % Solid layer
-layer(cLayer).poisson = solid.poisson;     % Solid layer
-layer(cLayer).thickness = d;               % Solid layer
-fluid(2) = fluid(1);
-
-msh = MultiShearModelPlateClass(ff, theta, layer, fluid);
-msh.doAll();
-R = msh.V;
-T = msh.W;
-
+% fluid = struct();                       % Define materials
+% layer = struct();                       % Define materials
+% fluid(1).cp = 1500;                     % Coupling medium, VOS
+% fluid(1).rho = 1000;                    % Coupling medium
+% cLayer = 1;
+% 
+% layer(cLayer).cp = solid.v;                % Solid layer, VOS
+% layer(cLayer).rho = solid.density;         % Solid layer
+% layer(cLayer).poisson = solid.poisson;     % Solid layer
+% layer(cLayer).thickness = d;               % Solid layer
+% fluid(2) = fluid(1);
+% 
+% msh = MultiShearModelPlateClass(ff, theta, layer, fluid);
+% msh.doAll();
+% R = msh.V;
+% T = msh.W;
+[R, T] = waterSteelWaterC1(ff, theta, d);
 
 %% Compare
 figure,plot(ff, abs(V), '.', ff, abs(R), 'o')

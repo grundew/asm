@@ -1,16 +1,14 @@
-function A = layerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d)
+function B = fluidSolidFluidLayer(rho, w, k_z_S, k_z_L, K, k_S, d)
 % Function for calculating the solid layer matrix.
 % 
-% A = layerMatrix(rho, w, k_z)
+% B = fluidSolidFluidLayer(rho, w, k_z_S, k_z_L, K, d, mu)
 %
 % J. AcoustS. oc.A m.8 9 (4), Pt. 1, April 1991
 % A new efficient algorithm to compute the exact reflection
 % and transmission factors for plane waves in layered absorbing
 % media (liquids and solids)
 % Pierre Cervenka and Pascal Challande
-% Equation 14.
-
-% a(d) = MxP(d)xM-1
+% Equation 24 pp. 1582
 
 S = K/k_S;
 C2 = 1 - 2*S^2;
@@ -38,17 +36,21 @@ else
     d_L = S_L/k_z_L;
 end
 
-% Calculate matrix elements used twice or more
-A13 = K*(C_S - C_L)/rho/w^2;
-A22 = C2*C_L + 2*S^2*C_S;
-A12 = K*C2*d_L - 2*S*m_L/k_S;
-A11 = C2*C_S + S^2*C_L;
 A21 = -(K*C2*d_S - 2*S*m_L/k_S);
-A31 = 2*rho*w^2*S*C2*(C_S - C_L)/k_S;
+A22 = C2*C_L + 2*S^2*C_S;
+A23 = -(K^2*d_S + m_L)/(rho*w^2);
 
-% Put together the whole shebang
-A = [A11, A12, A13, -(K^2*d_L + m_S)/rho/w^2;...
-     A21, A22, -(K^2*d_S + m_L)/rho/w^2, A13;...
-     A31, -rho*w^2*(C2^2*d_L + 4*S^2*m_S/(k_S)^2), A22, A12;...
-     -rho*w^2*(C2^2*d_S + 4*S^2*m_L/k_S^2), A31, A21, A11];
+A31 = 2*rho*w^2*S*C2*(C_S - C_L)/k_S;
+A32 = -rho*w^2*(C2^2*d_L + 4*S^2*m_S/k_S^2);
+A33 = A22;
+
+A41 = -rho*w^2*(C2^2*d_S + 4*S^2*m_L/k_S^2);
+A42 = A31;
+A43 = A21;
+
+B(1, 1) = A22 - A21*A42/A41;
+B(1, 2) = A23 - A21*A43/A41;
+B(2, 1) = A32 - A31*A42/A41;
+B(2, 2) = A33 - A31*A43/A41;
+
 end
