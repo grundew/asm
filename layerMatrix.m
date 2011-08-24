@@ -1,4 +1,4 @@
-function A = layerMatrix(rho, w, k_z_S, k_z_L, K, d, mu)
+function A = layerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d)
 % Function for calculating the solid layer matrix.
 % 
 % A = layerMatrix(rho, w, k_z)
@@ -11,7 +11,6 @@ function A = layerMatrix(rho, w, k_z_S, k_z_L, K, d, mu)
 % Equation 14.
 
 % a(d) = MxP(d)xM-1
-k_S = sqrt(rho*w^2/mu);
 
 S = K/k_S;
 C2 = 1 - 2*S^2;

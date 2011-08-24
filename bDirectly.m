@@ -1,4 +1,4 @@
-function B = bDirectly(rho, w, k_z_S, k_z_L, K, d, mu)
+function B = bDirectly(rho, w, k_z_S, k_z_L, K, k_S, d)
 % Function for calculating the solid layer matrix.
 % 
 % B = transformSolidMatrix(rho, w, k_z_S, k_z_L, K, d, mu)
@@ -9,8 +9,6 @@ function B = bDirectly(rho, w, k_z_S, k_z_L, K, d, mu)
 % media (liquids and solids)
 % Pierre Cervenka and Pascal Challande
 % Equation 24 pp. 1582
-
-k_S = sqrt(rho*w^2/mu);
 
 S = K/k_S;
 C2 = 1 - 2*S^2;
