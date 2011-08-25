@@ -1,4 +1,4 @@
-function [V, W, k_hor, k_vert_L] = waterSteelWaterC1(freq, theta_in, d)
+function [V, W, k_hor, k_vert_L, alpha_L] = waterSteelWaterC1(freq, theta_in, d, thresh)
 % Modeling a water steel water system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
 
@@ -46,7 +46,7 @@ for i = 1:nf
         k_z_S = sqrt(k_S^2 - K^2);
         k_z_L = sqrt(k_L^2 - K^2);
         k_vert_L(i, j) = k_z_L;
-        
+                
         % Step 1:
         % Calculate input matrix
         input = inputMatrix(rho_water, w, k_z);
@@ -58,7 +58,7 @@ for i = 1:nf
             % If angle is zero the shear waves in solid is neglected.
             B = fluidLayerMatrix(rho_steel, w, k_z_L);
         else
-            B = fluidSolidFluidLayer(rho_steel, w, k_z_S, k_z_L, K, k_S, d);
+            B = fluidSolidFluidLayer(rho_steel, w, k_z_S, k_z_L, K, k_S, d, thresh);
         end
 
         % Step 3:

@@ -1,6 +1,6 @@
-function B = fluidSolidFluidLayer(rho, w, k_z_S, k_z_L, K, k_S, d)
+function B = fluidSolidFluidLayer(rho, w, k_z_S, k_z_L, K, k_S, d, thresh)
 % Function for calculating the solid layer matrix.
-% 
+%
 % B = fluidSolidFluidLayer(rho, w, k_z_S, k_z_L, K, d, mu)
 %
 % J. AcoustS. oc.A m.8 9 (4), Pt. 1, April 1991
@@ -34,6 +34,27 @@ if k_z_L == 0
 else
     m_L = k_z_L*S_L;
     d_L = S_L/k_z_L;
+end
+
+% Check if there is an evanescent longitudenal wave
+% k_z_L = k_r_L + jalpha_L, exp(-alpha_L*D)<<1
+alpha_L = imag(k_z_L);
+
+if exp(-alpha_L*d) < thresh
+    % This propagates the shear wave only
+    rhow2 = rho*w^2;
+    
+    B1 = [2*S^2 , 0;...
+        rhow2*C2^2/k_z_L, 1];
+    
+    b = [C_S, -k_S^2*d_S/(2*rhow2);...
+        -2*rhow2*m_S/k_S^2, C_S];
+    
+    B0 = [1/2/S^2, 0;...
+        rhow2*C2^2/(2*S^2*k_z_L), 1];
+    
+    B = B0*b*B1;
+    return
 end
 
 A21 = -(K*C2*d_S - 2*S*m_L/k_S);
