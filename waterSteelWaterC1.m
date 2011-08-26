@@ -1,6 +1,12 @@
-function [V, W, k_hor, k_vert_L, alpha_L] = waterSteelWaterC1(freq, theta_in, d, thresh)
+function [V, W, k_hor, k_vert_L] = waterSteelWaterC1(freq, theta_in, d, thresh)
 % Modeling a water steel water system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
+
+if ~exist('thresh', 'var')
+    % Threshold for where the algorithm stops propagating longitudenal
+    % waves. Might be different for different thicknesses.
+    thresh = 4.4e-15;
+end
 
 % Define parameters
 nt = length(theta_in);
