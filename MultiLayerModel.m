@@ -25,11 +25,18 @@ classdef MultiLayerModel < handle
                     this.thickness = thickness;
                 
                 case 'aralditesteelwater'
+                    % Reference:
+                    % Cervanka and Challande: A new efficient algorithm to
+                    % compute the exact reflection and transmission factors
+                    % for plane wase in layered absorbing media (liquid and
+                    % solids)
+                    
                     % Araldite (fluid)
                     s = materials.Fluid();
                     s.name = 'araldite';
                     s.density = 2000;
                     s.v = 1800;
+                    s.alpha = 1000;
                     f(1) = s;
                     
                     % Water
@@ -37,6 +44,7 @@ classdef MultiLayerModel < handle
                     s.name = 'water';
                     s.density = 1000;
                     s.v = 1450;
+                    s.alpha = 1;
                     f(2) = s;
                     
                     this.fluid = f;
@@ -46,6 +54,8 @@ classdef MultiLayerModel < handle
                     s.density = 7850;
                     s.v = 5900;
                     s.vShear = 3150;
+                    s.alpha_L = 1000;
+                    s.alpha_S = 1000;
                     this.solid = s;
                     this.thickness = thickness;
             end
