@@ -6,13 +6,11 @@ ff = 100e3:0.5e3:1e6;
 
 % Material props
 solid = materials.MaterialFactory.produce('stainless steel');
-
-c = 1500; % Speed of sound in water
-rho_water = 1000;
-rho_steel = 7850;
+fluidm = materials.MaterialFactory.produce('water');
 d = 12.4e-3;
+model = MultiLayerModel(fluidm, solid, fluidm, d);
 
-[V, W] = waterSteelWaterC1(ff, theta, d);
+[V, W] = fluidSolidFluid(ff, theta, model);
 
 % Plotting
 
@@ -33,8 +31,8 @@ d = 12.4e-3;
 %% Use Brekhovkikh to compare with
 fluid = struct();                       % Define materials
 layer = struct();                       % Define materials
-fluid(1).cp = 1500;                     % Coupling medium, VOS
-fluid(1).rho = 1000;                    % Coupling medium
+fluid(1).cp = fluidm.v;                     % Coupling medium, VOS
+fluid(1).rho = fluidm.density;                    % Coupling medium
 cLayer = 1;
 
 layer(cLayer).cp = solid.v;                % Solid layer, VOS
