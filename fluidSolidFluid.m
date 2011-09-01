@@ -1,4 +1,4 @@
-function [V, W, k_hor, k_vert_L] = waterSteelWaterC1(freq, theta_in, d, thresh)
+function [V, W, k_hor, k_vert_L] = fluidSolidFluid(freq, theta_in, model, thresh)
 % Modeling a water steel water system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
 
@@ -17,13 +17,19 @@ W = zeros(nf, nt);
 k_hor = zeros(nf, nt);
 k_vert_L = zeros(nf, nt);
 
-% Material props
-solid.v = 5348.6;
-solid.vShear = 3158.2;
+% Speed of sounds
+c_front = model.fluid(1).v;
+c_back = model.fluid(2).v;
+vShear = model.solid.vShear;
+vLong = model.solid.v;
 
-c = 1500; % Speed of sound in water
-rho_water = 1000;
-rho_steel = 7850;
+% Densities
+rho_fluidFront = model.fluid(1).density;
+rho_fluidBack = model.fluid(2).density;
+rho_solid = model.solid.density;
+
+% Thickness of plate
+d = model.thickness;
 
 for i = 1:nf
     
@@ -33,11 +39,11 @@ for i = 1:nf
     % Wavenumbers
     
     % Length of wavenumber vector in the steel (S = shear, L = longitudenal)
-    k_S = w/solid.vShear;
-    k_L = w/solid.v;
+    k_S = w/vShear;
+    k_L = w/vLong;
         
     % Length of wavenumber vector in fluid
-    k = w/c;
+    k = w/c_front;
     
     for j = 1:nt
         theta = theta_in(j);
@@ -45,8 +51,8 @@ for i = 1:nf
         K = k*sin(theta);
         k_hor(i, j) = K;
         
-        % Vertical wavenumber in water
-        k_z = k*cos(theta);
+        % Vertical wavenumber in front fluid
+        k_z_front = k*cos(theta);
         
         % Horizontal part of wavenumber in steel
         k_z_S = sqrt(k_S^2 - K^2);
@@ -55,21 +61,22 @@ for i = 1:nf
                 
         % Step 1:
         % Calculate input matrix
-        input = inputMatrix(rho_water, w, k_z);
+        input = inputMatrix(rho_fluidFront, w, k_z_front);
     
         % Step 2:
         % Calculate the matrices related to each layer
         %a = layerMatrix(rho_steel, w, k_z_S, k_z_L, K, k_S, d);
         if theta == 0
             % If angle is zero the shear waves in solid is neglected.
-            B = fluidLayerMatrix(rho_steel, w, k_z_L, d);
+            B = fluidLayerMatrix(rho_solid, w, k_z_L, d);
         else
-            B = fluidSolidFluidLayer(rho_steel, w, k_z_S, k_z_L, K, k_S, d, thresh);
+            B = fluidSolidFluidLayer(rho_solid, w, k_z_S, k_z_L, K, k_S, d, thresh);
         end
 
         % Step 3:
-        % Calculate the output matrix
-        output = outputMatrix(rho_water, w, k_z);
+        % Calculate the output matrix.
+        k_z_back = sqrt((w/c_back)^2 - K^2);
+        output = outputMatrix(rho_fluidBack, w, k_z_back);
         
         % Calculate V and W
         G = output*B*input;
