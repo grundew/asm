@@ -80,11 +80,15 @@ classdef MultiLayerModel < handle
                 end
                 
             elseif nargin == 4
-                this.fluid(1) = varargin{1};
+                
+                f(1) = varargin{1};
+                f(2) = varargin{3};
+                this.fluid = f;
                 this.solid = varargin{2};
-                this.fluid(2) = varargin{3};
                 this.thickness = varargin{4};
+                
             else
+                
                 error('DNV:WrongNumerOfArguments', 'Number of arguments must be either 2 or 3');
             end
             
