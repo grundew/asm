@@ -1,4 +1,4 @@
-function [V, W, k_hor, k_vert_L] = fluidSolidFluid(freq, theta_in, model, thresh)
+function [V, W, k_hor, k_vert_L, debug] = fluidSolidFluid(freq, theta_in, model, thresh)
 % Modeling a water steel water system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
 
@@ -37,7 +37,9 @@ d = model.thickness;
 % alpha_L = 10;
 % alpha_S = 10;
 
-
+debug(nf, nt) = struct('C2', [], 'd_S', [], 'S', [],...
+    'm_L', [], 'k_S', [], 'k_z_S', [],...
+    'K', [], 'S_S', [], 'k_z_L', [], 'S_L', []);
 for i = 1:nf
     
     f = freq(i);
@@ -77,7 +79,7 @@ for i = 1:nf
             % If angle is zero the shear waves in solid is neglected.
             B = fluidLayerMatrix(rho_solid, w, k_z_L, d);
         else
-            B = fluidSolidFluidLayer(rho_solid, w, k_z_S, k_z_L, K, k_S, d, thresh);
+            [B, debug(i, j)] = fluidSolidFluidLayer(rho_solid, w, k_z_S, k_z_L, K, k_S, d, thresh);
         end
         
         % Step 3:
