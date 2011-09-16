@@ -39,7 +39,7 @@ d = model.thickness;
 
 debug(nf, nt) = struct('C2', [], 'd_S', [], 'S', [],...
     'm_L', [], 'k_S', [], 'k_z_S', [],...
-    'K', [], 'S_S', [], 'k_z_L', [], 'S_L', []);
+    'K', [], 'S_S', [], 'k_z_L', [], 'S_L', [], 'B', zeros(2, 2));
 for i = 1:nf
     
     f = freq(i);
