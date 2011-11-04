@@ -29,8 +29,16 @@ function [V, W] =  fluidLayerReflectionCoefficient(f, theta, fluid3, fluid2, flu
 % plot(f, real(V(:, 1))
 % hold all
 % plot(f, real(W(:, 1))
-w = 2*pi*repmat(f(:), 1, length(theta));
-theta = repmat(theta(:).', length(w), 1);
+
+f = f(:);
+theta = theta(:).';
+if numel(theta) > 1
+    w = 2*pi*repmat(f, 1, length(theta));
+end
+
+if numel(f) > 1
+    theta = repmat(theta, length(f), 1);
+end
 rho1 = fluid1.density;
 rho2 = fluid2.density;
 rho3 = fluid3.density;
