@@ -54,6 +54,10 @@ if exp(-alpha_L*d) < thresh
         rhow2*C2^2/(2*S^2*k_z_L), 1];
     
     B = B0*b*B1;
+    debug = struct('C2', C2, 'd_S', d_S, 'S', S,...
+        'm_L', m_L, 'k_S', k_S, 'k_z_S', k_z_S,...
+        'K', K, 'S_S', S_S, 'k_z_L', k_z_L, 'S_L', S_L, ...
+        'B', B);
     return
 end
 
