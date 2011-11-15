@@ -1,8 +1,8 @@
 clear
-fluid = materials.Fluid;
+%fluid = materials.Fluid;
 fluid.v = 1500;
 fluid.density = 1000;
-solid = materials.LinearElastic;
+%solid = materials.LinearElastic;
 solid.v = 5900;
 solid.vShear = 3150;
 solid.density = 7850;

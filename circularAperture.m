@@ -1,9 +1,8 @@
 function [X, kx, ky] = circularAperture(r, verbose)
 
 %% Circular aperture
-%r = 0.06; % Meter
 dx = 0.001; % Meter
-n = 1000;
+n = 1001;
 x = zeros(n, n);
 for i = 0:n-1
     for j = 0:n-1
@@ -55,6 +54,6 @@ if exist('verbose', 'var') && verbose == true
     
     %% Plot the centre line
     figure
-    id = size(X, 2)/2;
+    id = ceil(size(X, 2)/2);
     plot(kx, 20*log10(abs(Xf(id, :))/max(abs(Xf(id, :)))), '.')
 end
