@@ -1,4 +1,4 @@
-function [X, kx, ky] = circularAperture(r, verbose)
+function [X, kx, ky] = circularAperture(r, nfft, verbose)
 
 %% Circular aperture
 dx = 0.001; % Meter
@@ -15,9 +15,8 @@ end
 x = [rot90(x,2) flipud(x); fliplr(x) x];
 
 %% Calculate the FFT and the k-vector
-nfft = 2^12;
 X = fft2(x, nfft, nfft);
-Xf = fftshift(X);
+
 p = -nfft/2:nfft/2-1;
 ky = p*(2*pi/dx/nfft);
 kx = p*(2*pi/dx/nfft);
@@ -55,5 +54,6 @@ if exist('verbose', 'var') && verbose == true
     %% Plot the centre line
     figure
     id = ceil(size(X, 2)/2);
+    Xf = fftshift(X);
     plot(kx, 20*log10(abs(Xf(id, :))/max(abs(Xf(id, :)))), '.')
 end
