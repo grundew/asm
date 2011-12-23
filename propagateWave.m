@@ -12,18 +12,13 @@ if length(x) ~= length(z)
     error('Error:WrongInputDimensions', 'x and z must be equal length');
 end
 
-p = zeros(length(z), length(x));
+p = zeros(size(z));
 q = sin(atan(kx./kz));
-for i = 1:length(z)
-    for j = 1:length(x)
-        % kx = k*q
-        % kz = k*cq
-        % fprintf('%d\t %d\n', z(i), x(j))
-        % Scale Phi. Convert from velocity to pressure spectrum.
-        Phi = 1i*w*rho./(1i*kz).*V;
-        %Phi = k/2/pi*Phi;
-        E = exp(1i*(kx.*x(j) + kz.*z(i)));
-        p(i, j) = trapz(q, Phi.*E);
-    end
+for i = 1:numel(z)
+    % Scale Phi. Convert from velocity to pressure spectrum.
+    Phi = 1i*w*rho./(1i*kz).*V;
+    %Phi = k/2/pi*Phi;
+    E = exp(1i*(kx.*x(i) + kz.*z(i)));
+    p(i) = trapz(q, Phi.*E);
 end
 end
