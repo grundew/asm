@@ -27,7 +27,7 @@ x = 0.001:dx:0.4;
 z = 0.001:dz:h;
 [X, Z] = meshgrid(x, z);
 
-%% Propagate the wave to all points on the x,z grid
+%% Propagate the wave to all points on the x, z grid
 tic();
 p_i = propagateWave(Z, X, w, kx, kz, rho, V);
 p_i = reshape(p_i, size(Z));
@@ -53,11 +53,11 @@ model = MultiLayerModel(fluid, solid, fluid, d);
 [R, T] = fluidSolidFluid(f, asin(q), model);
 
 %% Propagate the reflected wave back
-zb = h+dz:dz:2*h;
-[X, Zb] = meshgrid(x, zb);
+zr = h:dz:2*h-dz;
+[X, Zr] = meshgrid(x, zr);
 tic();
-p_r = propagateReflectedWave(Zb, X, w, kx, kz, rho, V, R);
-p_r = reshape(p_r, size(Zb));
+p_r = propagateReflectedWave(Zr, X, w, kx, kz, rho, V, R);
+p_r = reshape(p_r, size(Zr));
 t1 = toc();
 fprintf('Trapezoidal: %.3fs\n', t1);
 
@@ -82,7 +82,7 @@ figure
 imagesc(xx, z, abs(pr+pi))
 title('Total pressure')
 
-%% Plot the complete wave pressure
+%% Plot the complete pressure
 figure
 hold all
 pt = rot90([fliplr(p_t) p_t], 2);
