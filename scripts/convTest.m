@@ -29,7 +29,11 @@ z = 10e-2;
 d = 12.4e-3;
 a = 3e-3;
 
-wni = WaveNumberIntegration(xo, z, q, a, MultiLayerModel('watersteelwater', d));
+fluid = struct('v', 1450, 'density', 1000);
+solid = struct('v', 5900, 'vShear', 3150, 'density', 7850);
+thickness = 12.4e-3;
+mdl = MultiLayerModel(fluid, solid, fluid, thickness);
+wni = WaveNumberIntegration(xo, z, q, a, MultiLayerModel(fluid, solid, fluid, d));
 [Pr, Pt] = wni.doAll(ff);
 
 %% Plotting & comparing with normal incidence

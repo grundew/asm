@@ -117,7 +117,7 @@ classdef WaveNumberIntegration < handle
             % Output:
             % V: Reflection coefficients
             % W: Transmission coefficients
-            [V, W] = fluidSolidFluid(this.f, this.theta, this.model);
+            [V, W] = fluidSolidFluidReflectionCoefficient(this.f, this.theta, this.model);
         end
         
         function [Pr, Pt] = reflectedPressure(this, Phi, W, V)
