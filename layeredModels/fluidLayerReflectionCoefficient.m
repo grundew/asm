@@ -71,4 +71,9 @@ den = (Z1 + Z2).*(Z2 + Z3).*exp(-1i*2*fi) + (Z1 - Z2).*(Z2 - Z3);
 V = num./den;
 
 W = (1 + V)./(cos(fi) - 1i*Z2.*sin(fi)./Z1);
+
+
+% If f = 0 is present, set V = 0 and T = 1 at f = 0
+V(f==0) = 0;
+W(f==0) = 1;
 end

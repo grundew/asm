@@ -26,6 +26,11 @@ fmax = 1e6;
 id = find(f<fmax & f>fmin);
 ff = f(id);
 
+% Plot the pulse
+plotIR(t, y, false);
+% Plot the fft of the pulse
+plotIR(f, Y, true);
+
 %% Reflection and transimission coefficients: Fluid - solid - fluid model
 qs = 0.001;
 fluid.v = 1500;
@@ -36,28 +41,34 @@ solid.density = 7850;
 d = 12.4e-3;
 model = MultiLayerModel(fluid, solid, fluid, d);
 [Rs, Ts] = fluidSolidFluidReflectionCoefficient(ff, asin(qs), model);
+ax = plotIR(ff, Rs, true);
+plotIR(ff, Ts, true, ax);
+legend(ax(1), 'R_fluid', 'T_fluid')
 
 %% Reflection and transmission coefficients: Fluid - fluid - fluid model
 qf = 0;
-[Rf, Tf] = fluidLayerReflectionCoefficient(ff, asin(qf), fluid, solid, fluid, d);
+[Rf, Tf] = fluidLayerReflectionCoefficient(f, asin(qf), fluid, solid, fluid, d);
 
+plotIR(f, Rf, true, ax);
+plotIR(f, Tf, true, ax);
+legend(ax(1), 'R_fluid', 'T_fluid', 'R_solid', 'T_solid')
 %% Plotting & comparing with normal incidence
-figure
-ax1 = subplot(211);
-ax2 = subplot(212);
-hold(ax1, 'all')
-hold(ax2, 'all')
+[yPulses, ts] = convTimeFreq(y, fs, nfft, Rs, ff, true);
+[yPulsef, tf] = convTimeFreq(y, fs, nfft, Rf, f, true);
 
-yPulse = ifft(Y(id).*Tf, nfft);
-tailPrd = (abs(fft(yPulse(2400:end), nfft)).^2)/nfft;
+axt = plotIR(tf, yPulsef, false);
+plotIR(ts, yPulses, false, axt);
 
-plot(ax1, real(yPulse)/max(real(yPulse(:))))
-plot(ax2, f, tailPrd/max(tailPrd(:)))
-xlim([0 500e3]);
-
-yPulse_norm = ifft(Y(id).*Rf, nfft);
-
-plot(ax1, real(yPulse_norm)./max(real(yPulse_norm(:))))
-tailPrd = (abs(fft(yPulse_norm(2400:end), nfft)).^2)/nfft;
-plot(ax2, f, tailPrd/max(tailPrd(:)))
-legend(ax1, 'Solid layer', 'Fluid layer')
+% yPulse = ifft(Y(id).*Tf, nfft);
+% tailPrd = (abs(fft(yPulse(2400:end), nfft)).^2)/nfft;
+% 
+% plot(ax1, real(yPulse)/max(real(yPulse(:))))
+% plot(ax2, f, tailPrd/max(tailPrd(:)))
+% xlim([0 500e3]);
+% 
+% yPulse_norm = ifft(Y(id).*Rf, nfft);
+% 
+% plot(ax1, real(yPulse_norm)./max(real(yPulse_norm(:))))
+% tailPrd = (abs(fft(yPulse_norm(2400:end), nfft)).^2)/nfft;
+% plot(ax2, f, tailPrd/max(tailPrd(:)))
+% legend(ax1, 'Solid layer', 'Fluid layer')

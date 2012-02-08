@@ -16,7 +16,7 @@ X = fft(x, nfft);
 fx = fftshift((-nfft/2:nfft/2-1)*fs/nfft);
 % Interpolate Y's to where X is sampled
 if (length(fx) ~= length(fy)) || (length(fx) == length(fy) && sum(nnz(fx-fy)) > 0)
-    Yx = interp1(fy, Y, fx, 'cubic', 0);
+    Yx = interp1(fy, Y, fx, 'cubic', 0).';
 else
     Yx = Y;
 end
@@ -28,4 +28,6 @@ t = (0:nfft-1)/fs;
 
 if exist('complex', 'var') && ~complex
     c = real(c);
+end
+
 end
