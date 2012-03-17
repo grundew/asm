@@ -26,7 +26,7 @@ else
 end
 
 % Check if user wants the real/imaginary or abs/phase.
-if ~exist('ir', 'var') || isempty(ir) || ~ir
+if ~exist('ir', 'var') || isempty(ir) || ir
     plot(ax(1), f, real(R))
     plot(ax(2), f, imag(R))
     ylabel(ax(1), 'Real')

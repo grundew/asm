@@ -1,4 +1,4 @@
-function [p, debug] = propagateReflectedWave(z, x, w, kx, kz, rho, V, R)
+function p = propagateReflectedWave(z, x, w, kx, kz, rho, V, R)
 % p = propaGatewave(x, z, w, kx, kz, rho, V)
 %
 % x - x-positions.
@@ -7,6 +7,7 @@ function [p, debug] = propagateReflectedWave(z, x, w, kx, kz, rho, V, R)
 % q - Sine of incoming angle.
 % k - Length of wave number.
 % V - Plane wave velocity spectrum.
+% rho - Density of propagation medium
 
 if length(x) ~= length(z)
     error('Error:WrongInputDimensions', 'x and z must be equal length');

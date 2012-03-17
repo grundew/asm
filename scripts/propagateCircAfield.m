@@ -29,7 +29,7 @@ z = 0.001:dz:h;
 
 %% Propagate the wave to all points on the x, z grid
 tic();
-p_i = propagateWave(Z, X, w, kx, kz, rho, V);
+p_i = propagateWave(X, Z, w, kx, kz, rho, V);
 p_i = reshape(p_i, size(Z));
 t1 = toc();
 fprintf('Trapezoidal: %.3fs\n', t1);
@@ -42,13 +42,13 @@ solid.vShear = 3150;
 solid.density = 7850;
 d = 12.4e-3;
 model = MultiLayerModel(fluid, solid, fluid, d);
-[R, T] = fluidSolidFluid(f, asin(q), model);
+[R, T] = fluidSolidFluidReflectionCoefficient(f, asin(q), model);
 
 %% Propagate the reflected wave back
 zr = fliplr(h:dz:2*h-dz);
 [X, Zr] = meshgrid(x, zr);
 tic();
-p_r = propagateReflectedWave(Zr, X, w, kx, kz, rho, V, R);
+p_r = propagateReflectedWave(X, Zr, w, kx, kz, rho, V, R);
 p_r = reshape(p_r, size(Zr));
 t1 = toc();
 fprintf('Trapezoidal: %.3fs\n', t1);
@@ -57,7 +57,7 @@ fprintf('Trapezoidal: %.3fs\n', t1);
 zt = h:dz:2*h+d;
 [Xt, Zt] = meshgrid(x, zt);
 tic();
-p_t = propagateReflectedWave(Zt, Xt, w, kx, kz, rho, V, T);
+p_t = propagateReflectedWave(Xt, Zt, w, kx, kz, rho, V, T);
 p_t = reshape(p_t, size(Zt));
 t1 = toc();
 fprintf('Trapezoidal: %.3fs\n', t1);

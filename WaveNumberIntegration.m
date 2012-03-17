@@ -136,7 +136,6 @@ classdef WaveNumberIntegration < handle
             % Phi: Incoming pressure
             % W: Transmission coefficient
             % V: Reflection coeficcient
-            
             z = this.z;
             xo = this.xo;
             cR = this.model.fluid(1).v;

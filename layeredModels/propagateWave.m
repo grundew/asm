@@ -1,4 +1,4 @@
-function [p, debug] = propagateWave(z, x, w, kx, kz, rho, V)
+function [p, debug] = propagateWave(x, z, w, kx, kz, rho, V)
 % p = propaGatewave(x, z, w, kx, kz, rho, V)
 %
 % x - x-positions.

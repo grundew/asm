@@ -1,4 +1,4 @@
-function [V, W] =  fluidLayerReflectionCoefficient(f, theta, fluid3, fluid2, fluid1, d)
+function [V, W, debug] =  fluidLayerReflectionCoefficient(f, theta, fluid3, fluid2, fluid1, d)
 % Calculates the reflection and transmission coefficient for a fluid layer
 % embedded in a fluid (same fluid on each side of the fluid layer).
 %
