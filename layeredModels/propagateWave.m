@@ -1,9 +1,9 @@
-function [p, debug] = propagateWave(x, z, w, kx, kz, rho, V)
+function p = propagateWave(x, z, f, q, kx, kz, rho, V)
 % p = propaGatewave(x, z, w, kx, kz, rho, V)
 %
 % x - x-positions.
 % z - z-positions, acoustical axis.
-% w - Angular frequency.
+% f - Angular frequency.
 % q - Sine of incoming angle.
 % k - Length of wave number.
 % V - Plane wave velocity spectrum.
@@ -11,14 +11,17 @@ function [p, debug] = propagateWave(x, z, w, kx, kz, rho, V)
 if length(x) ~= length(z)
     error('Error:WrongInputDimensions', 'x and z must be equal length');
 end
+W = repmat(2*pi*f, length(q), 1);
+p = zeros([size(z), length(f)]);
 
-p = zeros(size(z));
-q = sin(atan(kx./kz));
-for i = 1:numel(z)
-    % Scale Phi. Convert from velocity to pressure spectrum.
-    Phi = 1i*w*rho./(1i*kz).*V;
-    %Phi = k/2/pi*Phi;
-    E = exp(1i*(kx.*x(i) + kz.*z(i)));
-    p(i) = trapz(q, Phi.*E);
+% Scale Phi. Convert from velocity to pressure spectrum.
+Phi = 1i*rho*W./(1i*kz).*V;
+%Phi = k/2/pi*Phi;
+for i = 1:size(z, 1)
+    for j = 1:size(z, 2)
+        E = exp(1i*(kx.*x(i, j) + kz.*z(i, j)));
+        p(i, j, :) = trapz(q, Phi.*E, 1);
+    end
 end
+
 end

@@ -1,4 +1,4 @@
-function [B, debug] = fluidSolidFluidLayerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d, thresh)
+function B = fluidSolidFluidLayerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d, thresh)
 % Function for calculating the solid layer matrix.
 %
 % B = fluidSolidFluidLayer(rho, w, k_z_S, k_z_L, K, d, mu)
@@ -54,10 +54,6 @@ if exp(-alpha_L*d) < thresh
         rhow2*C2^2/(2*S^2*k_z_L), 1];
     
     B = B0*b*B1;
-    debug = struct('C2', C2, 'd_S', d_S, 'S', S,...
-        'm_L', m_L, 'k_S', k_S, 'k_z_S', k_z_S,...
-        'K', K, 'S_S', S_S, 'k_z_L', k_z_L, 'S_L', S_L, ...
-        'B', B);
     return
 end
 
@@ -77,9 +73,4 @@ B(1, 1) = A22 - A21*A42/A41;
 B(1, 2) = A23 - A21*A43/A41;
 B(2, 1) = A32 - A31*A42/A41;
 B(2, 2) = A33 - A31*A43/A41;
-
-debug = struct('C2', C2, 'd_S', d_S, 'S', S,...
-    'm_L', m_L, 'k_S', k_S, 'k_z_S', k_z_S,...
-    'K', K, 'S_S', S_S, 'k_z_L', k_z_L, 'S_L', S_L, ...
-    'B', B);
 end

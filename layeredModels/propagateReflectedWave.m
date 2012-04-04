@@ -1,4 +1,4 @@
-function p = propagateReflectedWave(z, x, w, kx, kz, rho, V, R)
+function p = propagateReflectedWave(x, z, f, q, kx, kz, rho, V, R)
 % p = propaGatewave(x, z, w, kx, kz, rho, V)
 %
 % x - x-positions.
@@ -8,18 +8,22 @@ function p = propagateReflectedWave(z, x, w, kx, kz, rho, V, R)
 % k - Length of wave number.
 % V - Plane wave velocity spectrum.
 % rho - Density of propagation medium
-
+%
+% TODO: Handle q = -1 and 1 (Phi goes now to inf)
 if length(x) ~= length(z)
     error('Error:WrongInputDimensions', 'x and z must be equal length');
 end
+W = repmat(2*pi*f, length(q), 1);
+p = zeros([size(z), length(f)]);
 
-p = zeros(size(z));
-q = sin(atan(kx./kz));
-for i = 1:numel(z)
-    % Scale Phi. Convert from velocity to pressure spectrum.
-    Phi = 1i*w*rho./(1i*kz).*V;
-    %Phi = k/2/pi*Phi;
-    E = exp(1i*(kx.*x(i) + kz.*z(i)));
-    p(i) = trapz(q, R.*Phi.*E);
+% Scale Phi. Convert from velocity to pressure spectrum.
+Phi = 1i*rho*W./(1i*kz).*V;
+%Phi = k/2/pi*Phi;
+for i = 1:size(z, 1)
+    for j = 1:size(z, 2)
+        E = exp(1i*(kx.*x(i, j) + kz.*z(i, j)));
+        p(i, j, :) = trapz(q, R.*Phi.*E, 1);
+    end
 end
+
 end
