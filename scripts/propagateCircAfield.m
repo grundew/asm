@@ -6,14 +6,14 @@ nfft = 2^12;
 c = 1500;
 rho = 1000;
 %f = [1000e3, 1500e3];
-f = 1000e3;
+f = 100e3;
 w = 2*pi*f;
 
 % Distance to reflector
 h = 10e-2;
 
 % q is sine theta
-q = linspace(-0.7, 0.7, nfft)';
+q = linspace(-0.99, 0.99, nfft)';
 qq = repmat(q, 1, length(f));
 k = repmat(w/c, length(q), 1);
 kx = k.*qq;
@@ -21,6 +21,7 @@ kz = k.*sqrt(1-qq.^2);
 
 %% Circular aperture
 V = angularPlaneWaveSpectrumPiston(r, c, q, f);
+V = V/max(V);
 
 %% Discretization of x, z
 dx = 0.001;
@@ -39,10 +40,11 @@ fprintf('Trapezoidal: %.3fs\n', t1);
 xx = [-fliplr(x), x];
 for i = 1:size(p_i, 3)
     figure
-    title(sprintf('Incoming pressure. f = %d', f(i)))
     pi = [fliplr(p_i(:, :, i)), p_i(:, :, i)];
     imagesc(xx, z, abs(pi))
     clim = caxis();
+    title(sprintf('Incoming pressure. f = %d', f(i)))
+    axis xy
 end
 
 %% Reflection coefficient
@@ -70,9 +72,9 @@ fprintf('Trapezoidal: %.3fs\n', t1);
 for i = 1:size(p_r, 3)
     pr = [fliplr(p_r(:, :, i)) p_r(:, :, i)];
     figure;
-    imagesc(xx, z, abs(pr));
-    title(sprintf('Reflected pressure. f = %d', f(i)));
+    imagesc(xx, z, db(abs(pr)));
     caxis(clim);
+    title(sprintf('Reflected pressure. f = %d', f(i)));
 end
 
 %% Propagate the transmitted wave
@@ -85,7 +87,7 @@ fprintf('Trapezoidal: %.3fs\n', t1);
 
 %% Plot total reflected pressure
 figure
-imagesc(xx, z, abs(pr+pi))
+imagesc(xx, z, db(abs(pr+pi)))
 title('Total pressure')
 
 %% Plot the complete pressure
@@ -95,16 +97,17 @@ pt = [fliplr(p_t) p_t];
 
 [XX, ZZ] = meshgrid([-fliplr(x) x], z);
 [XXt, ZZt] = meshgrid([-fliplr(x) x], zt+d);
-mesh(XX, ZZ, zeros(size(ZZ)), 10*log10(abs(pi+pr)))
-mesh(XXt, ZZt, zeros(size(ZZt)), 10*log10(abs(pt)))
+mesh(XX, ZZ, zeros(size(ZZ)), db(abs(pi+pr)))
+mesh(XXt, ZZt, zeros(size(ZZt)), db(abs(pt)))
+title('Total pressure and transmitted pressure')
 
 %% Plot the reflected and transmitted pressure
 figure
 hold all
-title('Reflected and transmitted pressure')
 pt = [fliplr(p_t) p_t];
 
 [XX, ZZ] = meshgrid([-fliplr(x) x], z);
 [XXt, ZZt] = meshgrid([-fliplr(x) x], zt+d);
 mesh(XX, ZZ, zeros(size(ZZ)), 10*log10(abs(pr)))
 mesh(XXt, ZZt, zeros(size(ZZt)), 10*log10(abs(pt)))
+title('Reflected and transmitted pressure')

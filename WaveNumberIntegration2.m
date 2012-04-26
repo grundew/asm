@@ -69,26 +69,30 @@ classdef WaveNumberIntegration2 < handle
         function P = calculateReflectedPressure(this, x, z, R)
             % Calculates the pressure in each pair of points {x(i), z(i)} in frequency domain.
             % z is the distance from the top of the plate.
+            % 
+            % Input:
+            % x - x-positions
+            % z - z-positions
+            % R - (Optional) Either a reflection coefficient (default) or a
+            %     transmission coefficient.
             if nargin == 3
                 R = this.R;
             end
-            % Angular frequency
-            w = 2*pi*this.f();
-            nf = length(w);
-            
+            % Frequency
+            f = this.f();
+                        
             rho = this.model.fluid(1).density;
             Kx = this.kx;
             Kz = this.kz;
             
+            q = this.q;
+            
+            V = this.Phi;
             % Add the distance from the transducer (TX) to the z position
             % to take into account the propagation from TX to target.
             z = this.h + z;
-            P = zeros(numel(x), numel(z), nf);
-            for i = 1:nf
-                V = this.Phi(:, i);
-                RR = R(:, i);
-                P(:, :, i) = propagateReflectedWave(x, z, w(i), Kx(:, i), Kz(:, i), rho, V, RR);
-            end
+            
+            P = propagateReflectedWave(x, z, f, q, Kx, Kz, rho, V, R);
         end
         
         function P = calculateTransmittedPressure(this, x, z)
@@ -143,7 +147,7 @@ classdef WaveNumberIntegration2 < handle
             % Returns a matrix of vertical wave numbers in the front
             % fluid
             w = 2*pi*this.f;
-            cq = (1 - this.q(:).^2);
+            cq = sqrt((1 - this.q(:).^2));
             nq = length(cq);
             nf = length(w);
             
@@ -158,13 +162,16 @@ classdef WaveNumberIntegration2 < handle
             % is true. Otherwise returns the variable T_.
             
             if this.updatePhi
+                a = this.a;
+                c = this.model.fluid(1).v;
                 f = this.f;
+                q = this.q;
                 nf = length(f);
                 Phi = zeros(this.nq, nf);
                 Kx = this.kx;
                 for i = 1:nf
                     kx = Kx(:, i);
-                    Phi(:, i) = angularPlaneWaveSpectrumPiston(this.a, kx);
+                    Phi(:, i) = angularPlaneWaveSpectrumPiston(a, c, q, f);
                     this.Phi_ = Phi;
                     this.updatePhi = false;
                 end
@@ -226,7 +233,7 @@ classdef WaveNumberIntegration2 < handle
         
         function val = get.q(this)
             % Get's the sine of angle of the plane waves
-            val = linspace(-1, 1, this.nq);
+            val = linspace(-0.99, 0.99, this.nq);
         end
         
         function set.f(this, val)
