@@ -19,10 +19,6 @@ b = fir1(n, wn);
 y = filtfilt(b, 1, y);
 
 %% TODO
-% Use FIR-filtert to remove the DC-component, bandpass.
-% Increase infft
-% Check frequency vector
-
 nfft = 2^18;
 f = fftshift((-nfft/2:nfft/2-1)*fs/nfft);
 Y = fft(y, nfft);
