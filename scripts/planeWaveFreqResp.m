@@ -9,21 +9,20 @@ f1 = 600e3;
 
 alpha = (f1-f0)/tend;
 wndw = hann(length(t));
-%y = wndw.*1j.*exp(1j*2*pi*alpha*t.^2/2);
+% y = wndw.*exp(-1j*2*pi*alpha*t.^2/2);
 y = chirp(t, f0, t(end), f1, 'linear', 270);
 
 % Filter to remove the DC-component
-n = 100;
-wn = [10e3, 1000e3]./fs/2;
-b = fir1(n, wn);
-y = filtfilt(b, 1, y);
+% n = 100;
+% wn = [10e3, 1000e3]./fs/2;
+% b = fir1(n, wn);
+% y = filtfilt(b, 1, y);
 
-%% TODO
 nfft = 2^18;
 f = fftshift((-nfft/2:nfft/2-1)*fs/nfft);
-Y = fft(y, nfft);
+Y = ifft(y, nfft);
 
-plotIR(t, y);
+% plotIR(t, y);
 
 %% Fluid-fluid-fluid model
 fluid1 = struct('v', 1500, 'density', 1000);
@@ -44,10 +43,10 @@ plotyy(f, abs(Y), f, abs(V));
 legend('Reflection', 'FFT(pulse)')
 
 %% Convolve the pulse and the reflection coefficient
-infft = length(t);
-x = ifft(Y.*V, infft);
-plotIR(t, x, true);
+x = real(fft(Y.*V, nfft));
+tx = (0:nfft-1)/fs;
+plotIR(tx, x, true);
 
 %% Impulse response of the reflection coefficient
-v = ifft(V, nfft);
+v = fft(V, nfft);
 ax = plotIR(0:length(v)-1, v);

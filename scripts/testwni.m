@@ -1,7 +1,7 @@
 a = 12e-3;
 h = 10e-2;
-fluid.v = 350;
-fluid.density = 1.6;
+fluid.v = 1500;
+fluid.density = 1000;
 solid.v = 5900;
 solid.vShear = 3150;
 solid.density = 7850;
@@ -50,15 +50,15 @@ title('Reflected and transmitted pressure')
 %% Test time signal
 % Chirp pulse
 fs = 50e6;
-nfft = 2^8;
+nfft = 2^10;
 tend = 50e-6;
-t = (0:1/fs:tend)';
+ty = (0:1/fs:tend)';
 f0 = 50e3;
 f1 = 600e3;
 
 alpha = (f1-f0)/tend;
-wndw = hann(length(t));
-y = wndw.*1j.*exp(1j*2*pi*alpha*t.^2/2);
+wndw = hann(length(ty));
+y = wndw.*exp(-1j*2*pi*alpha*ty.^2/2);
 %y = chirp(t, f0, t(end), f1, 'linear', 270);
 
 % Filter to remove the DC-component
@@ -69,14 +69,15 @@ y = wndw.*1j.*exp(1j*2*pi*alpha*t.^2/2);
 
 %% Plot pulse
 figure
-plot(t, y)
+plot(ty, y)
 
 %% Calculate time signal
-wni = WaveNumberIntegration2(a, h, [], model, nq);
+q = 0;
+wni = WaveNumberIntegration2(a, h, [], model, nq, q);
 
-nx = 10;
-[x, t] = calculateReflectedPressureRx(wni, a, d, nx, y, t, nfft);
+nx = 1;
+[x, tx, debug] = calculateReflectedPressureRx(wni, a, nx, y, ty, nfft);
 
 %% Plot the time signal
 figure
-plot(t, x)
+plot(tx, x)

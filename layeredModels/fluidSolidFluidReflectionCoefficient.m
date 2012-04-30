@@ -11,19 +11,12 @@ end
 % Define parameters
 nt = length(theta_in);
 nf = length(freq);
-% V = zeros(nf, nt);
-% W = zeros(nf, nt);
 
 V = zeros(nt, nf);
 W = zeros(nt, nf);
 
-
 k_hor = zeros(nt, nf);
 k_vert_L = zeros(nt, nf);
-
-% k_hor = zeros(nf, nt);
-% k_vert_L = zeros(nf, nt);
-
 
 % Speed of sounds
 c_front = model.fluid(1).v;
@@ -50,6 +43,11 @@ for i = 1:nf
     f = freq(i);
     w = 2*pi*f;
     
+    %     if f == 0
+    %         V(:, i) = ones(nt, 1);
+    %         W(:, i) = zeros(nt, 1);
+    %         continue
+    %     end
     % Wavenumbers
     
     % Length of wavenumber vector in the steel (S = shear, L = longitudenal)
@@ -99,4 +97,9 @@ for i = 1:nf
         W(j, i) = G(1, 1) - G(1, 2)*G(2, 1)/G(2, 2);
     end
     
+end
+
+fzero = freq==0;
+V(:, fzero) = ones(nt, nnz(fzero));
+W(:, fzero) = zeros(nt, nnz(fzero));
 end
