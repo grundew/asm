@@ -73,7 +73,7 @@ plot(ty, y)
 
 %% Calculate time signal
 q = 0;
-wni = WaveNumberIntegration2(a, h, [], model, nq, q);
+wni = WaveNumberIntegration2(a, h, [], model, nq);
 
 nx = 1;
 [x, tx, debug] = calculateReflectedPressureRx(wni, a, nx, y, ty, nfft);

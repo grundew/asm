@@ -1,4 +1,4 @@
-function [V, W, k_hor, k_vert_L] = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
+function [V, W, KK, thetal, thetas, KL, KS, k_vert_L, k_vert_S] = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
 % Modeling a water steel water system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
 
@@ -17,6 +17,7 @@ W = zeros(nt, nf);
 
 k_hor = zeros(nt, nf);
 k_vert_L = zeros(nt, nf);
+k_vert_S = zeros(nt, nf);
 
 % Speed of sounds
 c_front = model.fluid(1).v;
@@ -31,6 +32,13 @@ rho_solid = model.solid.density;
 
 % Thickness of plate
 d = model.thickness;
+
+% Wave numbers to output
+thetal = zeros(nf, nt);
+thetas = zeros(nf, nt);
+
+KL = zeros(nf, 1);
+KS = zeros(nf, 1);
 
 % Absorbsion
 % alpha_front = 1000;
@@ -51,8 +59,8 @@ for i = 1:nf
     % Wavenumbers
     
     % Length of wavenumber vector in the steel (S = shear, L = longitudenal)
-    k_S = w/vShear;
-    k_L = w/vLong;
+    k_S = w/vShear;KS(i) = k_S;
+    k_L = w/vLong;KL(i) = k_L;
         
     % Length of wavenumber vector in fluids
     k_front = w/c_front;
@@ -69,8 +77,15 @@ for i = 1:nf
         % Horizontal part of wavenumber in steel
         k_z_S = sqrt(k_S^2 - K^2);
         k_z_L = sqrt(k_L^2 - K^2);
+        % k_z_S = k_S*asin(K/k_L);
+        % k_z_L = k_L*asin(K/k_L);
+
         k_vert_L(j, i) = k_z_L;
-                
+        k_vert_S(j, i) = k_z_S;
+        % Debug variables
+        thetal(i, j) = asin(K/k_L);
+        thetas(i, j) = asin(K/k_S);
+        
         % Step 1:
         % Calculate input matrix
         input = inputMatrix(rho_fluidFront, w, k_z_front);
@@ -87,7 +102,7 @@ for i = 1:nf
         
         % Step 3:
         % Calculate the output matrix.
-        k_z_back = sqrt(k_back^2 - K^2);
+        k_z_back = k_back*cos(theta_in);
         output = outputMatrix(rho_fluidBack, w, k_z_back);
         
         % Calculate V and W
@@ -99,7 +114,9 @@ for i = 1:nf
     
 end
 
+KK = k_hor;
+
 fzero = freq==0;
-V(:, fzero) = ones(nt, nnz(fzero));
-W(:, fzero) = zeros(nt, nnz(fzero));
+V(:, fzero) = zeros(nt, nnz(fzero));
+W(:, fzero) = ones(nt, nnz(fzero)) + 1i*zeros(nt, nnz(fzero));
 end
