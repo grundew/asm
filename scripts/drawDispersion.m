@@ -1,15 +1,16 @@
 function drawDispersion()
 
 nt = 100;
-thetamax = 0.5;
+thetamax = 0.25;
 theta = linspace(0, thetamax, nt);
 d = 10e-3;
 
 nf = 3000;
 v = 5850;
-vs = v.*linspace(0.45, 0.75, 5);
+% vs = v.*linspace(0.45, 0.75, 5);
+vs = 3100;
 fres = v/d/2;
-f =  linspace(0, 2.5*fres, nf);
+f =  linspace(0.9*fres, 1.05*fres, nf);
 
 for vShear = vs
     % Calculate the reflection coefficient for all f and theta
@@ -28,10 +29,12 @@ layer = struct('v', v, 'density', 7850, 'vShear', vShear);
 % Fluid-solid-fluid model
 model = MultiLayerModel(fluid1, layer, fluid3, d);
 % Calculate V
-[R, N1, N2, M1, M2] = analyticRT(f, theta, model); %#ok<ASGLU>
+[R, N1, N2, M1, M2, alpha_L, alpha_S] = analyticRT(f, theta, model); %#ok<ASGLU>
 % Save calculated parameters
-outfn = sprintf('data_%2.2f.mat', v/vShear);
-save(outfn, 'f', 'theta', 'vShear', 'R', 'N1', 'N2', 'M1', 'M2'); 
+outfn = fullfile('/Users/grundew/Dropbox/phd_hive/work/DispersionCurves',...
+    sprintf('data_%2.2f.mat', v/vShear));
+save(outfn, 'f', 'theta', 'vShear',...
+    'R', 'N1', 'N2', 'M1', 'M2', 'alpha_L', 'alpha_S'); 
 end
 
 function plotdisp(x, y, V, clcp)

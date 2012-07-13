@@ -1,4 +1,4 @@
-function [R, T, N1, N2, M1, M2] = analyticRT(freq, theta, model)
+function [R, T, N1, N2, M1, M2, alpha_L, alpha_S] = analyticRT(freq, theta, model)
 
 % L is half the thickness
 L = 0.5*model.thickness;
@@ -17,7 +17,8 @@ N1 = zeros(nf, nt);
 N2 = zeros(nf, nt);
 M1 = zeros(nf, nt);
 M2 = zeros(nf, nt);
-
+alpha_L = zeros(nf, nt);
+alpha_S = zeros(nf, nt);
 for i = 1:length(freq);
     % Frequency
     f = freq(i);
@@ -25,9 +26,7 @@ for i = 1:length(freq);
     h = 2*pi*f/c_L;
     % Wave vector shear
     k = 2*pi*f/c_S;
-    % Debug variables
-    kL(i) = h;
-    kS(i) = k;
+
     for j = 1:length(theta)
         theta_f = theta(j);
         K = 2*pi*f/c_f*sin(theta_f);
@@ -44,7 +43,12 @@ for i = 1:length(freq);
         M1(i, j) = a./(rho_f*c_f*cos(theta_L)*tan(2*h*L*cos(theta_L)));
         M2(i, j) = b./(rho_f*c_f*cos(theta_S)*tan(2*k*L*cos(theta_S)));
         M = M1(i, j) + M2(i, j);
-
+        
+        % Debug parameters
+        alpha_L(i, j) = h*L*cos(theta_L);
+        alpha_S(i, j) = k*L*cos(theta_S);
+        
+        % Calculate reflection and transmission coefficients
         T(i, j) = 2*N./(2*M + 1i*(M.^2 - N.^2 - 1));
         R(i, j) = 1i*(M.^2 - N.^2 + 1)./(2*M + 1i*(M.^2 - N.^2 - 1));
     end
