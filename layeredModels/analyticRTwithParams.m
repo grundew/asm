@@ -92,8 +92,17 @@ term3 = bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
     cos(theta_S)/cos(theta_L));
 plotit(term3), axis('xy'), colormap('jet'), colorbar
 
+% Plot the sum and difference of alpha_X square
+% Can drop the sum
+figure
+alphasum = (alpha_L + alpha_S);
+alphadiff = (alpha_L - alpha_S);
+subplot(311),plotit(cos(alphasum).^2-1),colorbar,axis xy
+subplot(312),plotit(cos(alphadiff).^2-1),colorbar,axis xy
+subplot(313),plotit(cos(alphadiff).^2+cos(alphadiff).^2-1),colorbar,axis xy
+
 % All of it
-all = bsxfun(@(x, y) x.*y, term1 + term2 + term3, DS.^2);
+all = bsxfun(@(x, y) x.*y, term1 + term2 - term3, DS.^2);
 plotit(db(all)), axis('xy'), colormap('jet'), colorbar
 
 %% Do it the other way
