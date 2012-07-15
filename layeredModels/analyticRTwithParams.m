@@ -93,7 +93,7 @@ term3 = bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
 plotit(term3), axis('xy'), colormap('jet'), colorbar
 
 % Plot the sum and difference of alpha_X square
-% Can drop the sum
+% Can drop the sum?
 figure
 alphasum = (alpha_L + alpha_S);
 alphadiff = (alpha_L - alpha_S);
