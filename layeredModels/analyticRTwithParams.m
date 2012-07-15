@@ -84,13 +84,21 @@ plotit(term1), axis('xy'), colormap('jet'), colorbar
 % Looks like term 2 is frequency independent
 figure
 term2 = ES.^2.*sin(2*alpha_S).^2;
-plotit(ES.^2.*sin(2*alpha_S).^2), axis('xy'), colormap('jet') , colorbar
+plotit(term2), axis('xy'), colormap('jet'), colorbar
 % Plot term 3
 figure
-term3 = bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
+term3 = -bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
     EL.*ES.*(cos(2.*alpha_L).*cos(2.*alpha_S) - 1),...
     cos(theta_S)/cos(theta_L));
 plotit(term3), axis('xy'), colormap('jet'), colorbar
+
+
+term3a = -bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
+    EL.*ES.*(cos(alpha_L+alpha_S).^2), cos(theta_S)/cos(theta_L));
+term3b = -bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
+    EL.*ES.*(cos(alpha_L-alpha_S).^2), cos(theta_S)/cos(theta_L));
+term3c = bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
+    EL.*ES, cos(theta_S)/cos(theta_L));
 
 % Plot the sum and difference of alpha_X square
 % Can drop the sum?
@@ -104,6 +112,10 @@ subplot(313),plotit(cos(alphadiff).^2+cos(alphadiff).^2-1),colorbar,axis xy
 % All of it
 all = bsxfun(@(x, y) x.*y, term1 + term2 - term3, DS.^2);
 plotit(db(all)), axis('xy'), colormap('jet'), colorbar
+
+% Check for term1, term2 and term3
+Rcheck = 1i*(term1 + term2 + term3 + 1)./(2*M + 1i*(M.^2 - N.^2 - 1));
+disp(nnz(R-Rcheck))
 
 %% Do it the other way
 % Fluid-solid-fluid model
