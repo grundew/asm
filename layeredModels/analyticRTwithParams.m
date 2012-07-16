@@ -75,50 +75,46 @@ plotit = @(z) imagesc(x, theta_F, abs(z).');
 % Plot reflection coefficient
 figure
 plotit(R), axis xy, colormap gray
-% Plot term 1
-% Looks like term 1 is frequency independent
-figure
-term1 = bsxfun(@(x, y) x.*y, A.^2.*EL.^2, sin(2*alpha_L).^2);
-plotit(term1), axis('xy'), colormap('jet'), colorbar
-% Plot term 2
-% Looks like term 2 is frequency independent
-figure
-term2 = ES.^2.*sin(2*alpha_S).^2;
-plotit(term2), axis('xy'), colormap('jet'), colorbar
-% Plot term 3
-figure
-term3 = -bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
-    EL.*ES.*(cos(2.*alpha_L).*cos(2.*alpha_S) - 1),...
-    cos(theta_S)/cos(theta_L));
-plotit(term3), axis('xy'), colormap('jet'), colorbar
-
-
-term3a = -bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
-    EL.*ES.*(cos(alpha_L+alpha_S).^2), cos(theta_S)/cos(theta_L));
-term3b = -bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
-    EL.*ES.*(cos(alpha_L-alpha_S).^2), cos(theta_S)/cos(theta_L));
-term3c = bsxfun(@(x, y) 2.*c_L./c_S.*x.*y,...
-    EL.*ES, cos(theta_S)/cos(theta_L));
 
 % Plot the sum and difference of alpha_X square
 % Can drop the sum?
 figure
 alphasum = (alpha_L + alpha_S);
 alphadiff = (alpha_L - alpha_S);
-subplot(311),plotit(cos(alphasum).^2-1),colorbar,axis xy
-subplot(312),plotit(cos(alphadiff).^2-1),colorbar,axis xy
-subplot(313),plotit(cos(alphadiff).^2+cos(alphadiff).^2-1),colorbar,axis xy
+subplot(311),plotit(1 - cos(alphasum).^2),colorbar,axis xy,title('1 - cos(alpha_L + alpha_S).^2')
+subplot(312),plotit(1 - cos(alphadiff).^2),colorbar,axis xy,title('1 - cos(alpha_L - alpha_S).^2')
+subplot(313),plotit(1 - cos(alphadiff).^2 - cos(alphadiff).^2),colorbar,axis xy,title('1-alphasum-alphadiff')
 
-% All of it
-all = bsxfun(@(x, y) x.*y, term1 + term2 - term3, DS.^2);
-plotit(db(all)), axis('xy'), colormap('jet'), colorbar
+%% Calculate the three terms in the numerator of R
+% Scalars
+AL = rho_S*c_L/rho_F/c_F;
+AS = rho_S*c_S/rho_F/c_F;
+% Theta dependent
+BL = cos(theta_F)./cos(theta_L);
+BS = cos(theta_F)./cos(theta_S);
+% Frequency dependent
+DL = bsxfun(@rdivide, cos(2*theta_S).^2, sin(2*alpha_L));
+DS = bsxfun(@rdivide, sin(2*theta_S).^2, sin(2*alpha_S));
 
-% Check for term1, term2 and term3
-Rcheck = 1i*(term1 + term2 + term3 + 1)./(2*M + 1i*(M.^2 - N.^2 - 1));
-disp(nnz(R-Rcheck))
+% Gather terms. M^2 - N^2 + 1 = -term1 - term2 - term3 +1; 
+term1 = AL^2*bsxfun(@times, DL.*sin(2*alpha_L), BL).^2;
+term2 = AS^2*bsxfun(@times, DS.*sin(2*alpha_S), BS).^2;
+term3 = 2*AL*AS*bsxfun(@times,...
+    DL.*DS.*(1 - cos(2*alpha_L).*cos(2*alpha_S)),...
+    BL.*BS);
 
-%% Do it the other way
-% Fluid-solid-fluid model
-% model = MultiLayerModel(fluid1, layer, fluid3, d);
-% Calculate V
-% [V, NN1, NN2, MM1, MM2, alpha_L2, alpha_S2] = analyticRT(f, theta_F, model);
+% Check the result. Seems correct now to within 1e-9
+Rcheck = 1i*(-term1 - term2 - term3 + 1)./(2*M + 1i*(M.^2 - N.^2 - 1));
+% Plot the new reflection coefficient to check
+figure
+plotit(Rcheck), axis xy, colormap gray,title('Reflection coefficient check')
+
+% Plot the three terms
+figure
+plotit(term1), axis xy, title term1
+figure
+plotit(term2), axis xy, title term2
+figure
+plotit(term3), axis xy, title term3
+
+
