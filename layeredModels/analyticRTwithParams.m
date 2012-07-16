@@ -70,11 +70,11 @@ R(f==0, :) = zeros(nnz(f==0), length(theta_F));
 
 %% Plot the parameters
 x = f/fres;
-plotit = @(z) imagesc(x, theta_F, abs(z).');
+plotit = @(z) imagesc(x, theta_F, z.');
 
 % Plot reflection coefficient
 figure
-plotit(R), axis xy, colormap gray
+plotit(abs(R)), axis xy, colormap gray
 
 % Plot the sum and difference of alpha_X square
 % Can drop the sum?
@@ -107,7 +107,7 @@ term3 = 2*AL*AS*bsxfun(@times,...
 Rcheck = 1i*(-term1 - term2 - term3 + 1)./(2*M + 1i*(M.^2 - N.^2 - 1));
 % Plot the new reflection coefficient to check
 figure
-plotit(Rcheck), axis xy, colormap gray,title('Reflection coefficient check')
+plotit(abs(Rcheck)), axis xy, colormap gray,title('Reflection coefficient check')
 
 % Plot the three terms
 figure
@@ -117,4 +117,15 @@ plotit(term2), axis xy, title term2
 figure
 plotit(term3), axis xy, title term3
 
+%% Approximate BL^2 to 1? Yes.
+figure
+plot(theta_F, BL.^2-ones(size(theta_F)))
 
+%% Approximate BS^2 to 1? Yes.
+figure
+plot(theta_F, BS.^2-ones(size(theta_S)))
+
+% Plot stuff at resonance
+idfres = find(f>fres, 1, 'first');
+>> figure,plot(theta_F, cos(alpha_L(idfres,:)-alpha_S(idfres, :)).^2)
+>> figure,plot(theta_F, cos(alpha_L(idfres,:)+alpha_S(idfres, :)).^2)
