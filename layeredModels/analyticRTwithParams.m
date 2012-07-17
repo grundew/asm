@@ -127,5 +127,5 @@ plot(theta_F, BS.^2-ones(size(theta_S)))
 
 % Plot stuff at resonance
 idfres = find(f>fres, 1, 'first');
->> figure,plot(theta_F, cos(alpha_L(idfres,:)-alpha_S(idfres, :)).^2)
->> figure,plot(theta_F, cos(alpha_L(idfres,:)+alpha_S(idfres, :)).^2)
+figure,plot(theta_F, cos(alpha_L(idfres,:)-alpha_S(idfres, :)).^2)
+figure,plot(theta_F, cos(alpha_L(idfres,:)+alpha_S(idfres, :)).^2)
