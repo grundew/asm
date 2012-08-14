@@ -30,6 +30,10 @@ c_F = model.fluid.v;
 theta_L = asin(c_L/c_F*sin(theta_F));
 theta_S = asin(c_S/c_F*sin(theta_F));
 
+% Critical angles
+theta_CL = asin(c_F/c_L);
+theta_CS = asin(c_F/c_S);
+
 % Calculate wave vectors in the solid, total and vertical
 % Total (angle independent)
 h = 2*pi*f./c_L;
@@ -70,7 +74,8 @@ R(f==0, :) = zeros(nnz(f==0), length(theta_F));
 
 %% Plot the parameters
 x = f/fres;
-plotit = @(z) imagesc(x, theta_F, z.');
+y = theta_F/theta_CL;
+plotit = @(z) imagesc(x, y, z.');
 
 % Plot reflection coefficient
 figure
