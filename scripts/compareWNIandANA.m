@@ -1,4 +1,4 @@
-
+fs = 2e6;
 nfft = 2^12;
 f = fftshift((-nfft/2:nfft/2-1)*fs/nfft);
 % f = -200e3;

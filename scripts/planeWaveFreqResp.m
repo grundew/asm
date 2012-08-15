@@ -1,8 +1,8 @@
 %% Plane wave normal incidence frequency response
-reflection = false;
+reflection = true;
 
 %% Generate the chirp pulse
-fs = 6e6;
+fs = 2e6;
 tend = 50e-6;
 t = (0:1/fs:tend)';
 f0 = 150e3;
@@ -41,15 +41,15 @@ T = zeros(length(f), 1);
 
 fmin = min(f(idfneg));
 
-rho_fluid = 1000;
-v_fluid = 1500;
-v = 0.4;
+rho_fluid = 5;
+v_fluid = 350;
+v = 0;
 for i = 1:length(v)
     %% Fluid-fluid-fluid model
     fluid1 = struct('v', v_fluid, 'density', rho_fluid);
     % fluid1 = struct('v', 340, 'density', 1000);
     fluid3 = fluid1;
-    layer = struct('v', 5850, 'density', 7850, 'vShear', 3218);
+    layer = struct('v', 5850 + 100j, 'density', 7850, 'vShear', 3218);
     theta = v(i);
     %theta = 1e-4;
     d = 10.15e-3;
@@ -58,26 +58,26 @@ for i = 1:length(v)
     model = MultiLayerModel(fluid1, layer, fluid3, d);
     
     tic
-    [V, W, K, tL, tS] = analyticRT(f, theta, model);
+    [V, W] = analyticRT(f, theta, model);
     toc
-    tic
-    [R(idfpos), T(idfpos), KK, ttL, ttS] = fluidSolidFluidReflectionCoefficient(f(idfpos), theta, model);
-    [R_minf, T_minf] = fluidSolidFluidReflectionCoefficient(abs(fmin), theta, model);
-    R(idfneg) = conj(flipud([R(idfpos); R_minf]));
-    T(idfneg) = conj(flipud([T(idfpos); T_minf]));
-    T(f==0) = 1;
-    toc
+    %     tic
+    %     [R(idfpos), T(idfpos), KK, ttL, ttS] = fluidSolidFluidReflectionCoefficient(f(idfpos), theta, model);
+    %     [R_minf, T_minf] = fluidSolidFluidReflectionCoefficient(abs(fmin), theta, model);
+    %     R(idfneg) = conj(flipud([R(idfpos); R_minf]));
+    %     T(idfneg) = conj(flipud([T(idfpos); T_minf]));
+    %     T(f==0) = 1;
+    %     toc
     % V(idfpos) = zeros(size(V(idfpos)));
     % T(idfpos) = zeros(size(T(idfpos)));
     
     %% Convolve the pulse and the reflection coefficient
     if reflection
-        T = V(:);
+        TT = V(:);
     else
-        T = W(:);
+        TT = W(:);
     end
     
-    x = fft(Y(:).*T(:), nfft);
+    x = fft(Y(:).*TT(:), nfft);
     xprd = abs(ifft(x.*hann(length(x)), nfft)).^2;
     tailstart = 800;
     tailend = 1200;
