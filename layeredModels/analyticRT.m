@@ -1,4 +1,4 @@
-function [R, T, N1, N2, M1, M2, alpha_L, alpha_S] = analyticRT(freq, theta, model)
+function [R, T] = analyticRT(freq, theta, model)
 
 % L is half the thickness
 L = 0.5*model.thickness;
@@ -17,8 +17,7 @@ N1 = zeros(nf, nt);
 N2 = zeros(nf, nt);
 M1 = zeros(nf, nt);
 M2 = zeros(nf, nt);
-alpha_L = zeros(nf, nt);
-alpha_S = zeros(nf, nt);
+
 for i = 1:length(freq);
     % Frequency
     f = freq(i);
@@ -30,11 +29,15 @@ for i = 1:length(freq);
     for j = 1:length(theta)
         theta_f = theta(j);
         K = 2*pi*f/c_f*sin(theta_f);
-        % Angle longitudenal
-        theta_L = asin(K./h);
-        % Angle shear
-        theta_S = asin(K./k);
-        
+        % Compute angles (longitudenal and shear)
+        if theta_f == 0
+            theta_L = 0;
+            theta_S = 0;
+        else
+            theta_L = asin(K./h);
+            theta_S = asin(K./k);
+        end
+
         a = rho_s*c_L*cos(theta_f)*cos(2*theta_S).^2;
         b = rho_s*c_S*cos(theta_f)*sin(2*theta_S).^2;
         N1(i, j) = a./(rho_f*c_f*cos(theta_L)*sin(2*h*L*cos(theta_L)));
@@ -43,10 +46,6 @@ for i = 1:length(freq);
         M1(i, j) = a./(rho_f*c_f*cos(theta_L)*tan(2*h*L*cos(theta_L)));
         M2(i, j) = b./(rho_f*c_f*cos(theta_S)*tan(2*k*L*cos(theta_S)));
         M = M1(i, j) + M2(i, j);
-        
-        % Debug parameters
-        alpha_L(i, j) = h*L*cos(theta_L);
-        alpha_S(i, j) = k*L*cos(theta_S);
         
         % Calculate reflection and transmission coefficients
         T(i, j) = 2*N./(2*M + 1i*(M.^2 - N.^2 - 1));
