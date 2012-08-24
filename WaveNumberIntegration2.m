@@ -110,6 +110,10 @@ classdef WaveNumberIntegration2 < handle
             % t - Times (s)
             xx = linspace(0, a, nx);
             zz = d;
+            
+            % Update frequencies
+            this.f = fx;
+            
             % Get the pressure (matrix nx x nf)
             P = this.calculateReflectedPressure(xx, zz);
             
