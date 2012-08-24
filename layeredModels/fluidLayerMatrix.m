@@ -10,7 +10,7 @@ function B = fluidLayerMatrix(rho, w, k_z_L, d)
 % Pierre Cervenka and Pascal Challande
 % Equation 29.
 
-rhow2 = -rho*w^2;
+rhow2 = rho*w^2;
 
 % Elements of P(d), equation (9)
 S_L = 1j*sin(k_z_L*d);
