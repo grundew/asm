@@ -39,8 +39,9 @@ end
 % Check if there is an evanescent longitudenal wave
 % k_z_L = k_r_L + jalpha_L, exp(-alpha_L*D)<<1
 alpha_L = imag(k_z_L);
+alpha_S = imag(k_z_S);
 
-if exp(-alpha_L*d) < thresh
+if exp(-alpha_L*d) < thresh && exp(-alpha_S*d) > thresh
     % This propagates the shear wave only
     rhow2 = rho*w^2;
     
@@ -50,10 +51,13 @@ if exp(-alpha_L*d) < thresh
     b = [C_S, -k_S^2*d_S/(2*rhow2);...
         -2*rhow2*m_S/k_S^2, C_S];
     
-    B0 = [1/2/S^2, 0;...
+    B0 = [0.5*1/S^2, 0;...
         rhow2*C2^2/(2*S^2*k_z_L), 1];
     
     B = B0*b*B1;
+    return
+elseif exp(-alpha_S*d) < thresh
+    B = zeros(2, 2);
     return
 end
 

@@ -1,11 +1,11 @@
-function [V, W] = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
+function [V, W, debug] = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
 % Modeling a water steel water system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
 
 if ~exist('thresh', 'var')
     % Threshold for where the algorithm stops propagating longitudenal
     % waves. Might be different for different thicknesses.
-    thresh = 4.4e-15;
+    thresh = 4.5e-15;
 end
 
 % Define parameters
@@ -14,6 +14,10 @@ nf = length(freq);
 
 V = zeros(nt, nf);
 W = zeros(nt, nf);
+g11 = zeros(nt, nf);
+g12 = zeros(nt, nf);
+g21 = zeros(nt, nf);
+g22 = zeros(nt, nf);
 
 % Speed of sounds
 c_front = model.fluid(1).v;
@@ -93,8 +97,13 @@ for i = 1:nf
         % Calculate V and W
         G = output*B*input;
         
-        V(j, i) = -G(2, 1)/G(2, 2);
-        W(j, i) = G(1, 1) - G(1, 2)*G(2, 1)/G(2, 2);
+        if isequal(G, zeros(2, 2))
+            V(j, i) = 1;
+            W(j, i) = 0;
+        else
+            V(j, i) = -G(2, 1)/G(2, 2);
+            W(j, i) = G(1, 1) - G(1, 2)*G(2, 1)/G(2, 2);
+        end
     end
     
 end
@@ -102,4 +111,8 @@ end
 fzero = freq==0;
 V(:, fzero) = zeros(nt, nnz(fzero));
 W(:, fzero) = ones(nt, nnz(fzero)) + 1i*zeros(nt, nnz(fzero));
+debug.g11 = g11;
+debug.g12 = g12;
+debug.g21 = g21;
+debug.g22 = g22;
 end
