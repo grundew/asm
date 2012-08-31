@@ -5,10 +5,12 @@ function p = propagateReflectedWave(x, z, f, q, kx, kz, rho, V, R)
 % z - z-positions, acoustical axis.
 % w - Angular frequency.
 % q - Sine of incoming angle.
-% k - Length of wave number.
+% kz - Vertical wave number
+% kx - Horizontal wave number
 % V - Plane wave velocity spectrum.
 % rho - Density of propagation medium
-%
+% R - Transmission/reflection coefficient
+
 % TODO: Handle q = -1 and 1 (Phi goes now to inf)
 if length(x) ~= length(z)
     error('Error:WrongInputDimensions', 'x and z must be equal length');
