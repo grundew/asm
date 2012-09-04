@@ -5,7 +5,7 @@ fluid.density = 1000;
 solid.v = 5900;
 solid.vShear = 3150;
 solid.density = 7850;
-d = 12.4e-3;
+d = 10.15e-3;
 model = MultiLayerModel(fluid, solid, fluid, d);
 nq = 2^10;
 
@@ -52,7 +52,7 @@ nq = 2^10;
 %% Test time signal
 % Chirp pulse
 fs = 50e6;
-nfft = 2^10;
+nfft = 2^14;
 tend = 50.7e-6;
 ty_tmp = (0:1/fs:tend)';
 f0 = 50e3;
@@ -63,8 +63,9 @@ wndw = gausswin(length(ty_tmp));
 y = wndw.*1j.*exp(1j*2*pi*alpha*ty_tmp.^2/2);
 y = [zeros(100, 1); y; zeros(100, 1)];
 ty = 1/fs*(0:length(y)-1)';
+Y = ifft(y, nfft);
 
-f = fftshift((-nfft/2:nfft/2-1)*fs/nfft);
+f = (0:nfft-1)*fs/nfft;
 % Real chirp
 % wndw = gausswin(length(t));
 % y = wndw.*chirp(t, f0, tend, f1, 'linear', 270);
@@ -85,8 +86,9 @@ plot(ty, real(y))
 %% Calculate time signal
 wni = WaveNumberIntegration2(a, h, [], model, nq);
 
-nx = 1;
-[x, tx] = calculateReflectedPressureRx(wni, a, h, nx, y, fs, f);
+nx = 10;
+% [x, tx] = calculateReflectedPressureRx(wni, a, h, nx, y, fs, f);
+[x, tx] = calculateReflectedPressureRx(wni, a, h, nx, Y.', fs, f);
 
 %% Plot the time signal
 figure

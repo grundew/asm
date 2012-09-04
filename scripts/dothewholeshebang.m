@@ -2,13 +2,15 @@
 
 %% Samplings stuff
 fs = 2e6;
-nfft = 2^15;
+nfft = 2^14;
 ntheta = 2^12;
-thetamax = pi/2-0.01;
+thetamax = 0.5;
 theta = linspace(-thetamax, thetamax, ntheta)';
 
 % Observation point
 z = 10e-2;
+nx = 1;
+% x = linspace(0, 12e-3, nx);
 x = 0;
 
 %% Transducer specs
@@ -22,6 +24,7 @@ fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
 layer = struct('v', v_layer, 'density', 7850, 'vShear', 3218);
 d = 10.15e-3;
+fres = 0.5*v_layer/d;
 
 % Fluid-solid-fluid model
 model = MultiLayerModel(fluid1, layer, fluid3, d);
@@ -29,7 +32,8 @@ thresh = 1e-10;
 
 %% Excitation pulse
 tend = 50e-6;
-f = fftshift((-nfft/2:nfft/2-1)*fs/nfft);
+% f = fftshift((-nfft/2:nfft/2-1)*fs/nfft);
+f = (0:nfft-1)*fs/nfft;
 t = (0:1/fs:tend)';
 
 % Start and stop frequencies
@@ -52,57 +56,55 @@ y = [zeros(100, 1); y; zeros(100, 1)];
 t = (0:length(y)-1)/fs';
 Y = ifft(y, nfft);
 
-% Plot the chirp with the spectrum
-figure
-subplot(211)
-plot(t, real(y))
-subplot(212)
-plot(f, db(abs(Y)/max(abs(Y))), '.')
-
 %% Integrate over all angles for the point on the axis
-p = zeros(nfft, 1);
-idfpos = find(f>0);
-fpos = f(idfpos);
 q = sin(theta);
 
+tic
 % figure
-for i = 1:length(fpos)
-    freq = fpos(i);
+p = zeros(nfft, nx);
+for i = 1:length(f)
+    % Time it
+    if i == 1
+        datestr(now)
+        tic
+    end
+    
+    freq = f(i);
     % Vertical and horizontal wave number
     kz = 2*pi*freq*cos(theta)/v_fluid;
     kx = 2*pi*freq*q/v_fluid;
     
     % Compute the factors in the integrand
     Phi = angularPlaneWaveSpectrumPiston(a, v_fluid, q, freq);
-    [~, T] = fluidSolidFluidReflectionCoefficient(freq, theta, model, thresh);
-    p(idfpos(i)) = propagateReflectedWave(x, z,...
-        freq, q, kx, kz, rho_fluid, Phi, T);
+    % [~, T] = fluidSolidFluidReflectionCoefficient(freq, theta, model, thresh);
+    T = 1 - fluidSolidFluidReflectionCoefficient(freq, theta, model, thresh);
+    for j = 1:nx
+        p(i, j) = propagateReflectedWave(x(j), z, freq, q, kx, kz, rho_fluid, Phi, T);
+    end
+    
+    % Time it
+    if i == 2
+        tme = 0.5*toc/60*length(f);
+        fprintf('Estimated time of arrival: %f min\n', tme)
+    end
     
     % Plot the integrands
-    %     subplot(211)
-    %     plot(theta, db(abs(T)/max(abs(T))))
-    %     subplot(212)
-    %     plot(theta, db(abs(Phi)/max(abs(Phi))), '.')
-    %     pause(0.1)
+    % subplot(211)
+    % plot(theta, db(abs(T)/max(abs(T))))
+    % subplot(212)
+    % plot(theta, db(abs(Phi)/max(abs(Phi))), '.')
+    % pause(0.1)
 end
 
-%% Plot the frequency and impulse response of the observation point
-figure
-subplot(211)
-plot(f, real(p), '.')
-subplot(212)
-plot(f, imag(p), '.')
-
-figure
-plot((0:nfft-1)/fs, real(fft(p, nfft)))
+%% Integrate over position
+pint = zeros(nfft, 1);
+for i = 1:length(y)
+    pint = trapz(x, 2*pi*x.*p(i, :));
+end
 
 %% Convolve the pulse and the impulse response of the observation point
-yy = conv(y, fft(p, nfft));
-tt = (0:length(yy)-1)/fs;
+yy = conv(y, fft(pint, nfft));
+tt = (0:size(yy, 2)-1)/fs;
 
-%% Plot the convolved pulse
-figure
-plot(tt, real(yy))
-xlabel('time')
-ylabel('amplitude')
-title('Transmitted pulse')
+%% Finnished
+fprintf('Finnished in %s min - %s\n', toc/60, datestr(now))

@@ -3,6 +3,7 @@
 %% Samplings stuff
 ntheta = 2.^(2:17);
 thetamax = pi/2-0.01;
+freq = 100e3;
 
 % Observation point
 z = 10e-2;
@@ -25,7 +26,6 @@ model = MultiLayerModel(fluid1, layer, fluid3, d);
 thresh = 1e-9;
 
 %% Integrate over all angles for the point on the axis
-freq = 100e3;
 p = zeros(length(ntheta), 1);
 
 figure

@@ -15,18 +15,20 @@ function p = propagateReflectedWave(x, z, f, q, kx, kz, rho, V, R)
 if length(x) ~= length(z)
     error('Error:WrongInputDimensions', 'x and z must be equal length');
 end
-W = repmat(2*pi*f, length(q), 1);
+
+% W = repmat(2*pi*f, length(q), 1);
 p = zeros([size(z), length(f)]);
 
 nq = length(q);
 
 % Scale Phi. Convert from velocity to pressure spectrum.
-if nq == 1
-    Phi = ones(size(V));
-else
-    Phi = 1i*rho*W./(1i*kz).*V;
-end
-%Phi = k/2/pi*Phi;
+% if nq == 1 || isequal(kz, zeros(size(kz)))
+%     Phi = ones(size(V));
+% else
+%     Phi = 1i*rho*W./(1i*kz).*V;
+% end
+% Phi = k/2/pi*Phi;
+Phi = V;
 
 for i = 1:size(z, 1)
     for j = 1:size(z, 2)
