@@ -1,9 +1,9 @@
 %% Test one single frequency
 
 %% Samplings stuff
-ntheta = 2.^(2:17);
-thetamax = pi/2-0.01;
-freq = 100e3;
+ntheta = 2.^(11:19);
+thetamax = 0.1;
+freq = 2000e3;
 
 % Observation point
 z = 10e-2;
@@ -13,8 +13,8 @@ x = 0;
 a = 12e-3;
 
 %% Material parameters
-rho_fluid = 1000;
-v_fluid = 1500;
+rho_fluid = 1;
+v_fluid = 350;
 v_layer = 5850;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
@@ -23,7 +23,7 @@ d = 10.15e-3;
 
 % Fluid-solid-fluid model
 model = MultiLayerModel(fluid1, layer, fluid3, d);
-thresh = 1e-9;
+thresh = 1e-6;
 
 %% Integrate over all angles for the point on the axis
 p = zeros(length(ntheta), 1);
@@ -42,16 +42,23 @@ for i = 1:length(ntheta)
     kx = 2*pi*freq*q/v_fluid;
     
     % Compute the factors in the integrand
-    Phi = angularPlaneWaveSpectrumPiston(a, v_fluid, q, freq);
-    [~, T] = fluidSolidFluidReflectionCoefficient(freq, theta, model, thresh);
-    p(i) = propagateReflectedWave(x, z,...
-        freq, q, kx, kz, rho_fluid, Phi, T);
+    Phi = planePistonPressureAngularSpectrum(z, kx, kz, a, v_fluid, rho_fluid);
+    [R, T] = analyticRTFast(freq, theta, model);
+
+    Ht = Phi.*T.*exp(1i*kz*z);
     
+    E = exp(1i*kx.*x);
+    p = trapz(q, Ht.*E, 1);
+    
+    %     p(i) = propagateReflectedWave(x, z,...
+    %         freq, q, kx, kz, rho_fluid, Phi, T);
+
     % Plot the integrands
-    subplot(211)
-    plot(theta, db(abs(T)/max(abs(T))))
-    subplot(212)
+    ax(1) = subplot(211);
+    plot(theta, db(abs(R)))
+    ax(2) = subplot(212);
     plot(theta, db(abs(Phi)/max(abs(Phi))), '.')
+    linkaxes(ax, 'x')
 end
 
 %% Plot the pressure response for frequency freq

@@ -1,16 +1,12 @@
-function ax = plotprd(x, tailstart, len, nfft, fs, ax)
+function ax = plotprd(x, f, ax)
 
-x = x(:);
-xtail = x(tailstart:tailstart+len-1);
-% wndw = hann(length(xtail));
-wndw = rectwin(length(xtail));
-Xtail = abs(fft(xtail.*wndw, nfft)).^2;
-f = (-nfft/2:nfft/2-1)*(fs/nfft);
-
-if nargin < 6
-    figure;
-    ax = axes;
+if nargin < 3
+    figure
+    ax = axes();
 end
-plot(ax, f, Xtail.^2);
+
+nfft = length(f);
+X = 1/nfft*abs(ifft(x, nfft)).^2;
+plot(ax, f, db(X));
 
 end

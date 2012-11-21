@@ -1,6 +1,6 @@
 %% Plane wave normal incidence frequency response
 fs = 5e6;
-nfft = 2^19;
+nfft = 2^13;
 f = (0:nfft-1)*fs/nfft;
 
 %% Excitation pulse
@@ -35,7 +35,7 @@ plot(f, db(abs(Y).^2))
 %% Do the whole she bang
 rho_fluid = 1;
 v_fluid = 350;
-v = 0;
+v = 0.05;
 for i = 1:length(v)
     %% Fluid-fluid-fluid model
     fluid1 = struct('v', v_fluid, 'density', rho_fluid);
@@ -55,15 +55,18 @@ for i = 1:length(v)
     %% Convolve the pulse and the reflection coefficient
     xt = fft(Y(:).*T(:), nfft);
     xr = fft(Y(:).*R(:), nfft);
-    tx = (0:length(x)-1)/fs;
+    tx = (0:length(xt)-1)/fs;
     
     %% Plot both signals
     figure
     subplot(211)
     plot(tx, real(xt), tx, real(xr));
     legend('Transmitted', 'Reflected')
+    title(sprintf('theta = %d', theta));
     ax = subplot(212);
     hold(ax, 'all');
-    plotprd(xt, nfft, fs, ax);
-    plotprd(xr, nfft, fs, ax);
+    plotprd(xt, f/fres, ax);
+    plotprd(xr, f/fres, ax);
+    ylabel('dB')
+    xlabel('Normalized frequency (f/f_1)')
 end

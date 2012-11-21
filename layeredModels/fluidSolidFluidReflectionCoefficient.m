@@ -1,4 +1,4 @@
-function [V, W, debug] = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
+function [V, W] = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
 % Modeling a water steel water system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
 
@@ -11,13 +11,8 @@ end
 % Define parameters
 nt = length(theta_in);
 nf = length(freq);
-
 V = zeros(nt, nf);
 W = zeros(nt, nf);
-g11 = zeros(nt, nf);
-g12 = zeros(nt, nf);
-g21 = zeros(nt, nf);
-g22 = zeros(nt, nf);
 
 % Speed of sounds
 c_front = model.fluid(1).v;
@@ -33,7 +28,7 @@ rho_solid = model.solid.density;
 % Thickness of plate
 d = model.thickness;
 
-% Absorbsion
+% Absorption
 % alpha_front = 1000;
 % alpha_back = 1;
 % alpha_L = 10;
@@ -111,8 +106,4 @@ end
 fzero = freq==0;
 V(:, fzero) = zeros(nt, nnz(fzero));
 W(:, fzero) = ones(nt, nnz(fzero)) + 1i*zeros(nt, nnz(fzero));
-debug.g11 = g11;
-debug.g12 = g12;
-debug.g21 = g21;
-debug.g22 = g22;
 end

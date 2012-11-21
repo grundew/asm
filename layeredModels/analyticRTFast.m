@@ -45,6 +45,7 @@ M = M1 + M2;
 % Transmission and reflection
 T = 2*N./(2*M + 1i*(M.^2 - N.^2 - 1));
 R = 1i*(M.^2 - N.^2 + 1)./(2*M + 1i*(M.^2 - N.^2 - 1));
-T(freq==0, :) = ones(nnz(freq==0), length(theta));
-R(freq==0, :) = zeros(nnz(freq==0), length(theta));
+idfreq0 = freq==0;
+T(:, idfreq0) = 1;
+R(:, idfreq0) = 0;
 end
