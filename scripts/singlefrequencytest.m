@@ -1,16 +1,16 @@
 %% Test one single frequency
 
 %% Samplings stuff
-ntheta = 2.^(11:19);
-thetamax = 0.1;
-freq = 2000e3;
+ntheta = 2.^(8:2:30);
+qmax = 1;
+freq = 500e3;
 
 % Observation point
 z = 10e-2;
 x = 0;
 
 %% Transducer specs
-a = 12e-3;
+a = 9e-3;
 
 %% Material parameters
 rho_fluid = 1;
@@ -27,43 +27,38 @@ thresh = 1e-6;
 
 %% Integrate over all angles for the point on the axis
 p = zeros(length(ntheta), 1);
+pp = zeros(length(ntheta), 1);
+nstep = 20;
 
-figure
-subplot(211)
-hold all
-subplot(212)
-hold all
+tic
 for i = 1:length(ntheta)
-    theta = linspace(-thetamax, thetamax, ntheta(i))';
-    q = sin(theta);
-
-    % Vertical and horizontal wave number
-    kz = 2*pi*freq*cos(theta)/v_fluid;
-    kx = 2*pi*freq*q/v_fluid;
-    
-    % Compute the factors in the integrand
-    Phi = planePistonPressureAngularSpectrum(z, kx, kz, a, v_fluid, rho_fluid);
-    [R, T] = analyticRTFast(freq, theta, model);
-
-    Ht = Phi.*T.*exp(1i*kz*z);
-    
-    E = exp(1i*kx.*x);
-    p = trapz(q, Ht.*E, 1);
-    
-    %     p(i) = propagateReflectedWave(x, z,...
-    %         freq, q, kx, kz, rho_fluid, Phi, T);
-
-    % Plot the integrands
-    ax(1) = subplot(211);
-    plot(theta, db(abs(R)))
-    ax(2) = subplot(212);
-    plot(theta, db(abs(Phi)/max(abs(Phi))), '.')
-    linkaxes(ax, 'x')
+    % Uniform in q
+    n = ntheta(i);
+    % p(i) = integratePTrapezoidal(n, freq, x, z, model, a, qmax);
+    p(i) = integratePTrapezoidalStepWise(n, freq, x, z, model, a, qmax, nstep);
 end
+toc
 
 %% Plot the pressure response for frequency freq
-figure
+figure(1)
 subplot(211)
-plot(ntheta, real(p), '.-')
+hold all
+loglog(ntheta, abs(real(p)), '.-')
+%loglog(ntheta, abs(real(p) - real(p(end))), '.-')
+ylabel('Real p')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
 subplot(212)
-plot(ntheta, imag(p), '.-')
+hold all
+loglog(ntheta, abs(imag(p)), '.-')
+ylabel('Imag p')
+xlabel('N_{\theta}')
+set(gca, 'YScale', 'log')
+set(gca, 'XScale', 'log')
+
+% % Plot the integrand
+% figure
+% subplot(211)
+% plot(q, db(abs(Ht)))
+% subplot(212)
+% plot(q, unwrap(angle(Ht)))
