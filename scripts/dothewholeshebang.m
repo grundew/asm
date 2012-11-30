@@ -1,17 +1,13 @@
 %% Do the whole she bang!
 debug = false;
-saveresults = true;
+saveresults = false;
 
 %% Samplings stuff
 fs = 2e6;
-nfft = 2^12;
-nq = 2^15;
-qmax = 0.3;
-q = linspace(-qmax, qmax, nq)';
-theta = asin(q);
+nfft = 2^15;
+nq = 2^16;
+qmax = 1;
 f = (0:nfft-1)*fs/nfft;
-% f = 2.05*fres;
-% f = [100e3, 1000e3, 2000e3];
 
 %% Transducer specs
 a = 9e-3;
@@ -19,22 +15,24 @@ arx = 3e-3;
 
 % Observation point
 xmax = 10e-2;
-nx = 2^6;
 h = 10e-2;
 z = h;
-xo = linspace(0, arx, nx);
-% xo = 0;
+% nx = 2^6;
+% xo = linspace(0, arx, nx);
+nx = 1;
+xo = 0;
 zo = h;
 
 %% Material parameters
 rho_fluid = 1.5;
 v_fluid = 350;
 v_layer = 5850;
+damping = 1;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
-layer = struct('v', v_layer, 'density', 7850, 'vShear', 3218);
+layer = struct('v', v_layer - 1i*damping, 'density', 7850, 'vShear', 3218 - 1i*damping);
 d = 10e-3;
-fres = 0.5*v_layer/10.15e-3;
+fres = 0.5*v_layer/d;
 
 % Fluid-solid-fluid model
 model = MultiLayerModel(fluid1, layer, fluid3, d);
@@ -66,7 +64,6 @@ t = (0:length(y)-1)/fs';
 Y = ifft(y, nfft);
 
 %% Integrate over all angles for the point on the axis
-% q = sin(theta);
 
 tic
 % figure
@@ -81,26 +78,9 @@ for i = 1:nf
     end
     
     freq = f(i);
-    k = 2*pi*freq/v_fluid;
-    
-    % Vertical and horizontal wave number
-    kz = k*cos(theta)/v_fluid;
-    kx = k*q/v_fluid;
-    
-    % Compute the factors in the integrand
-    Phi = planePistonPressureAngularSpectrum(z, kx, kz, a, v_fluid, rho_fluid);
-    
-    % Reflection or transmission coefficient
-    % [R, T] = fluidSolidFluidReflectionCoefficient(freq, theta, model, thresh);
-    [R, T] = analyticRTFast(freq, theta, model);
-
-    Ht = Phi.*T.*exp(1i*kz*zo);
-    Hr = Phi.*R.*exp(1i*kz*zo);
-
     for j = 1:nx
-        E = exp(1i*kx.*xo(j));
-        pt(i, j) = trapz(q, Ht.*E, 1);
-        pr(i, j) = trapz(q, Hr.*E, 1);
+        pt(i, j) = integratePHankelTransformAdaptive(...
+            ntheta, freq, xo, zo, model, a, qmax);
     end
     
     % Time it
@@ -110,19 +90,22 @@ for i = 1:nf
     end
     
     if debug
-        debugplots(theta, freq, Phi, T, Ht, E)
+        debugplots(theta, freq, Phi, T, Ht, E); %#ok<UNRCH>
     end
 end
 
-% % Integrate over position
+%% Integrate over position
 pint = zeros(nfft, 1);
-for i = 1:nfft
-    pint(i) = trapz(xo, 2*pi*xo.*pt(i, :));
+if nx > 1
+    for i = 1:nfft
+        pint(i) = trapz(xo, 2*pi*xo.*pt(i, :));
+    end
+else
+    pint = pt;
 end
  
 %% Convolve the pulse and the impulse response of the observation point
 yt = conv(real(y), fft(pint, nfft));
-yr = conv(real(y), fft(pint, nfft));
 tt = (0:length(yt)-1)/fs;
 
 %% Finnished
