@@ -1,6 +1,6 @@
 %% Do the whole she bang!
 debug = false;
-saveresults = false;
+saveresults = true;
 
 %% Samplings stuff
 fs = 2e6;
@@ -17,15 +17,19 @@ arx = 3e-3;
 xmax = 10e-2;
 h = 10e-2;
 z = h;
-% nx = 2^6;
-% xo = linspace(0, arx, nx);
-nx = 1;
-xo = 0;
+
+nx = 2^6;
+xo = linspace(0, arx, nx);
+% nx = 1;
+% xo = 0;
 zo = h;
 
 %% Material parameters
-rho_fluid = 1.5;
-v_fluid = 350;
+% rho_fluid = 1.5;
+% v_fluid = 350;
+rho_fluid = 1000;
+v_fluid = 1500;
+
 v_layer = 5850;
 damping = 1;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
@@ -78,14 +82,14 @@ for i = 1:nf
     end
     
     freq = f(i);
-    for j = 1:nx
-        pt(i, j) = integratePHankelTransformAdaptive(...
-            ntheta, freq, xo, zo, model, a, qmax);
-    end
+    pt(i, :) = integratePHankelTransformAdaptive(...
+        nq, freq, xo, zo, model, a, qmax, 0, false);
+    % pt(i, j) = integratePHankelTransform(...
+    %     nq, freq, xo, zo, model, a, qmax);
     
     % Time it
-    if i == 2
-        tme = 0.5*toc/60*length(f);
+    if i == 5
+        tme = toc/60*length(f)/i;
         fprintf('Estimated time of arrival: %f min\n', tme)
     end
     

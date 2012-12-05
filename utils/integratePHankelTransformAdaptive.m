@@ -1,11 +1,13 @@
-function p = integratePHankelTransformAdaptive(ntheta, f, r, z, model, a, qmax, debug)
+function p = integratePHankelTransformAdaptive(ntheta, f, r, z,...
+    model, a, qmax, alphaD, alphaT, debug)
 
 if nargin < 8
     debug = false;
 end
 
 % Init p
-p = 0;
+nr = length(r);
+p = zeros(nr, 1);
 
 % Calculate integrand
 q = linspace(0, qmax, ntheta+1);
@@ -18,21 +20,14 @@ kz = 2*pi*f*sqrt(1-q.^2)/v_fluid;
 kr = 2*pi*f*q/v_fluid;
 
 Phi = planePistonPressureAngularSpectrum(z, kr, kz, a, v_fluid, rho_fluid);
-[~, T] = analyticRTFast(f, asin(q), model);
+T = transmissionCoefficientAnalytical(f, q, model);
 Ht = Phi.*T.*exp(1i*kz*z);
-Integrand = kr.*Ht.*besselj(0, kr.*r);
-
-if debug
-    figure
-    plot(q, abs(Integrand))
-    hold all
-end
 
 % Find the peaks
 [qsid, qeid] = getPeaksStartStopIndex(abs(T));
 
 % Sample more densily around those points
-ndense = 1;
+ndense = 0.5;
 ninc = min(40, floor(ntheta/4));
 qeid = cat(2, 1, qeid+ninc);
 
@@ -47,7 +42,10 @@ for i = 1:length(qeid)-1
     end
     
     if ~isempty(qsparseid)
-        p = p + integrate(Integrand(qsparseid), dq);
+        for j = 1:nr
+            Integrand = kr.*Ht.*besselj(0, kr.*r(j));
+            p(j) = p(j) + integrate(Integrand(qsparseid), dq);
+        end
     end
     
     % Dense indices for the peaks
@@ -55,17 +53,18 @@ for i = 1:length(qeid)-1
     qdense = linspace(q(idstop), q(idstoppk), ntheta*ndense);
     dqdense = qdense(2) - qdense(1);
     % Add the integration of the dense points
-    kz = 2*pi*f*sqrt(1-qdense.^2)/v_fluid;
-    kr = 2*pi*f*qdense/v_fluid;
+    kzdense = 2*pi*f*sqrt(1-qdense.^2)/v_fluid;
+    krdense = 2*pi*f*qdense/v_fluid;
 
-    Phi = planePistonPressureAngularSpectrum(z, kr, kz, a, v_fluid, rho_fluid);
-    [~, T] = analyticRTFast(f, asin(qdense), model);
-    Ht = Phi.*T.*exp(1i*kz*z);
-    Idense = kr.*Ht.*besselj(0, kr.*r);
-    p = p + integrate(Idense, dqdense);
-    if debug
-        plot(qdense, abs(Idense), 'o')
+    Phidense = planePistonPressureAngularSpectrum(z, krdense, kzdense, a, v_fluid, rho_fluid);
+    Tdense = transmissionCoefficientAnalytical(f, qdense, model);
+    Htdense = Phidense.*Tdense.*exp(1i*kzdense*z);
+    
+    for j = 1:nr
+        Idense = krdense.*Htdense.*besselj(0, krdense.*r(j));
+        p(j) = p(j) + integrate(Idense, dqdense);
     end
+    
 end
 
 end

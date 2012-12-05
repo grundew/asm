@@ -1,4 +1,4 @@
-function [R, T] = analyticRTFast(freq, theta, model)
+function [R, T] = analyticRTFast(freq, q, model)
 
 % L is half the thickness
 L = 0.5*model.thickness;
@@ -9,13 +9,14 @@ c_S = model.solid.vShear;
 c_F = model.fluid.v;
 
 % Calculate angles (independent of frequency)
-theta_L = asin(c_L/c_F*sin(theta));
-theta_S = asin(c_S/c_F*sin(theta));
+theta_L = asin(c_L/c_F*q);
+theta_S = asin(c_S/c_F*q);
 
 % Calculate wave vectors in the solid, total and vertical
 % Total (angle independent)
 h = 2*pi*freq./c_L;
 k = 2*pi*freq./c_S;
+
 % Vertical (angle and frequency dependent)
 hz = bsxfun(@(x, y) x.*cos(y), h, theta_L);
 kz = bsxfun(@(x, y) x.*cos(y), k, theta_S);
@@ -27,8 +28,9 @@ alpha_S = kz*L;
 
 %% Helpfull factors
 % Frequency independent
-DS = rho_S*c_S/(rho_F*c_F)*cos(theta)./cos(theta_S);
-DL = rho_S*c_L/(rho_F*c_F)*cos(theta)./cos(theta_L);
+qcos = sqrt(1-q.^2);
+DS = rho_S*c_S/(rho_F*c_F)*qcos./cos(theta_S);
+DL = rho_S*c_L/(rho_F*c_F)*qcos./cos(theta_L);
 
 % Frequency dependent
 EL = bsxfun(@(x, y) cos(2*y).^2./sin(2*x), alpha_L, theta_S);

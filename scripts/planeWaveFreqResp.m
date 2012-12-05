@@ -1,6 +1,6 @@
 %% Plane wave normal incidence frequency response
-fs = 5e6;
-nfft = 2^13;
+fs = 2e6;
+nfft = 2^15;
 f = (0:nfft-1)*fs/nfft;
 
 %% Excitation pulse
@@ -12,7 +12,7 @@ f0 = 200e3;
 f1 = 800e3;
 
 % Window
-wndw = gausswin(length(t));
+wndw = rectwin(length(t));
 
 % Real chirp
 y = wndw.*chirp(t, f0, tend, f1, 'linear', 270);
@@ -35,13 +35,14 @@ plot(f, db(abs(Y).^2))
 %% Do the whole she bang
 rho_fluid = 1;
 v_fluid = 350;
-v = 0.05;
+v = 0;
+damping = -0.4i;
 for i = 1:length(v)
     %% Fluid-fluid-fluid model
     fluid1 = struct('v', v_fluid, 'density', rho_fluid);
     % fluid1 = struct('v', 340, 'density', 1000);
     fluid3 = fluid1;
-    layer = struct('v', 5850, 'density', 7850, 'vShear', 3218);
+    layer = struct('v', 5850 + damping, 'density', 7850, 'vShear', 3218 + damping);
     theta = v(i);
     
     d = 10.15e-3;
@@ -60,8 +61,10 @@ for i = 1:length(v)
     %% Plot both signals
     figure
     subplot(211)
-    plot(tx, real(xt), tx, real(xr));
-    legend('Transmitted', 'Reflected')
+    plot(tx, real(xt))
+    legend('Transmitted')
+    % plot(tx, real(xt), tx, real(xr));
+    % legend('Transmitted', 'Reflected')
     title(sprintf('theta = %d', theta));
     ax = subplot(212);
     hold(ax, 'all');

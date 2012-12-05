@@ -2,6 +2,7 @@
 figure
 subplot(211)
 plot(t, real(y))
+title('Excitation pulse')
 subplot(212)
 plot(f/fres, db(abs(Y)/max(abs(Y))), '.')
 
@@ -9,7 +10,7 @@ plot(f/fres, db(abs(Y)/max(abs(Y))), '.')
 tailstart = 1000;
 taillength = 1000;
 tailend = 700 + taillength;
-ytail = real(yr(tailstart:tailend));
+ytail = real(yt(tailstart:tailend));
 ttail = tt(tailstart:tailend);
 Ytail = abs(ifft(ytail.*hann(length(ytail)), nfft)).^2/nfft;
 
@@ -18,6 +19,7 @@ figure
 subplot(211)
 plot(ttail, ytail)
 xlabel('Time')
+title('Tail signal')
 subplot(212)
 plot(f/fres, db(Ytail)/max(Ytail), '.')
 xlabel('f/f_{res}')

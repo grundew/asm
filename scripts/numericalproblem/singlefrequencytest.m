@@ -1,29 +1,34 @@
 %% Test one single frequency
 debug = false;
 figure(1)
+
 %% Samplings stuff
-ntheta = 2.^(2:2:22);
-% ntheta = 2.^20;
+ntheta = 2.^(2:2:20);
 qmax = 1;
 freq = 2000e3;
 
 % Observation point
 z = 10e-2;
-x = 0;
+x = 1e-2;
 
 %% Transducer specs
 a = 9e-3;
 
 %% Material parameters
-rho_fluid = 1;
-v_fluid = 350;
+% Water
+rho_fluid = 1000;
+c_F = 1500;
+damping = 0;
+% Air
+% rho_fluid = 1;
+% c_F = 350;
 % v_layer = 5850 - i*1.25;
 % v_shear = 3218 - i*1.25;
-v_layer = 5850;
-v_shear = 3218;
-fluid1 = struct('v', v_fluid, 'density', rho_fluid);
+c_L = 5850;
+c_S = 3218;
+fluid1 = struct('v', c_F, 'density', rho_fluid);
 fluid3 = fluid1;
-layer = struct('v', v_layer, 'density', 7850, 'vShear', v_shear);
+layer = struct('v', c_L, 'density', 7850, 'vShear', c_S);
 d = 10.15e-3;
 
 % Fluid-solid-fluid model
@@ -34,6 +39,10 @@ thresh = 1e-6;
 p = zeros(length(ntheta), 1);
 tid = zeros(length(ntheta), 1);
 nstep = 200;
+
+% % Calculate angles of refraction
+% theta_L = asin(c_L/c_F*sin(theta)); 
+% theta_S = asin(c_S/c_F*sin(theta));
 
 for i = 1:length(ntheta)
     % Uniform in q
@@ -47,9 +56,9 @@ for i = 1:length(ntheta)
     tic
     % p(i) = integratePTrapezoidalStepWise(n, freq, x, z, model, a, qmax, nstep, false);
     % p(i) = integratePTrapezoidal(n, freq, x, z, model, a, qmax, debug);
-    % p(i) = integratePHankelTransform(n, freq, x, z, model, a, qmax, debug);
+    p(i) = integratePHankelTransform(n, freq, x, z, model, a, qmax, debug);
     % p(i) = integratePHankelTransformSimpson(n, freq, x, z, model, a, qmax, debug);
-    p(i) = integratePHankelTransformAdaptive(n, freq, x, z, model, a, qmax, debug);
+    % p(i) = integratePHankelTransformAdaptive(n, freq, x, z, model, a, qmax, damping, debug);
     tid(i) = toc;
 end
 
