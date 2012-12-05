@@ -109,20 +109,28 @@ classdef WaveNumberIntegration2 < handle
             % x - Time signal
             % t - Times (s)
             xx = linspace(0, a, nx);
-            zz = d;
+            zz = d*ones(size(xx));
+            
+            % Update frequencies
+            this.f = fx;
+            
             % Get the pressure (matrix nx x nf)
             P = this.calculateReflectedPressure(xx, zz);
+            P = squeeze(P);
             
             % Convolve with the pulse
             nfft = size(P, 2);
             c = zeros(nx, nfft);
             for i = 1:nx
-                [c(i, :), t] = convTimeFreq(P(i, :), fs, nfft, X, fx, true);
+                c(i, :) = fft(P(i, :).*X, nfft);
+                % [c(i, :), t] = convTimeFreq(P(i, :), fs, nfft, X, fx, true);
             end
+            t = (0:nfft-1)/fs;
             
             % Integrate over the transducer surface. Assume circular
             % symmetric???
-            x = trapz(xx, 2*pi*xx*c, 1);
+            I = bsxfun(@(x, y) 2*pi*x.*y, xx', c);
+            x = trapz(xx, I, 1);
         end
         
         function [x, t] = calculateTransmittedPressureRx(this, d, a)
@@ -171,7 +179,7 @@ classdef WaveNumberIntegration2 < handle
                 Kx = this.kx;
                 for i = 1:nf
                     kx = Kx(:, i);
-                    Phi(:, i) = angularPlaneWaveSpectrumPiston(a, c, q, f);
+                    Phi(:, i) = angularPlaneWaveSpectrumPiston(a, c, q, f(i));
                     this.Phi_ = Phi;
                     this.updatePhi = false;
                 end

@@ -19,7 +19,7 @@ classdef MultiLayerModel < handle
         solid;
         thickness;
         
-        % Fluid in front and back of target
+        % Fluid in front and back of target (vector)
         fluid;
                 
     end
