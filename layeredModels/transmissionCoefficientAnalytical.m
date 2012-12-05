@@ -6,11 +6,11 @@ function T = transmissionCoefficientAnalytical(freq, q, model, alpha_L, alpha_S)
 % used.
 % 
 % Input:
-% freq: Frequency (scalar)
+% freq: Frequency (scalar, Hz)
 % q: Sine of theta, where theta is the angle of incidence in the fluid.
 % model: A MultiLayerModel object.
-% alpha_L: Damping coefficient (optional, scalar). Default = 0.
-% alpha_S: Damping coefficient (optinoal, scalar). If not given, and
+% alpha_L: Damping coefficient (optional, scalar, 1/m). Default = 0.
+% alpha_S: Damping coefficient (optinoal, scalar, 1/m). If not given, and
 %          alpha_L is given, alpha_S is calculated based on alpha_L. See
 %          Ref(2) equation 11.
 %
@@ -43,6 +43,7 @@ elseif nargin < 5
     % Ref(2) equation 11
     alpha_S = (alpha_L/2)*(c_Lr/c_Sr)^3;
 end
+% Equation 5 & 6 from Ref(2) 
 c_L = c_Lr + 1i*alpha_L*c_Lr/freq/2/pi;
 c_S = c_Sr + 1i*alpha_S*c_Sr/freq/2/pi;
 
