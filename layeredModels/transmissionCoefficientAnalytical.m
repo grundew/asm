@@ -30,8 +30,8 @@ L = 0.5*model.thickness;
 rho_F = model.fluid.density;
 rho_S = model.solid.density;
 % The real wave velocities
-c_Lr = model.solid.v + 1i*r_L;
-c_Sr = model.solid.vShear + 1i*r_S;
+c_Lr = model.solid.v;
+c_Sr = model.solid.vShear;
 c_F = model.fluid.v;
 
 %% Handle absorption as complex wave velocity

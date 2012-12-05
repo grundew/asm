@@ -8,6 +8,8 @@ function [xR, xT, t, R, T] = planeWaveTimeSignal(model, xPulse, tPulse, theta, d
 % model - MultiLayerModel object (Defines the material properties).
 % xPulse - The amplitudes of the excitation pulse.
 % tPulse - The time stamps of the excitation pulse samples.
+% theta - Angle of incidence.
+% dist - Distance from target to receiver.
 % 
 % Output:
 % xR - Reflected time signal.
