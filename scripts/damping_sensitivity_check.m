@@ -1,60 +1,75 @@
-%% Test the use of damping factor in the speed of sound
+% This is a script for investigating the transmission signal sensitivity to
+% the damping factor.
 
-%% Generate the chirp pulse
+%% Pulse
 fs = 2e6;
+nfft = 2^21;
 tend = 50e-6;
 t = (0:1/fs:tend)';
 f0 = 200e3;
 f1 = 800e3;
-
-% Real chirp
 wndw = gausswin(length(t));
 y = wndw.*chirp(t, f0, tend, f1, 'linear', 270);
-y = [zeros(100, 1); y; zeros(100, 1)];
-t = (0:length(y)-1)/fs';
 y = conj(hilbert(y));
-y = y - mean(y);
 
-nfft = 2^18;
+%% Material properties
+% 0.008 dB/m
+alphaLambda = 10.^[0.008, 0.08, 0.8]./20;
+fluid1 = struct('v', 350, 'density', 1.5);
+layer = struct('v', 5850, 'density', 7850, 'vShear', 3218);
+model = MultiLayerModel(fluid1, layer, fluid1, 10e-3);
+dist = 10e-2;
+theta = 0;
+
 f = (0:nfft-1)*fs/nfft;
+fres = 0.5*5850/10e-3;
 Y = ifft(y, nfft);
+legendstr = {};
 
-%% Do the whole she bang
-rho_fluid = 1000;
-v_fluid = 1500;
-v = 0;
-v_layer = 5850;
-theta = 0.1;
+for i = 1:length(alphaLambda)
+    al = alphaLambda(i);
+    [xT, t, T] = planeWaveTransmissionTimeSignal(model, y, t, theta, dist, al, nfft);
+    
+    legendstr = cat(1, legendstr, num2str(al));
+    
+    %% Plot time signals
+    figure(1)
+    hold all
+    plot(t, real(xT), '.')
+    title('Transmission')
+    xlabel('Time')
+    ylabel('Amplitude')
+    
+    %% Plot frequency spectrum
+    figure(2)
+    hold all
+    plot(f/fres, db(1/nfft*abs(ifft(xT, nfft))))
+    xlabel('Normalized frequency')
+    ylabel('PSD')
+    title('Frequency spectrum')
+    
+    %% Plot the transmission coefficient and pulse spectrum
+    figure(3)
+    hold all
+    plot(f/fres, abs(T))
+    xlabel('Frequency (Normalized to resonance)')
+    ylabel('abs T')
+    title('Transmission coefficient')
+    
+    %% Plot the decay of the time signal
+    figure(4)
+    hold all
+    semilogy(t, abs(xT))
+    xlabel('Time')
+    ylabel('Abs amplitude')
+    title('Signal decay')
+end
 
-%% Fluid-fluid-fluid model
-fluid1 = struct('v', v_fluid, 'density', rho_fluid);
-fluid3 = fluid1;
-layer = struct('v', v_layer, 'density', 7850, 'vShear', 3218);
-
-d = 10e-3;
-
-% Fluid-solid-fluid model
-model = MultiLayerModel(fluid1, layer, fluid3, d);
-[~, W] = analyticRTFast(f, theta, model);
-x = fft(Y(:).*W(:), nfft);
-xprd = abs(ifft(x, nfft)).^2;
-tailstart = 800;
-tailend = 1200;
-xtailprd = abs(ifft(x(tailstart:tailend), nfft)).^2;
-tx = (0:nfft-1)/fs;
-
-%% Plot the impulse response of the transmission and reflection coefficients
-figure
-subplot(211)
-plot((0:nfft-1)/fs, abs(fft(W, nfft)));
-xlabel('Time')
-ylabel('Abs')
-title('Impulse response')
-subplot(212)
-plot((0:nfft-1)/fs, unwrap(angle((fft(W, nfft)))))
-ylabel('Angle')
-xlabel('Time')
-
-%% Plot tail signal and the whole signal
-plotSignal(tx, x, tx(tailstart:end), x(tailstart:end),...
-    f, xprd, xtailprd, 0.5/d*[(1:2)*layer.v, 3*layer.vShear]);
+%% Add the excitation pulse spectrum and legends
+figure(3)
+hold all
+plot(f/fres, abs(Y)./max(abs(Y)))
+for i = 1:4
+    figure(i)
+    legend(legendstr)
+end
