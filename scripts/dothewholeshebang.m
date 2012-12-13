@@ -67,13 +67,16 @@ y = [zeros(100, 1); y; zeros(100, 1)];
 t = (0:length(y)-1)/fs';
 Y = ifft(y, nfft);
 
+%% Damping coefficients
+alphaLambda = 10.^(0.08./20);
+
 %% Integrate over all angles for the point on the axis
 
 tic
 % figure
 nf = length(f);
 pt = zeros(nf, nx);
-pr = zeros(nf, nx);
+% pr = zeros(nf, nx);
 for i = 1:nf
     % Time it
     if i == 1
@@ -82,13 +85,19 @@ for i = 1:nf
     end
     
     freq = f(i);
-    pt(i, :) = integratePHankelTransformAdaptive(...
-        nq, freq, xo, zo, model, a, qmax, 0, false);
+    
+    for j = 1:nx
+        fun = @(xin) hankelintegrand(xin, freq, xo(j), z, model, a, 0);
+        pt(i, j) = quadgk(fun, 0, qmax);
+    end
+    
+    % pt(i, :) = integratePHankelTransformAdaptive(...
+    %    nq, freq, xo, zo, model, a, qmax, 0, false);
     % pt(i, j) = integratePHankelTransform(...
     %     nq, freq, xo, zo, model, a, qmax);
     
     % Time it
-    if i == 5
+    if i == 100
         tme = toc/60*length(f)/i;
         fprintf('Estimated time of arrival: %f min\n', tme)
     end

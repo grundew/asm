@@ -1,5 +1,5 @@
 function p = integratePHankelTransformAdaptive(ntheta, f, r, z,...
-    model, a, qmax, alphaD, alphaT, debug)
+    model, a, qmax, alphaLambda, debug)
 
 if nargin < 8
     debug = false;
@@ -20,7 +20,8 @@ kz = 2*pi*f*sqrt(1-q.^2)/v_fluid;
 kr = 2*pi*f*q/v_fluid;
 
 Phi = planePistonPressureAngularSpectrum(z, kr, kz, a, v_fluid, rho_fluid);
-T = transmissionCoefficientAnalytical(f, q, model);
+alphaL = -alphaLambda*f/model.solid.v;
+T = transmissionCoefficientAnalytical(f, q, model, alphaL);
 Ht = Phi.*T.*exp(1i*kz*z);
 
 % Find the peaks
@@ -65,6 +66,15 @@ for i = 1:length(qeid)-1
         p(j) = p(j) + integrate(Idense, dqdense);
     end
     
+end
+
+% If no peaks found just integrate the whole thing with the values already
+% calculated
+if isempty(i)
+    for i = 1:nr
+        Integrand = kr.*Ht.*besselj(0, kr.*r(i));
+        p(i) = integrate(Integrand, dq);
+    end
 end
 
 end

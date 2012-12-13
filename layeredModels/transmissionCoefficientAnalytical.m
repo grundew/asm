@@ -2,8 +2,8 @@ function T = transmissionCoefficientAnalytical(freq, q, model, alpha_L, alpha_S)
 % T = transmissionCoefficientAnalytical(freq, q, model, alpha_L, alpha_S)
 %
 % transmissionCoefficientAnalytical computes the transmission coefficient
-% for a solid elastic plate embedded in a fluid. Equation (1) in Ref(1) is
-% used.
+% for a solid elastic plate embedded in a fluid (same fluid on both sides).
+% Equation (1) in Ref(1) is used.
 % 
 % Input:
 % freq: Frequency (scalar, Hz)
@@ -18,7 +18,7 @@ function T = transmissionCoefficientAnalytical(freq, q, model, alpha_L, alpha_S)
 % Ref(1): MEASUREMENTS AND 3D SIMULATIONS OF ULTRASONIC DIRECTIVE BEAM
 %         TRANSMISSION THROUGH A WATER-IMMERSED STEEL PLATE
 %         Kjetil Daae Lohne, Per Lunde, Magne Vestrheim
-%         Proceedings of the 34th Scandinavian Symposium on Physical Acoustics, Geilo 30 January – 2 February, 2011
+%         Proceedings of the 34th Scandinavian Symposium on Physical Acoustics, Geilo 30 January ? 2 February, 2011
 %
 % Ref(2): Modal resonance analysis of acoustic transmission and reflection
 %         losses in viscoelastic plates
@@ -86,5 +86,5 @@ M = M1 + M2;
 % Transmission and reflection
 T = 2*N./(2*M + 1i*(M.^2 - N.^2 - 1));
 idfreq0 = freq==0;
-T(:, idfreq0) = 1;
+T(idfreq0, :) = 1;
 end
