@@ -10,19 +10,20 @@ qmax = 1;
 f = (0:nfft-1)*fs/nfft;
 
 %% Transducer specs
-a = 9e-3;
-arx = 3e-3;
+aTx = 9e-3;
+aRx = 3e-3;
+d1 = 10e-2;
+d3 = 10e-2;
 
 % Observation point
-xmax = 10e-2;
-h = 10e-2;
-z = h;
+% xmax = 10e-2;
+% h = 10e-2;
+% z = h;
 
-nx = 2^6;
-xo = linspace(0, arx, nx);
+% nx = 2^6;
+% xo = linspace(0, arx, nx);
 % nx = 1;
 % xo = 0;
-zo = h;
 
 %% Material parameters
 % rho_fluid = 1.5;
@@ -75,21 +76,27 @@ alphaLambda = 10.^(0.08./20);
 tic
 % figure
 nf = length(f);
-pt = zeros(nf, nx);
+% pt = zeros(nf, nx);
 % pr = zeros(nf, nx);
+pt = zeros(nf, 1);
+
 for i = 1:nf
     % Time it
     if i == 1
-        datestr(now)
+        fprintf('Started: %s\n', datestr(now, 'dd-mm-yyyy_HH-MM-SS'));
         tic
     end
     
     freq = f(i);
     
-    for j = 1:nx
-        fun = @(xin) hankelintegrand(xin, freq, xo(j), z, model, a, 0);
-        pt(i, j) = quadgk(fun, 0, qmax);
-    end
+    fun = @(xx) orofiniIntegrand(xx, freq, aRx, aTx,...
+        v_fluid, rho_fluid, d1, d3, model, alphaLambda);
+    pt(i) = quadgk(fun, 0, qmax);
+    
+    % for j = 1:nx
+    %     fun = @(xin) hankelintegrand(xin, freq, xo(j), z, model, a, 0);
+    %     pt(i, j) = quadgk(fun, 0, qmax);
+    % end
     
     % pt(i, :) = integratePHankelTransformAdaptive(...
     %    nq, freq, xo, zo, model, a, qmax, 0, false);
@@ -107,25 +114,25 @@ for i = 1:nf
     end
 end
 
-%% Integrate over position
-pint = zeros(nfft, 1);
-if nx > 1
-    for i = 1:nfft
-        pint(i) = trapz(xo, 2*pi*xo.*pt(i, :));
-    end
-else
-    pint = pt;
-end
+% %% Integrate over position
+% pint = zeros(nfft, 1);
+% if nx > 1
+%     for i = 1:nfft
+%         pint(i) = trapz(xo, 2*pi*xo.*pt(i, :));
+%     end
+% else
+%     pint = pt;
+% end
  
 %% Convolve the pulse and the impulse response of the observation point
-yt = conv(real(y), fft(pint, nfft));
+yt = conv(y, fft(pt, nfft));
 tt = (0:length(yt)-1)/fs;
 
 %% Finnished
 if saveresults
     dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
+    fprintf('Finnished: %s\n', dtstr)
     outfile = sprintf('wholeshebang_%s_thickness%d.mat', dtstr, d);
-    fprintf('Finnished in %s min - %s\n', toc/60, dtstr)
     fprintf('Saved to %s\n', outfile)
     save(outfile);
 end
