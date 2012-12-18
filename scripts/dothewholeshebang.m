@@ -1,12 +1,11 @@
 %% Do the whole she bang!
 debug = false;
-saveresults = true;
+saveresults = false;
 
 %% Samplings stuff
 fs = 2e6;
 nfft = 2^15;
-nq = 2^16;
-qmax = 1;
+thetamax = pi/2;
 f = (0:nfft-1)*fs/nfft;
 
 %% Transducer specs
@@ -15,27 +14,17 @@ aRx = 3e-3;
 d1 = 10e-2;
 d3 = 10e-2;
 
-% Observation point
-% xmax = 10e-2;
-% h = 10e-2;
-% z = h;
-
-% nx = 2^6;
-% xo = linspace(0, arx, nx);
-% nx = 1;
-% xo = 0;
-
 %% Material parameters
-% rho_fluid = 1.5;
-% v_fluid = 350;
-rho_fluid = 1000;
-v_fluid = 1500;
+rho_fluid = 1.5;
+v_fluid = 350;
+% rho_fluid = 1000;
+% v_fluid = 1500;
 
 v_layer = 5850;
 damping = 1;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
-layer = struct('v', v_layer - 1i*damping, 'density', 7850, 'vShear', 3218 - 1i*damping);
+layer = struct('v', v_layer, 'density', 7850, 'vShear', 3218);
 d = 10e-3;
 fres = 0.5*v_layer/d;
 
@@ -76,8 +65,6 @@ alphaLambda = 10.^(0.08./20);
 tic
 % figure
 nf = length(f);
-% pt = zeros(nf, nx);
-% pr = zeros(nf, nx);
 pt = zeros(nf, 1);
 
 for i = 1:nf
@@ -91,17 +78,7 @@ for i = 1:nf
     
     fun = @(xx) orofiniIntegrand(xx, freq, aRx, aTx,...
         v_fluid, rho_fluid, d1, d3, model, alphaLambda);
-    pt(i) = quadgk(fun, 0, qmax);
-    
-    % for j = 1:nx
-    %     fun = @(xin) hankelintegrand(xin, freq, xo(j), z, model, a, 0);
-    %     pt(i, j) = quadgk(fun, 0, qmax);
-    % end
-    
-    % pt(i, :) = integratePHankelTransformAdaptive(...
-    %    nq, freq, xo, zo, model, a, qmax, 0, false);
-    % pt(i, j) = integratePHankelTransform(...
-    %     nq, freq, xo, zo, model, a, qmax);
+    pt(i) = 2*pi*quadgk(fun, 0, thetamax);
     
     % Time it
     if i == 100
@@ -114,23 +91,13 @@ for i = 1:nf
     end
 end
 
-% %% Integrate over position
-% pint = zeros(nfft, 1);
-% if nx > 1
-%     for i = 1:nfft
-%         pint(i) = trapz(xo, 2*pi*xo.*pt(i, :));
-%     end
-% else
-%     pint = pt;
-% end
- 
 %% Convolve the pulse and the impulse response of the observation point
 yt = conv(y, fft(pt, nfft));
 tt = (0:length(yt)-1)/fs;
 
 %% Finnished
 if saveresults
-    dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
+    dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS'); %#ok<UNRCH>
     fprintf('Finnished: %s\n', dtstr)
     outfile = sprintf('wholeshebang_%s_thickness%d.mat', dtstr, d);
     fprintf('Saved to %s\n', outfile)
