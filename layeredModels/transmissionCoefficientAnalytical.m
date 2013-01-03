@@ -43,9 +43,15 @@ elseif nargin < 5
     % Ref(2) equation 11
     alpha_S = (alpha_L/2)*(c_Lr/c_Sr)^3;
 end
-% Equation 5 & 6 from Ref(2) 
-c_L = c_Lr + 1i*alpha_L*c_Lr/freq/2/pi;
-c_S = c_Sr + 1i*alpha_S*c_Sr/freq/2/pi;
+
+if alpha_L == 0
+    c_L = c_Lr;
+    c_S = c_Sr;
+else
+    % Equation 5 & 6 from Ref(2)
+    c_L = c_Lr + 1i*alpha_L*c_Lr./freq/2/pi;
+    c_S = c_Sr + 1i*alpha_S*c_Sr./freq/2/pi;
+end
 
 % Calculate angles (independent of frequency)
 theta_L = asin(c_L/c_F*q);
@@ -86,5 +92,5 @@ M = M1 + M2;
 % Transmission and reflection
 T = 2*N./(2*M + 1i*(M.^2 - N.^2 - 1));
 idfreq0 = freq==0;
-T(idfreq0, :) = 1;
+T(:, idfreq0) = 1;
 end
