@@ -45,7 +45,7 @@ for i = 1:nf
         
         % Calculate a_0
         k_0 = sqrt(s(i)^2/c_0 - xi^2);
-        h_0 = sqrt(s(i)^2/cShear_0 - xi^2);
+        h_0 = sqrt(s(i)^2/cShear_0 - xi^2); % Problem when cShear_0 is zero
         gamma_0 = rho_0*s(i)^2 - 2*mu_0*xi^2;
         A_0 = 2*rho_0*s(i)^2*[gamma_0/k_0, -2*mu_0*xi, xi/k_0, -1];
         
@@ -53,23 +53,23 @@ for i = 1:nf
         k_np1 = sqrt(s(i)^2/c_np1 - xi^2);
         h_np1 = sqrt(s(i)^2/cShear_np1 - xi^2);
         gamma_np1 = rho_np1*s(i)^2 - 2*mu_np1*xi^2;
-        A_np1 = [k_np1, xi; -xi, h_np1; 2*mu_np1*xi, -gamma_np1; -gamma_np1, 2*mu_np1*xi*h_np1];
+        A_np1 = [k_np1, xi; -xi, h_np1; 2*mu_np1*xi*k_np1, -gamma_np1; -gamma_np1, 2*mu_np1*xi*h_np1];
         
         %% Make this a for-loop to take into account several layers
         % Calculate all helper parameters
         v = 2*mu_n*xi^2/rho_n/s(i)^2;
+        eta = rho_n*s(i)^2/xi;
         k_n = sqrt(s(i)^2/c_n - xi^2);
         h_n = sqrt(s(i)^2/cShear_n - xi^2);
         c_h = cosh(-h_n*d_n);
         c_k = cosh(-k_n*d_n);
-        r_k = (k_n/xi)^2;
-        r_h = (h_n/xi)^2;
-        s_k = xi/k_n/sinh(-k_n*d_n);
         s_h = xi/h_n/sinh(-h_n*d_n);
-        eta = rho_n*s(i)^2/xi;
+        s_k = xi/k_n/sinh(-k_n*d_n);
+        r_h = (h_n/xi)^2;
+        r_k = (k_n/xi)^2;
         
         % Calculate <g>
-        B(1, 1) = (1 - v)*c_k + v*c_n;
+        B(1, 1) = (1 - v)*c_k + v*c_h;
         B(1, 2) = v*s_k*r_k - (1 - v)*s_h;
         B(1, 3) = (c_k - c_h)/eta;
         B(1, 4) = (s_h + s_k*r_k)/eta;
@@ -102,9 +102,9 @@ for i = 1:nf
         D(1, 1) = c_h*c_k + 2*v*(1 - v)*(1 - c_h*c_k) + ((1 - v)^2 + v^2*r_h*r_k)*s_h*s_k;
         D(1, 2) = (c_h*s_k + c_k*s_h*r_h)/eta;
         D(1, 3) = ((1 - 2*v)*(1 - c_h*c_k) - (1 - v - v*r_h*r_k)*s_h*s_k)/eta;
-        D(1, 5) = -(c_h*s_k*r_k)/eta;
+        D(1, 5) = -(c_h*s_k*r_k + c_k*s_h)/eta;
         D(1, 6) = (2*(1 - c_h*c_k) - s_h*s_k*(1 + r_h*r_k))/eta^2;
-        D(2, 1) = eta*((1 - v)^2*c_k*s_h - s_h*s_k*(1 + r_h*r_k));
+        D(2, 1) = eta*((1 - v)^2*c_k*s_h - v^2*c_h*s_k*r_k);
         D(2, 2) = c_h*c_k;
         D(2, 3) = v*c_h*s_k*r_k - (1 - v)*c_k*s_h;
         D(2, 5) = -s_h*s_k*r_k;
@@ -118,9 +118,9 @@ for i = 1:nf
         D(2, 6) = D(5, 1);
         D(3, 4) = D(2, 2) - D(1, 1);
         D(3, 3) = D(3, 4) + 1;
-        D(3, 5) = D(3, 2);
-        D(3, 6) = D(3, 1);
+        D(3, 5) = D(4, 2);
         D(4, 1) = D(3, 1);
+        D(3, 6) = D(4, 1);
         D(4, 2) = D(3, 2);
         D(4, 3) = D(3, 4);
         D(4, 4) = D(3, 3);
