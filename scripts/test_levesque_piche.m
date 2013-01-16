@@ -1,11 +1,11 @@
 %% Test Levesque and Piche
 freq = 200e3;
-theta = linspace(1e-3, pi/2, 10);
+theta = linspace(1e-3, pi/2, 1e4);
 
 %% Material parameters
 % Water
-rho_fluid = 1.5;
-c_F = 340;
+rho_fluid = 1000;
+c_F = 1500;
 damping = 0;
 % Air
 % rho_fluid = 1;
@@ -25,8 +25,19 @@ d = 10e-3;
 model = MultiLayerModel(fluid1, layer, fluid3, d);
 
 %% Run the model
-[Rp, Tp, Rs, Ts] = reflectionCoefficientLayeredMedia(freq, theta, model);
-
+[Ra, Ta] = analyticRTFast(freq, theta, model);
+[Rb, Tb] = fluidSolidFluidReflectionCoefficient(freq, theta, model);
 
 %% Plot the stuff
-plot(theta, abs(Rp))
+figure
+subplot(211)
+plot(theta, abs(Ra), '.', theta, abs(Rb), 'o')
+title('Reflection coeffecient')
+subplot(212)
+plot(theta, unwrap(angle((Ra))), '.', theta, unwrap(angle((Rb))), 'o')
+figure
+subplot(211)
+plot(theta, abs(Ta), '.', theta, abs(Tb), 'o')
+title('Transmission coeffecient')
+subplot(212)
+plot(theta, unwrap(angle((Ta))), '.', theta, unwrap(angle((Tb))), 'o')

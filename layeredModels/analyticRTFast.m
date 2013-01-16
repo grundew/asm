@@ -1,5 +1,6 @@
-function [R, T] = analyticRTFast(freq, q, model)
+function [R, T] = analyticRTFast(freq, theta, model)
 
+q = sin(theta);
 % L is half the thickness
 L = 0.5*model.thickness;
 rho_F = model.fluid.density;
