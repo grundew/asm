@@ -76,7 +76,7 @@ for i = 1:nf
     
     freq = f(i);
     
-    fun = @(xx) orofiniIntegrand(xx, freq, aRx, aTx,...
+    fun = @(xx) orofinoIntegrand(xx, freq, aRx, aTx,...
         v_fluid, rho_fluid, d1, d3, model, alphaLambda);
     pt(i) = 2*pi*quadgk(fun, 0, thetamax);
     
