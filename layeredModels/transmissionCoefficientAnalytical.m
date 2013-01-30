@@ -25,6 +25,11 @@ function T = transmissionCoefficientAnalytical(freq, q, model, alpha_L, alpha_S)
 %         Walter Madigosky and Ralph Fiorito
 %         JASA 65 page 1105
 
+if length(freq) == 1 & freq == 0
+    T = ones(size(q));
+    return;
+end
+
 % L is half the thickness
 L = 0.5*model.thickness;
 rho_F = model.fluid.density;
