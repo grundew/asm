@@ -11,12 +11,12 @@ f = (0:nfft-1)*fs/nfft;
 %% Transducer specs
 aTx = 9e-3;
 aRx = 3e-3;
-d1 = 10e-2;
-d3 = 10e-2;
+d1 = 4e-2;
+d3 = 4e-2;
 
 %% Material parameters
 rho_fluid = 1.5;
-v_fluid = 350;
+v_fluid = 342.21;
 % rho_fluid = 1000;
 % v_fluid = 1500;
 
@@ -41,8 +41,8 @@ f0 = 200e3;
 f1 = 800e3;
 
 % Window
-% wndw = rectwin(length(t));
-wndw = gausswin(length(t));
+wndw = rectwin(length(t));
+% wndw = gausswin(length(t));
 
 % Real chirp
 y = wndw.*chirp(t, f0, tend, f1, 'linear', 270);
@@ -53,7 +53,6 @@ y = wndw.*chirp(t, f0, tend, f1, 'linear', 270);
 y = conj(hilbert(y));
 
 % Pad with zeros
-y = [zeros(100, 1); y; zeros(100, 1)];
 t = (0:length(y)-1)/fs';
 Y = ifft(y, nfft);
 
@@ -76,7 +75,7 @@ for i = 1:nf
     
     freq = f(i);
     
-    fun = @(xx) orofiniIntegrand(xx, freq, aRx, aTx,...
+    fun = @(xx) orofinoIntegrand(xx, freq, aRx, aTx,...
         v_fluid, rho_fluid, d1, d3, model, alphaLambda);
     pt(i) = 2*pi*quadgk(fun, 0, thetamax);
     
