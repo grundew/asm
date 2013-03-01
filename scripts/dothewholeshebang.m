@@ -1,6 +1,6 @@
 %% Do the whole she bang!
 debug = false;
-saveresults = false;
+saveresults = true;
 
 %% Samplings stuff
 fs = 2e6;
@@ -11,8 +11,8 @@ f = (0:nfft-1)*fs/nfft;
 %% Transducer specs
 aTx = 9e-3;
 aRx = 3e-3;
-d1 = 4e-2;
-d3 = 4e-2;
+d1 = 10e-2;
+d3 = 10e-2;
 
 %% Material parameters
 rho_fluid = 1.5;
@@ -25,7 +25,7 @@ damping = 1;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
 layer = struct('v', v_layer, 'density', 7850, 'vShear', 3218);
-d = 10e-3;
+d = 9.8e-3;
 fres = 0.5*v_layer/d;
 
 % Fluid-solid-fluid model
@@ -57,7 +57,7 @@ t = (0:length(y)-1)/fs';
 Y = ifft(y, nfft);
 
 %% Damping coefficients
-alphaLambda = 10.^(0.08./20);
+alphaLambda = 9.2e-3;
 
 %% Integrate over all angles for the point on the axis
 

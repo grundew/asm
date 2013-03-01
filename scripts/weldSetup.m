@@ -11,7 +11,7 @@ f = (0:nfft-1)*fs/nfft;
 %% Transducer specs
 % Transducer radius
 aTx = 25e-3/2;
-aRx = aTx;
+aRx = 2.5e-3;
 % Distance to pipe wall
 d1 = 41e-3;
 d3 = 41e-3;
