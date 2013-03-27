@@ -15,10 +15,10 @@ d1 = 10e-2;
 d3 = 10e-2;
 
 %% Material parameters
-rho_fluid = 1.5;
-v_fluid = 342.21;
-% rho_fluid = 1000;
-% v_fluid = 1500;
+% rho_fluid = 1.5;
+% v_fluid = 342.21;
+rho_fluid = 1000;
+v_fluid = 1500;
 
 v_layer = 5850;
 damping = 1;

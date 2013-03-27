@@ -2,7 +2,11 @@ classdef MultiLayerModel < handle
     % Container class for fluid - solid - fluid models.
     %
     % Example 1:
-    % mdl = MultiLayerModel('watersteelwater', 12.3e-3);
+    % d_Tx = 10e-2;
+    % d_Rx = 5e-2;
+    % a_Tx = 6e-3;
+    % a_Rx = 9e-3;
+    % mld = MultiLayerModel('watersteelwater', 12.3e-3, d_Tx, d_Rx, a_Tx, a_Rx);
     %
     % Example 2:
     % 
@@ -11,7 +15,13 @@ classdef MultiLayerModel < handle
     % fluid.density = 1000;
     % solid = materials.MaterialFactory.produce('stainless steel');
     % thickness = 12.3e-3;
-    % mdl = MultiLayerModel(fluid, solid, fluid, thickness);
+    % d_Tx = 10e-2;
+    % d_Rx = 8e-2;
+    % a_Tx = 6e-3;
+    % a_Rx = 9e-3;
+    % alphaLambda = 9.3e-3;
+    % mld = MultiLayerModel(fluid, solid, fluid, thickness,...
+    %         d_Tx, d_Rx, a_Tx, a_Rx, alphaLambda);
     
     properties
         
@@ -21,7 +31,19 @@ classdef MultiLayerModel < handle
         
         % Fluid in front and back of target (vector)
         fluid;
-                
+
+        % Alpha (damping factor)
+        alphaLambda;
+
+        % Distance from transmitter to plate
+        d_Tx;
+        % Distance from receiver to plate
+        d_Rx;
+        % Radius of transmitter
+        a_Tx;
+        % Radius of receiver
+        a_Rx;
+        
     end
     
     methods
@@ -29,13 +51,15 @@ classdef MultiLayerModel < handle
         function this = MultiLayerModel(varargin)
             % Constructor for MultiLayerModel class.
             %
-            % obj = MultiLayerModel(arg, thickness);
-            % obj = MultiLayerModel(fluidFront, solid, fluidBack, solidThickness);
+            % obj = MultiLayerModel(arg, thickness, d_Tx, d_Rx, a_Tx, a_Rx, alphaLambda)
+            % obj = MultiLayerModel(fluidFront, solid, fluidBack, thickness, d_Tx, d_Rx, alphaLambda)
             
-            if nargin == 2            
+            if nargin == 7
+                % obj = MultiLayerModel(arg, thickness, d_Tx, d_Rx)
                 arg = varargin{1};
                 this.thickness = varargin{2};
-                
+                this.d_Tx = varargin{3};
+                this.d_Rx = varargin{4};
                 switch arg
                 
                     case 'watersteelwater'
@@ -79,21 +103,26 @@ classdef MultiLayerModel < handle
                         this.solid = s;
                 end
                 
-            elseif nargin == 4
-                
+            elseif nargin == 9
+                % obj = MultiLayerModel(fluidFront, solid, fluidBack,...
+                %             solidThickness, d_Tx, d_Rx, a_Tx, a_Rx, alphaLambda)
                 f(1) = varargin{1};
                 f(2) = varargin{3};
                 this.fluid = f;
                 this.solid = varargin{2};
                 this.thickness = varargin{4};
-                
+                this.d_Tx = varargin{5};
+                this.d_Rx = varargin{6};
+                this.a_Tx = varargin{7};
+                this.a_Rx = varargin{8};
+                this.alphaLambda = varargin{9};
             else
-                
-                error('DNV:WrongNumerOfArguments', 'Number of arguments must be either 2 or 3');
+                error('HW:WrongNumerOfArguments',...
+                    'Number of arguments must be either 6 or 8');
             end
             
         end
         
-    end    
+    end
     
 end

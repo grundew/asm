@@ -36,13 +36,13 @@ plot(f, db(abs(Y).^2))
 rho_fluid = 1;
 v_fluid = 350;
 v = 0;
-damping = -0.4i;
+
 for i = 1:length(v)
     %% Fluid-fluid-fluid model
     fluid1 = struct('v', v_fluid, 'density', rho_fluid);
     % fluid1 = struct('v', 340, 'density', 1000);
     fluid3 = fluid1;
-    layer = struct('v', 5850 + damping, 'density', 7850, 'vShear', 3218 + damping);
+    layer = struct('v', 5850, 'density', 7850, 'vShear', 3218);
     theta = v(i);
     
     d = 10.15e-3;
@@ -52,6 +52,7 @@ for i = 1:length(v)
     model = MultiLayerModel(fluid1, layer, fluid3, d);
     
     [R, T] = analyticRTFast(f, theta, model);
+    % T = transmissionCoefficientAnalytical(freq, q, model, alpha_L);
     
     %% Convolve the pulse and the reflection coefficient
     xt = fft(Y(:).*T(:), nfft);
