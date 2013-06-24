@@ -52,6 +52,8 @@ classdef MultiLayerModel < handle
             % Constructor for MultiLayerModel class.
             %
             % obj = MultiLayerModel(arg, thickness, d_Tx, d_Rx, a_Tx, a_Rx, alphaLambda)
+            % obj = MultiLayerModel(fluidFront, solid, fluidBack, thickness, d_Tx, d_Rx)
+            % obj = MultiLayerModel(fluidFront, solid, fluidBack, thickness);
             % obj = MultiLayerModel(fluidFront, solid, fluidBack, thickness, d_Tx, d_Rx, alphaLambda)
             
             if nargin == 7
@@ -62,6 +64,18 @@ classdef MultiLayerModel < handle
                 this.d_Rx = varargin{4};
                 switch arg
                 
+                    case 'naturalgassteel'
+                        this.solid = materials.MaterialFactory.produce('stainless steel');
+                        f(1) = materials.MaterialFactory.produce('natural gas');
+                        f(2) = f(1);
+                        this.fluid = f;
+
+                    case 'naturalgassteelbitumen'
+                        this.solid = materials.MaterialFactory.produce('stainless steel');
+                        f(1) = materials.MaterialFactory.produce('natural gas');
+                        f(2) = materials.MaterialFactory.produce('bitumen');
+                        this.fluid = f;
+                    
                     case 'watersteelwater'
                         this.solid = materials.MaterialFactory.produce('stainless steel');
                         f(1) = materials.MaterialFactory.produce('water');
@@ -103,6 +117,13 @@ classdef MultiLayerModel < handle
                         this.solid = s;
                 end
                 
+            elseif nargin == 4
+                % obj = MultiLayerModel(fluidFront, solid, fluidBack, thickness);
+                f(1) = varargin{1};
+                f(2) = varargin{3};
+                this.fluid = f;
+                this.solid = varargin{2};
+                this.thickness = varargin{4};
             elseif nargin == 9
                 % obj = MultiLayerModel(fluidFront, solid, fluidBack,...
                 %             solidThickness, d_Tx, d_Rx, a_Tx, a_Rx, alphaLambda)
@@ -118,7 +139,7 @@ classdef MultiLayerModel < handle
                 this.alphaLambda = varargin{9};
             else
                 error('HW:WrongNumerOfArguments',...
-                    'Number of arguments must be either 6 or 8');
+                    'Number of arguments must be either 6, 8 or 9');
             end
             
         end

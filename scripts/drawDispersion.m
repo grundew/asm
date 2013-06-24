@@ -1,21 +1,20 @@
 function drawDispersion()
 
-nt = 2000;
-thetamax = 0.2;
+nt = 4000;
+thetamax = 10; % Deg
 theta = linspace(0, thetamax, nt);
-d = 10.15e-3;
+d = 25e-3;
 
 nf = 6000;
 v = 5850;
-% vs = v.*linspace(0.45, 0.75, 5);
-vs = 3218;
+vs = 3200;
 fres = v/d/2;
-% f =  linspace(0.5*fres, 3*fres, nf);
-f = linspace(50e3, 1e6, nf);
+
+f = linspace(400e3, 800e3, nf);
 
 for vShear = vs
     % Calculate the reflection coefficient for all f and theta
-    R = getReflectionCoeff(f, theta, v, vShear, d);
+    R = getReflectionCoeff(f, theta/180*pi, v, vShear, d);
     %% Solid layer immersed in a fluid
     plotdisp(f/fres, theta, R, v/vShear)
 end
@@ -23,7 +22,8 @@ end
 
 function R = getReflectionCoeff(f, theta, v, vShear, d)
 %% Material parameters
-fluid1 = struct('v', 350, 'density', 1000);
+fluid1 = struct('v', 430, 'density', 120);
+% fluid3 = struct('v', 2500, 'density', 1200);
 fluid3 = fluid1;
 layer = struct('v', v, 'density', 7850, 'vShear', vShear);
 
@@ -32,7 +32,8 @@ model = MultiLayerModel(fluid1, layer, fluid3, d);
 % Calculate V
 R = zeros(length(f), length(theta));
 for i = 1:length(f)
-    [~, R(i, :)] = analyticRTFast(f(i), theta, model);
+    R(i, :) = fluidSolidFluidReflectionCoefficient(f(i), theta, model);
+    % [~, R(i, :)] = analyticRTFast(f(i), theta, model);
 end
 % Save calculated parameters
 % outfn = fullfile('/Users/grundew/Dropbox/phd_hive/work/DispersionCurves',...

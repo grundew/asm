@@ -3,29 +3,28 @@ debug = false;
 saveresults = true;
 
 %% Samplings stuff
-fs = 2e6;
+fs = 2.5e6;
 nfft = 2^15;
-thetamax = pi/2;
+ntheta = 2^12;
+thetamax = 0.8;
+% thetamax = pi/2;
 f = (0:nfft-1)*fs/nfft;
 
 %% Transducer specs
-aTx = 9e-3;
-aRx = 3e-3;
-d1 = 10e-2;
-d3 = 10e-2;
+aTx = 6e-3;
+aRx = 6e-3;
+d1 = 0.04;
+d3 = 0.04;
 
 %% Material parameters
-% rho_fluid = 1.5;
-% v_fluid = 342.21;
-rho_fluid = 1000;
-v_fluid = 1500;
+rho_fluid = 120;
+v_fluid = 430;
 
 v_layer = 5850;
-damping = 1;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
 layer = struct('v', v_layer, 'density', 7850, 'vShear', 3218);
-d = 9.8e-3;
+d = 25e-3;
 fres = 0.5*v_layer/d;
 
 % Fluid-solid-fluid model
@@ -37,8 +36,8 @@ tend = 50e-6;
 t = (0:1/fs:tend)';
 
 % Start and stop frequencies
-f0 = 200e3;
-f1 = 800e3;
+f0 = 400e3;
+f1 = 1200e3;
 
 % Window
 wndw = rectwin(length(t));
@@ -56,15 +55,13 @@ y = conj(hilbert(y));
 t = (0:length(y)-1)/fs';
 Y = ifft(y, nfft);
 
-%% Damping coefficients
-alphaLambda = 9.2e-3;
-
 %% Integrate over all angles for the point on the axis
 
 tic
-% figure
 nf = length(f);
 pt = zeros(nf, 1);
+theta = linspace(0, thetamax, ntheta);
+dtheta = theta(2) - theta(1);
 
 for i = 1:nf
     % Time it
@@ -74,13 +71,17 @@ for i = 1:nf
     end
     
     freq = f(i);
-    
-    fun = @(xx) orofinoIntegrand(xx, freq, aRx, aTx,...
-        v_fluid, rho_fluid, d1, d3, model, alphaLambda);
-    pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+
+    % fun = @(xx) integrandFluidSolidFluid(xx, freq, aRx, aTx,...
+    %     v_fluid, rho_fluid, d1, d3, model);
+    %  pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    Ht = integrandFluidSolidFluidReflection(theta, freq, aRx, aTx,...
+        v_fluid, rho_fluid, d1, d3, model);
+    pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
+
     
     % Time it
-    if i == 100
+    if i == 300
         tme = toc/60*length(f)/i;
         fprintf('Estimated time of arrival: %f min\n', tme)
     end

@@ -1,4 +1,4 @@
-function [xR, xT, t, R, T] = planeWaveTimeSignal(model, xPulse, tPulse, theta, dist, nfft)
+function [xR, t, R] = planeWaveTimeSignal(model, xPulse, tPulse, theta, dist, nfft)
 % [xR, xT, t] = planeWaveTimeSignal(model, xPulse, tPulse)
 %
 % Calculates the response of a solid plate embedded in a fluid and
@@ -37,7 +37,7 @@ f = (0:nfft-1)*fs/nfft;
 Ypulse = ifft(xPulse, nfft);
 
 % Get the reflection and transmission coefficients
-[R, T] = fluidSolidFluidReflectionCoefficient(f, theta, model);
+R = fluidSolidFluidReflectionCoefficient(f, theta, model);
 
 % Phase shift from propagating distance dist
 kr = 2*pi*f/model.fluid(1).v;
@@ -47,6 +47,5 @@ Et = exp(1i*kt*dist);
 
 % Convolve the pulse and the reflection/transmission coefficient
 xR = fft(Ypulse(:).*R(:).*Er(:), nfft);
-xT = fft(Ypulse(:).*T(:).*Et(:), nfft);
 t = (0:length(xR)-1)/fs;
 end

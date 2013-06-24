@@ -49,6 +49,12 @@ M = M1 + M2;
 T = 2*N./(2*M + 1i*(M.^2 - N.^2 - 1));
 R = 1i*(M.^2 - N.^2 + 1)./(2*M + 1i*(M.^2 - N.^2 - 1));
 idfreq0 = freq==0;
+
+if length(freq) == 1
+    T(idfreq0, :) = 1;
+    R(idfreq0, :) = 0;
+end
+
 T(:, idfreq0) = 1;
 R(:, idfreq0) = 0;
 end

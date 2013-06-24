@@ -1,5 +1,5 @@
-function [V, W] = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
-% Modeling a water steel water system using method from Cervanka without
+function V = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
+% Modeling a fluid-solid-solid system using method from Cervanka without
 % taking into account over attenuated longitudenal waves.
 
 if ~exist('thresh', 'var')
@@ -105,5 +105,4 @@ end
 
 fzero = freq==0;
 V(:, fzero) = zeros(nt, nnz(fzero));
-W(:, fzero) = ones(nt, nnz(fzero)) + 1i*zeros(nt, nnz(fzero));
 end

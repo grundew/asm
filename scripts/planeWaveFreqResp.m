@@ -1,5 +1,5 @@
 %% Plane wave normal incidence frequency response
-fs = 2e6;
+fs = 6e6;
 nfft = 2^15;
 f = (0:nfft-1)*fs/nfft;
 
@@ -8,8 +8,8 @@ tend = 50e-6;
 t = (0:1/fs:tend)';
 
 % Start and stop frequencies
-f0 = 200e3;
-f1 = 800e3;
+f0 = 400e3;
+f1 = 1200e3;
 
 % Window
 wndw = rectwin(length(t));
@@ -33,9 +33,11 @@ subplot(212)
 plot(f, db(abs(Y).^2))
 
 %% Do the whole she bang
-rho_fluid = 1;
-v_fluid = 350;
+rho_fluid = 150;
+v_fluid = 420;
 v = 0;
+d_Tx = 10e-3; % Doesn't matter
+d_Rx = 10e-3; % Doesn't matter
 
 for i = 1:length(v)
     %% Fluid-fluid-fluid model
@@ -45,7 +47,7 @@ for i = 1:length(v)
     layer = struct('v', 5850, 'density', 7850, 'vShear', 3218);
     theta = v(i);
     
-    d = 10.15e-3;
+    d = 25e-3;
     fres = 0.5*5850/d;
     
     % Fluid-solid-fluid model
