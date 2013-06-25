@@ -3,7 +3,7 @@ debug = false;
 saveresults = true;
 
 %% Samplings stuff
-fs = 2.5e6;
+fs = 4e6;
 nfft = 2^15;
 ntheta = 2^12;
 thetamax = 0.8;
@@ -17,8 +17,8 @@ d1 = 0.04;
 d3 = 0.04;
 
 %% Material parameters
-rho_fluid = 120;
-v_fluid = 430;
+rho_fluid = 1000;
+v_fluid = 1500;
 
 v_layer = 5850;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
@@ -29,7 +29,6 @@ fres = 0.5*v_layer/d;
 
 % Fluid-solid-fluid model
 model = MultiLayerModel(fluid1, layer, fluid3, d);
-thresh = 1e-10;
 
 %% Excitation pulse
 tend = 50e-6;
