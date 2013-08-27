@@ -25,7 +25,7 @@ function T = transmissionCoefficientAnalytical(freq, q, model, alpha_L, alpha_S)
 %         Walter Madigosky and Ralph Fiorito
 %         JASA 65 page 1105
 
-if length(freq) == 1 & freq == 0
+if length(freq) == 1 && freq == 0
     T = ones(size(q));
     return;
 end
@@ -54,8 +54,8 @@ if alpha_L == 0
     c_S = c_Sr;
 else
     % Equation 5 & 6 from Ref(2)
-    c_L = c_Lr + 1i*alpha_L*c_Lr./freq/2/pi;
-    c_S = c_Sr + 1i*alpha_S*c_Sr./freq/2/pi;
+    c_L = c_Lr./(1 + 1i*alpha_L*c_Lr./freq/2/pi);
+    c_S = c_Sr./(1 + 1i*alpha_S*c_Sr./freq/2/pi);
 end
 
 % Calculate angles (independent of frequency)
