@@ -60,8 +60,6 @@ Y = ifft(y, nfft);
 tic
 nf = length(f);
 pt = zeros(nf, 1);
-theta = linspace(0, thetamax, ntheta);
-dtheta = theta(2) - theta(1);
 
 for i = 1:nf
     % Time it
