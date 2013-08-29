@@ -1,11 +1,12 @@
 %% Do the whole she bang!
 debug = false;
 saveresults = true;
-prefix = 'quadgk_nfft2^15_thetamax0.8';
+prefix = 'trapezoidal_nfft2^17_ntheta2^18_thetamax0.8';
 
 %% Samplings stuff
 fs = 2e6;
-nfft = 2^15;
+nfft = 2^17;
+ntheta = 2^18;
 thetamax = 0.8;
 % thetamax = pi/2;
 f = (0:nfft-1)*fs/nfft;
@@ -26,7 +27,7 @@ fluid3 = fluid1;
 layer = struct('v', v_layer, 'density', 7850, 'vShear', 3162);
 d = 10.15e-3;
 fres = 0.5*v_layer/d;
-alphaLambda_dB = 0.008;
+alphaLambda_dB = 0.008; % alpha times labda (dB)
 
 % Fluid-solid-fluid model
 model = MultiLayerModel(fluid1, layer, fluid3, d);
@@ -71,9 +72,18 @@ for i = 1:nf
     end
     
     freq = f(i);
-    fun = @(xx) integrandFluidSolidFluidTransmission_withLoss(xx, freq, aRx, aTx,...
-       v_fluid, rho_fluid, d1, d3, model, alphaLambda_dB);
-    pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    % fun = @(xx) integrandFluidSolidFluidTransmission_withLoss(xx, freq, aRx, aTx,...
+    %    v_fluid, rho_fluid, d1, d3, model, alphaLambda);
+    % fun = @(xx) integrandFluidSolidFluidTransmission(xx, freq, aRx, aTx,...
+    %    v_fluid, rho_fluid, d1, d3, model);
+    % fun = @(xx) integrandFluidSolidFluid(xx, freq, aRx, aTx,...
+    %    v_fluid, rho_fluid, d1, d3, model);
+    % pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    % Ht = integrandFluidSolidFluidReflection(theta, freq, aRx, aTx,...
+    %    v_fluid, rho_fluid, d1, d3, model);
+    Ht = integrandFluidSolidFluidTransmission_withLoss(theta, freq, aRx, aTx,...
+        v_fluid, rho_fluid, d1, d3, model, alphaLambda_dB);
+    pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
 
     
     % Time it
@@ -93,7 +103,7 @@ tt = (0:length(yt)-1)/fs;
 
 %% Finnished
 if saveresults
-    dtstr = datestr(now, 'dd-mm-yyyy_HH:MM:SS');
+    dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
     fprintf('Finnished: %s\n', dtstr)
     outfile = sprintf('%s_%s_thickness%d.mat', prefix, dtstr, d);
     fprintf('Saved to %s\n', outfile)

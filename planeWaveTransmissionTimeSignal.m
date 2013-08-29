@@ -1,5 +1,5 @@
 function [x, t, T] = planeWaveTransmissionTimeSignal(model, xPulse, tPulse,...
-    theta, dist, alphaLambda, nfft)
+    theta, dist, alphaLambda_dB, nfft)
 % [xT, t] = planeWaveTimeSignal(model, xPulse, tPulse, dist, alphaLambda)
 %
 % Calculates the transmission response of a solid plate embedded in a fluid
@@ -21,14 +21,14 @@ function [x, t, T] = planeWaveTransmissionTimeSignal(model, xPulse, tPulse,...
 if nargin < 4
     theta = 0;
     dist = 0;
-    alphaLambda = 0;
+    alphaLambda_dB = 0;
     nfft = 2^14;
 elseif nargin < 5
     dist = 0;
-    alphaLambda = 0;
+    alphaLambda_dB = 0;
     nfft = 2^14;
 elseif nargin < 6
-    alphaLambda = 0;
+    alphaLambda_dB = 0;
     nfft = 2^14;
 elseif nargin < 7
     nfft = 2^14;
@@ -41,8 +41,13 @@ f = (0:nfft-1)*fs/nfft;
 Ypulse = ifft(xPulse, nfft);
 
 % Get the reflection and transmission coefficients
-alphaL = -alphaLambda*f/model.solid.v;
-alphaL(f==0) = alphaL(2)*1e3;
+% Multiply with wavelength and convert from dB to linear:
+if alphaLambda_dB > 0
+    alphaL = 10.^(alphaLambda_dB*f/model.solid.v/20);
+else
+    alphaL = 0;
+end
+
 T = transmissionCoefficientAnalytical(f, sin(theta), model, alphaL);
 
 % Phase shift from propagating distance dist

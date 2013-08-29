@@ -1,5 +1,5 @@
 function I = integrandFluidSolidFluidTransmission_withLoss(theta, f, aRx, aTx,...
-    c, rho, d1, d3, model, alphaLambda)
+    c, rho, d1, d3, model, alphaLambda_dB)
 % I = orofinoIntegrand(theta, f, aRx, aTx, c, rho, d1, d3, model, alphaLambda)
 %   orofinoIntegrand is the integrand in equation (28) in Ref. 1. This is
 %   used as an input to the waveNumberIntegration function. It uses an
@@ -36,12 +36,17 @@ PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
 PhiTx = planePistonPressureAngularSpectrum(kx, aTx, c, rho);
 
 %% Plate response, angular
-alphaL = -alphaLambda*f/model.solid.v;
+% Multiply with wave length and convert from dB to linear
+if alphaLambda_dB > 0
+    alphaL = 10.^(alphaLambda_dB*f/model.solid.v/20);
+else
+    alphaL = 0;
+end
+
 T = transmissionCoefficientAnalytical(f, q, model, alphaL);
 
 %% Phase shift from transmitter to plate and from plate to receiver
 Phase = exp(1i*kz*(d1 + d3));
-
 I = T.*k.*q.*PhiRx.*PhiTx.*Phase.*k.*p;
 end
 

@@ -14,9 +14,9 @@ y = conj(hilbert(y));
 
 %% Material properties
 % 0.008 dB/m
-alphaLambda = 10.^[0.008, 0.08, 0.8]./20;
-fluid1 = struct('v', 350, 'density', 1.5);
-layer = struct('v', 5850, 'density', 7850, 'vShear', 3218);
+alphaLambda_dB = [0, 0.008, 0.08, 0.8, 1];
+fluid1 = struct('v', 1500, 'density', 1000);
+layer = struct('v', 5850, 'density', 7850, 'vShear', 3160);
 model = MultiLayerModel(fluid1, layer, fluid1, 10e-3);
 dist = 10e-2;
 theta = 0;
@@ -26,8 +26,8 @@ fres = 0.5*5850/10e-3;
 Y = ifft(y, nfft);
 legendstr = {};
 
-for i = 1:length(alphaLambda)
-    al = alphaLambda(i);
+for i = 1:length(alphaLambda_dB)
+    al = alphaLambda_dB(i);
     [xT, t, T] = planeWaveTransmissionTimeSignal(model, y, t, theta, dist, al, nfft);
     
     legendstr = cat(1, legendstr, num2str(al));
@@ -43,7 +43,8 @@ for i = 1:length(alphaLambda)
     %% Plot frequency spectrum
     figure(2)
     hold all
-    plot(f/fres, db(1/nfft*abs(ifft(xT, nfft))))
+    XT = 1/nfft*ifft(xT, nfft);
+    plot(f/fres, db(abs(XT)))
     xlabel('Normalized frequency')
     ylabel('PSD')
     title('Frequency spectrum')
@@ -59,7 +60,7 @@ for i = 1:length(alphaLambda)
     %% Plot the decay of the time signal
     figure(4)
     hold all
-    semilogy(t, abs(xT))
+    plot(t, db(abs(xT)))
     xlabel('Time')
     ylabel('Abs amplitude')
     title('Signal decay')
@@ -68,7 +69,7 @@ end
 %% Add the excitation pulse spectrum and legends
 figure(3)
 hold all
-plot(f/fres, abs(Y)./max(abs(Y)))
+plot(f/fres, abs(Y))
 for i = 1:4
     figure(i)
     legend(legendstr)
