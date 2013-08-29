@@ -21,9 +21,10 @@ rho_fluid = 1.5;
 v_fluid = 342.21;
 
 v_layer = 5850;
+vShear_layer = 3158;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
-layer = struct('v', v_layer, 'density', 7850, 'vShear', 3162);
+layer = struct('v', v_layer, 'density', 7850, 'vShear', vShear_layer);
 d = 10.15e-3;
 fres = 0.5*v_layer/d;
 alphaLambda_dB = 0.008;
