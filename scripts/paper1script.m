@@ -1,3 +1,4 @@
+function paper1script(thickness)
 %% Do the whole she bang!
 debug = false;
 saveresults = true;
@@ -25,7 +26,7 @@ vShear_layer = 3158;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
 layer = struct('v', v_layer, 'density', 7850, 'vShear', vShear_layer);
-d = 10.15e-3;
+d = thickness;
 fres = 0.5*v_layer/d;
 alphaLambda_dB = 0.008;
 
