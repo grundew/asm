@@ -9,10 +9,10 @@ v0 = 2/c/rho/2/pi;
 
 % Equation 8.10 and equation just after 8.6 from ref above
 x1 = kx*r_max;
-W1 = r_max*besselj(1, x1);
+W1 = r_max*besselj(1, x1)./kx;
 x2 = kx*r_min;
-W2 = r_min*besselj(1, x2);
-W1(x1==0) = 0.5;
-W2(x2==0) = 0.5;
-P = c*rho*2*pi*v0*(W1 - W2)./kx;
+W2 = r_min*besselj(1, x2)./kx;
+W1(x1==0) = r_max/2;
+W2(x2==0) = r_min/2;
+P = c*rho*2*pi*v0*(W1 - W2);
 end
