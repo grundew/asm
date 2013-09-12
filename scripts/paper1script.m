@@ -12,8 +12,8 @@ thetamax = 0.8;
 f = (0:nfft-1)*fs/nfft;
 
 %% Transducer specs
-aTx = 6e-3;
-aRx = 6e-3;
+aTx = 9e-3;
+aRx = 3e-3;
 d1 = 0.04;
 d3 = 0.04;
 
