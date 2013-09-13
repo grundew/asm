@@ -9,5 +9,5 @@ rho = logspace(log10(zstart/c), log10(zend/c), n);
 
 for i = 1:n
     fnvar = {'rho_fluid'};
-    startAsmSimulation('rho_fluid', rho(i), 'filenamevar', fnvar);
+    startAsmSimulation('rho_fluid', rho(i), 'filenamevars', fnvar);
 end
