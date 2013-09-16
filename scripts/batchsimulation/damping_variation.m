@@ -3,7 +3,7 @@ simdir = 'damping_variation';
 mkdir(simdir);
 cd(simdir);
 n = 100;
-alphalambda = linspace(0, 1, n);
+alphaLambda = linspace(0, 1, n);
 
 for i = 1:n
     fnvar = {'alphaLambda_db'};
