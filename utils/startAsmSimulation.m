@@ -1,5 +1,34 @@
 function startAsmSimulation(varargin)
-% startAsmSimulation()
+% startAsmSimulation('param1', value1, 'param2', value2, ...)
+% 
+%%
+% Valid parameters (all of them have default values)
+%
+% Solid properties:
+% 'thickness'
+% 'cp'
+% 'cs'
+% 'rho_solid'
+% 'alphaLambda_dB' - Damping in the solid.
+%
+% Fluid properties:
+% 'cf'
+% 'rho_fluid'
+%
+% Geometric setup:
+% 'aTx'
+% 'aRx'
+% 'distanceTx'
+% 'distanceRx'
+% 'alpha' - Misalignment angle of transducer (not implemented)
+%
+% Sampling stuff:
+% 'fs'
+% 'nfft'
+% 'thetamax'
+%
+% Admin stuff:
+% 'filenamevars' - Cell array of parameters with value included in the filename
 
 %% Parse the input
 params = parseInput(varargin{:});
@@ -78,7 +107,7 @@ yt = conv(y, fft(pt, nfft));
 tt = (0:length(yt)-1)/fs; %#ok<NASGU>
 
 %% Save results
-dtstr = datestr(now, 'dd-mm-yyyy_HHMMSS');
+dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
 fprintf('Finnished: %s\n', dtstr);
 outfilename = generateFilenameString(params, dtstr);
 fprintf('Saved to %s\n', outfilename);
@@ -140,7 +169,7 @@ end
 function outfilename = generateFilenameString(parameters, dtestr)
 prefix = 'asm';
 fnvars = parameters.filenamevars;
-c = cellfun(@(x) sprintf('%s%d', x, parameters.(x)) , fnvars, 'uni', 0);
-paramstr = strjoin(c, '_');
-outfilename = sprintf('%s_%s_%s.mat', prefix, paramstr, dtestr);
+c = cellfun(@(x) sprintf('%s-%d', x, parameters.(x)) , fnvars, 'uni', 0);
+paramstr = strjoin(c, '-');
+outfilename = sprintf('%s-%s-%s.mat', prefix, paramstr, dtestr);
 end
