@@ -141,12 +141,15 @@ p = inputParser();
 % Validator, true if x is a scalar greater than zero (gtz)
 validatorfun = @(x) validateattributes(x,...
     {'numeric'}, {'scalar', 'real', 'nonempty', '>', 0});
+validatorfunzero = @(x) validateattributes(x,...
+    {'numeric'}, {'scalar', 'real', 'nonempty', '>=', 0});
+
 % Solid
 p.addParamValue('thickness', def_thickness, validatorfun)
 p.addParamValue('cp', def_cp, validatorfun);
 p.addParamValue('cs', def_cs, validatorfun);
 p.addParamValue('rho_solid', def_rho_solid, validatorfun);
-p.addParamValue('alphaLambda_dB', def_alphaLambda, validatorfun);
+p.addParamValue('alphaLambda_dB', def_alphaLambda, validatorfunzero);
 % Fluid
 p.addParamValue('cf', def_cf, validatorfun);
 p.addParamValue('rho_fluid', def_rho_fluid, validatorfun);

@@ -6,6 +6,6 @@ n = 100;
 alphaLambda = linspace(0, 1, n);
 
 for i = 1:n
-    fnvar = {'alphaLambda_db'};
-    startAsmSimulation('alphaLambda_db', alphaLambda(i), 'filenamevars', fnvar);
+    fnvar = {'alphaLambda_dB'};
+    startAsmSimulation('alphaLambda_dB', alphaLambda(i), 'filenamevars', fnvar);
 end
