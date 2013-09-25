@@ -1,57 +1,60 @@
-function drawDispersion()
+function drawDispersion(f, theta, varargin)
+% drawDispersion(f, theta, 'param1', value1, 'param2', value2, ...)
+%
+% Input:
+% f - Frequency (Hz)
+% theta - Angle (rad)
+%
+% Valid parameters (all of them have default values)
+%
+% Solid properties:
+% 'thickness'
+% 'cp'
+% 'cs'
+% 'rho_solid'
+% 'alphaLambda_dB' - Damping in the solid.
+%
+% Fluid properties:
+% 'cf'
+% 'rho_fluid'
+%
 
-nt = 4000;
-thetamax = 10; % Deg
-theta = linspace(0, thetamax, nt);
-d = 25e-3;
+%% Parse the input
+[params, p] = parseWNIInput(varargin{:});
 
-nf = 6000;
-v = 5850;
-vs = 3200;
-fres = v/d/2;
-
-f = linspace(400e3, 800e3, nf);
-
-for vShear = vs
-    % Calculate the reflection coefficient for all f and theta
-    R = getReflectionCoeff(f, theta/180*pi, v, vShear, d);
-    %% Solid layer immersed in a fluid
-    plotdisp(f/fres, theta, R, v/vShear)
+invalidparams = {'fs', 'thetamax', 'distanceTx', 'distanceRx',...
+    'aTx', 'aRx', 'filenamevars', 'nfft'};
+invid = cellfun(@(x) ~any(strcmp(x, p.UsingDefaults)), invalidparams);
+if any(invid)
+    errorstr = sprintf('Invalid parameter specified: %s', invalidparams{~invid});
+    error('InputError:InvalidParameter', errorstr);
 end
-end
 
-function R = getReflectionCoeff(f, theta, v, vShear, d)
-%% Material parameters
-fluid1 = struct('v', 430, 'density', 120);
-% fluid3 = struct('v', 2500, 'density', 1200);
+fluid1 = struct('v', params.cf, 'density', params.rho_fluid);
 fluid3 = fluid1;
-layer = struct('v', v, 'density', 7850, 'vShear', vShear);
+layer = struct('v', params.cp, 'density', params.rho_solid, 'vShear', params.cs);
 
 % Fluid-solid-fluid model
-model = MultiLayerModel(fluid1, layer, fluid3, d);
-% Calculate V
+model = MultiLayerModel(fluid1, layer, fluid3, params.thickness);
+
+fres = params.cp/params.thickness/2;
+
+% Calculate the reflection coefficient for all f and theta
 R = zeros(length(f), length(theta));
 for i = 1:length(f)
-    R(i, :) = fluidSolidFluidReflectionCoefficient(f(i), theta, model);
-    % [~, R(i, :)] = analyticRTFast(f(i), theta, model);
-end
-% Save calculated parameters
-% outfn = fullfile('/Users/grundew/Dropbox/phd_hive/work/DispersionCurves',...
-%     sprintf('data_%2.2f.mat', v/vShear));
-% save(outfn, 'f', 'theta', 'vShear',...
-%     'R', 'N1', 'N2', 'M1', 'M2', 'alpha_L', 'alpha_S'); 
+    R(i, :) = analyticRTFast(f(i), theta, model);
 end
 
-function plotdisp(x, y, V, clcp)
+%% Solid layer immersed in a fluid
+plotdisp(f/fres, theta*180/pi, abs(R)')
+end
+
+function plotdisp(x, y, R)
 %% Plot
 fig = figure;
-imagesc(x, y, abs(V)')
+imagesc(x, y, R)
 axis xy
-xlabel('f/fres')
-ylabel('\theta')
-title(sprintf('Solid layer immersed in fluid. cL/cS = %2.2f', clcp))
+xlabel('f/f_1')
+ylabel('\theta (deg)')
 colormap(gray)
-outfn = fullfile('/Users/grundew/Dropbox/phd_hive/work/DispersionCurves',...
-    sprintf('curves_%2.2f.fig', clcp));
-saveas(fig, outfn,'fig');
 end

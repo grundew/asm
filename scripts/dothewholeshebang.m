@@ -3,9 +3,9 @@ debug = false;
 saveresults = true;
 
 %% Samplings stuff
-fs = 4e6;
-nfft = 2^15;
-ntheta = 2^12;
+fs = 2e6;
+nfft = 2^17;
+% ntheta = 2^12;
 thetamax = 0.8;
 % thetamax = pi/2;
 f = (0:nfft-1)*fs/nfft;
@@ -17,15 +17,16 @@ d1 = 0.04;
 d3 = 0.04;
 
 %% Material parameters
-rho_fluid = 1000;
-v_fluid = 1500;
+rho_fluid = 1.5;
+v_fluid = 342.21;
 
 v_layer = 5850;
 fluid1 = struct('v', v_fluid, 'density', rho_fluid);
 fluid3 = fluid1;
-layer = struct('v', v_layer, 'density', 7850, 'vShear', 3218);
-d = 25e-3;
+layer = struct('v', v_layer, 'density', 7850, 'vShear', 3162);
+d = 10.15e-3;
 fres = 0.5*v_layer/d;
+alphaLambda = 1;
 
 % Fluid-solid-fluid model
 model = MultiLayerModel(fluid1, layer, fluid3, d);
@@ -35,8 +36,8 @@ tend = 50e-6;
 t = (0:1/fs:tend)';
 
 % Start and stop frequencies
-f0 = 400e3;
-f1 = 1200e3;
+f0 = 200e3;
+f1 = 800e3;
 
 % Window
 wndw = rectwin(length(t));
@@ -59,8 +60,8 @@ Y = ifft(y, nfft);
 tic
 nf = length(f);
 pt = zeros(nf, 1);
-theta = linspace(0, thetamax, ntheta);
-dtheta = theta(2) - theta(1);
+% theta = linspace(0, thetamax, ntheta);
+% dtheta = theta(2) - theta(1);
 
 for i = 1:nf
     % Time it
@@ -70,13 +71,16 @@ for i = 1:nf
     end
     
     freq = f(i);
-
+    fun = @(xx) integrandFluidSolidFluidTransmission_withLoss(xx, freq, aRx, aTx,...
+        v_fluid, rho_fluid, d1, d3, model, alphaLambda);
+    % fun = @(xx) integrandFluidSolidFluidTransmission(xx, freq, aRx, aTx,...
+    %    v_fluid, rho_fluid, d1, d3, model);
     % fun = @(xx) integrandFluidSolidFluid(xx, freq, aRx, aTx,...
+    %    v_fluid, rho_fluid, d1, d3, model);
+    pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    % Ht = integrandFluidSolidFluidReflection(theta, freq, aRx, aTx,...
     %     v_fluid, rho_fluid, d1, d3, model);
-    %  pt(i) = 2*pi*quadgk(fun, 0, thetamax);
-    Ht = integrandFluidSolidFluidReflection(theta, freq, aRx, aTx,...
-        v_fluid, rho_fluid, d1, d3, model);
-    pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
+    % pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
 
     
     % Time it
@@ -96,7 +100,7 @@ tt = (0:length(yt)-1)/fs;
 
 %% Finnished
 if saveresults
-    dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS'); %#ok<UNRCH>
+    dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
     fprintf('Finnished: %s\n', dtstr)
     outfile = sprintf('wholeshebang_%s_thickness%d.mat', dtstr, d);
     fprintf('Saved to %s\n', outfile)

@@ -77,12 +77,12 @@ for i = 1:nf
     
     freq = f(i);
 
-    % fun = @(xx) integrandFluidSolidFluid_withAngle(xx, freq, aRx, aTx,...
-    %    v_fluid, rho_fluid, dist, model, alpha);
-    % pt(i) = 2*pi*quadgk(fun, 0, thetamax);
-    Ht = integrandFluidSolidFluid_withAngle(theta, freq, aRx, aTx,...
-        v_fluid, rho_fluid, dist, model, alpha);
-    pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
+    fun = @(xx) integrandFluidSolidFluid_withAngle(xx, freq, aRx, aTx,...
+       v_fluid, rho_fluid, dist, model, alpha);
+    pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    % Ht = integrandFluidSolidFluid_withAngle(theta, freq, aRx, aTx,...
+    %     v_fluid, rho_fluid, dist, model, alpha);
+    % pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
     
     % Time it
     if i == 300
