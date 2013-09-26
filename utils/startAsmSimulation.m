@@ -1,6 +1,7 @@
 function startAsmSimulation(varargin)
 % startAsmSimulation('param1', value1, 'param2', value2, ...)
 % 
+%%
 % Valid parameters (all of them have default values)
 %
 % Solid properties:
