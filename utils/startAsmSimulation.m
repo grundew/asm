@@ -1,7 +1,6 @@
 function startAsmSimulation(varargin)
 % startAsmSimulation('param1', value1, 'param2', value2, ...)
 % 
-%%
 % Valid parameters (all of them have default values)
 %
 % Solid properties:
@@ -31,7 +30,7 @@ function startAsmSimulation(varargin)
 % 'filenamevars' - Cell array of parameters with value included in the filename
 
 %% Parse the input
-params = parseWNIInput(varargin{:});
+params = parseAsmInput(varargin{:});
 
 fluid1 = struct('v', params.cf, 'density', params.rho_fluid);
 fluid3 = fluid1;

@@ -1,4 +1,4 @@
-function [result, p] = parseWNIInput(varargin)
+function [result, p] = parseAsmInput(varargin)
 %% Default values
 % Solid
 def_thickness = 10e-3; % m

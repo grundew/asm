@@ -15,9 +15,14 @@ thickness = 25e-3;
 nalpha = 1;
 alpha = 0;
 
-for i = 1:nalpha
-    fnvars = {'alpha'};
-    startAsmSimulation_txangle('aTx', aTx, 'aRx', aTx,...
-        'distanceTx', dist, 'distanceRx', dist, ...
-        'fs', fs, 'filenamevars', fnvars);
-end
+fnvars = {'distancetX
+startAsmSimulation_txangle('aTx', aTx, 'aRx', aTx,...
+         'distanceTx', dist, 'distanceRx', dist, ...
+         'fs', fs, 'filenamevars', fnvars);
+
+% for i = 1:nalpha
+%     fnvars = {'alpha'};
+%     tartAsmSimulation_txangle('aTx', aTx, 'aRx', aTx,...
+%         'distanceTx', dist, 'distanceRx', dist, ...
+%         'fs', fs, 'filenamevars', fnvars);
+% end

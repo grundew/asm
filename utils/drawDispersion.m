@@ -20,7 +20,7 @@ function drawDispersion(f, theta, varargin)
 %
 
 %% Parse the input
-[params, p] = parseWNIInput(varargin{:});
+[params, p] = parseAsmInput(varargin{:});
 
 invalidparams = {'fs', 'thetamax', 'distanceTx', 'distanceRx',...
     'aTx', 'aRx', 'filenamevars', 'nfft'};
@@ -46,7 +46,7 @@ for i = 1:length(f)
 end
 
 %% Solid layer immersed in a fluid
-plotdisp(f/fres, theta*180/pi, abs(R)')
+plotdisp(f/fres, theta*180/pi, db(abs(R))')
 end
 
 function plotdisp(x, y, R)

@@ -1,5 +1,5 @@
 function P = planePistonPressureAngularSpectrum(kx, a, c, rho)
-% p = planePistonPressureAngularSpectrum(theta, z, f, a, c, rho)
+% p = planePistonPressureAngularSpectrum(kx, a, c, rho)
 %
 % Based on Ultrasonic Nondestructive Evaluation System - Lester W. Schmerr
 % Jr and Sung-Jin Song.

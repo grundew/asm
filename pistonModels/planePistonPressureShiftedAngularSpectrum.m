@@ -1,25 +1,18 @@
-function I = shiftedTransducer(theta, f, aRx, aTx,...
-    c, rho, d1, d3, model, alphaLambda, deltax)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
-q = sin(theta);
-p = sqrt(1-q.^2);
-w = 2*pi*f;
-k = w./c;
-kx = k*q;
-kz = k*p;
+function P = planePistonPressureShiftedAngularSpectrum(kx, a, c, rho, deltax)
+% P = planePistonPressureShiftedAngularSpectrum(kx, a, c, rho, deltax);
+%   Calculates the angular spetrum of a plane piston shifted away from the z-axis.
+%
+% Input:
+% kx - wave number (1/m)
+% a - transducer radius (m)
+% c - speed of sound (m/s)
+% rho - density (kg/m3)
+% deltax - shifting distance (m)
 
-%% Transducer spacial sensitivities
-PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
-PhiTx = 2*pi*besselj(0, kx*deltax).*planePistonPressureAngularSpectrum(kx, aTx, c, rho);
+% Based on Ultrasonic Nondestructive Evaluation System - Lester W. Schmerr
+% Jr and Sung-Jin Song.
+v0 = 2/c/rho/2/pi/a^2;
 
-%% Plate response, angular
-alphaL = -alphaLambda*f/model.solid.v;
-T = transmissionCoefficientAnalytical(f, q, model, alphaL);
-
-%% Phase shift from transmitter to plate and from plate to receiver
-Phase = exp(1i*kz*(d1 + d3));
-
-I = T.*k.*q.*PhiRx.*PhiTx.*Phase.*k.*p;
+% Transducer spacial sensitivities
+P = 2*pi*besselj(0, kx*deltax).*planePistonPressureAngularSpectrum(kx, aTx, c, rho);
 end
-
