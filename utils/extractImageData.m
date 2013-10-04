@@ -11,11 +11,7 @@ function [C, x, y] = extractImageData(himage)
 % x - x-axis ('XData')
 % y - y-axis ('YData')
 
-if nargin == 0
-    himage = gco;
-end
-
-assert(ishandle(himage) & strcmp(get(himage, 'Type'), 'image'),...
+assert(~isempty(himage) & ishandle(himage) & strcmp(get(himage, 'Type'), 'image'),...
     'HW:InputError', 'Input or gco needs to be an image handle');
 
 C = get(himage, 'CData');
