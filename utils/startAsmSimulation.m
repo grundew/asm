@@ -116,7 +116,7 @@ end
 function outfilename = generateFilenameString(parameters, dtestr)
 prefix = 'asm';
 fnvars = parameters.filenamevars;
-c = cellfun(@(x) sprintf('%s-%d', x, parameters.(x)) , fnvars, 'uni', 0);
-paramstr = strjoin(c, '-');
-outfilename = sprintf('%s-%s-%s.mat', prefix, paramstr, dtestr);
+c = cellfun(@(x) sprintf('%s_%d', x, parameters.(x)) , fnvars, 'uni', 0);
+paramstr = strjoin(c, '_');
+outfilename = sprintf('%s_%s_%s.mat', prefix, paramstr, dtestr);
 end

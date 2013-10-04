@@ -1,4 +1,4 @@
-function I = computeAsmIntegrand(f, theta, varargin)
+function I = computeAsmTransmissionIntegrand(f, theta, varargin)
 % I = computeAsmIntegrand(f, theta, varargin)
 % 
 %
