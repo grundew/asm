@@ -19,7 +19,7 @@ C = C(idy, idx);
 x = xx(idx);
 y = yy(idy);
 
-[~, idmax] = max(C, [], 1);
+[~, idmax] = max(C, [], 2);
 
-y = y(idmax);
+x = x(idmax);
 end
