@@ -15,8 +15,7 @@ def_aRx = 3e-3; % Radius (m)
 def_distanceTx = 40e-3; % m
 def_distanceRx = 40e-3; % m
 % Sampling stuff
-def_fs = 2e6;
-def_nfft = 2^15;
+def_f = (0:2^15-1)*2e6/2^15;
 def_thetamax = 0.8;
 
 %% Parse input
@@ -25,6 +24,8 @@ p = inputParser();
 % Validator, true if x is a scalar greater than zero (gtz)
 validatorfun = @(x) validateattributes(x,...
     {'numeric'}, {'scalar', 'real', 'nonempty', '>', 0});
+validatorfunvec = @(x) validateattributes(x,...
+    {'numeric'}, {'vector', 'real', 'nonempty'});
 % Solid
 p.addParamValue('thickness', def_thickness, validatorfun)
 p.addParamValue('cp', def_cp, validatorfun);
@@ -40,11 +41,13 @@ p.addParamValue('aRx', def_aRx, validatorfun);
 p.addParamValue('distanceTx', def_distanceTx, validatorfun);
 p.addParamValue('distanceRx', def_distanceRx, validatorfun);
 % Sampling stuff
-p.addParamValue('fs', def_fs, validatorfun);
-p.addParamValue('nfft', def_nfft, validatorfun);
+p.addParamValue('f', def_f, validatorfunvec);
 p.addParamValue('thetamax', def_thetamax, validatorfun);
 % Admin stuff
 p.addParamValue('filenamevars', {}, @iscell);
+p.addParamValue('savemat', false, @islogical);
+p.addParamValue('debug', false, @islogical);
+
 % Parse
 p.parse(varargin{:});
 result = p.Results;

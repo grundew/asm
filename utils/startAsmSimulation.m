@@ -1,4 +1,4 @@
-function startAsmSimulation(varargin)
+function [pt, f, params] = startAsmSimulation(varargin)
 % startAsmSimulation('param1', value1, 'param2', value2, ...)
 % 
 % Valid parameters (all of them have default values)
@@ -22,8 +22,7 @@ function startAsmSimulation(varargin)
 % 'alpha' - Misalignment angle of transducer (not implemented)
 %
 % Sampling stuff:
-% 'fs'
-% 'nfft'
+% 'f'
 % 'thetamax'
 %
 % Admin stuff:
@@ -40,32 +39,8 @@ layer = struct('v', params.cp, 'density', params.rho_solid, 'vShear', params.cs)
 model = MultiLayerModel(fluid1, layer, fluid3, params.thickness);
 
 %% Samplings stuff
-fs = params.fs;
-nfft = params.nfft;
+f = params.f;
 thetamax = params.thetamax;
-f = (0:nfft-1)*fs/nfft;
-
-%% Excitation pulse
-tend = 50e-6;
-t = (0:1/fs:tend)';
-
-% Start and stop frequencies
-f0 = 200e3;
-f1 = 800e3;
-
-% Window
-wndw = rectwin(length(t));
-% wndw = gausswin(length(t));
-
-% Real chirp
-y = wndw.*chirp(t, f0, tend, f1, 'linear', 270);
-
-% Analytic chirp
-y = conj(hilbert(y));
-
-% Pad with zeros
-t = (0:length(y)-1)/fs'; %#ok<NASGU>
-Y = ifft(y, nfft); %#ok<NASGU>
 
 %% Unpack parameters
 aRx = params.aRx;
@@ -75,11 +50,12 @@ rho_fluid = params.rho_fluid;
 d1 = params.distanceTx;
 d3 = params.distanceRx;
 alphaLambda_dB = params.alphaLambda_dB;
+fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 
 %% Integrate over all angles for the point on the axis
 tic
-nf = length(f);
-pt = zeros(nf, 1);
+nf = numel(f);
+pt = zeros(size(f));
 for i = 1:nf
     % Time it
     if i == 1
@@ -101,16 +77,14 @@ for i = 1:nf
 
 end
 
-%% Convolve the excitation pulse with the system response
-yt = conv(y, fft(pt, nfft));
-tt = (0:length(yt)-1)/fs; %#ok<NASGU>
-
-%% Save results
-dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
-fprintf('Finnished: %s\n', dtstr);
-outfilename = generateFilenameString(params, dtstr);
-fprintf('Saved to %s\n', outfilename);
-save(outfilename, 'params', 'pt', 't', 'y', 'tt', 'yt');
+if params.savemat
+    %% Save results
+    dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
+    fprintf('Finnished: %s\n', dtstr);
+    outfilename = generateFilenameString(params, dtstr);
+    fprintf('Saved to %s\n', outfilename);
+    save(outfilename, 'params', 'pt', 'f', 'fres');
+end
 end
 
 function outfilename = generateFilenameString(parameters, dtestr)
