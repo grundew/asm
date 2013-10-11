@@ -1,11 +1,26 @@
 %% Batch simulation of varying impdance from Z = 525 to 1.5e6
-simdir = 'distance_to_plate_variation';
+simdir = 'distanceTx_variation';
 mkdir(simdir);
 cd(simdir);
-n = 100;
-dist = linspace(0.1e-3, 20e-2, n);
 
+%% Get default parameters
+p = parseAsmInput();
+fres = 0.5*p.cp/p.thickness;
+nf = 4000;
+f = linspace(0, 2.5*fres, nf);
+
+% Set aRx and aTx such that the fresnel distance is 1
+p.aRx = sqrt(p.cf/fres);
+p.aTx = p.aRx;
+
+n = 750;
+dist = linspace(0.01, 2, n);
+
+p.filenamevars = {'distanceTx', 'distanceRx'};
+
+%% Do the simulations
 for i = 1:n
-    fnvar = {'distanceTx'};
-    startAsmSimulation('distanceTx', dist(i), 'filenamevars', fnvar);
+    p.distanceTx = dist(i);
+    p.distanceRx = dist(i);
+    startAsmSimulation(p);
 end
