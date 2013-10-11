@@ -8,17 +8,17 @@ p = parseAsmInput();
 fres = 0.5*p.cp/p.thickness;
 z = p.cf*p.rho_fluid;
 
-nf = 2000;
-f = linspace(0.7, 1.5*fres, nf);
+nf = 5000;
+f = linspace(0.7*fres, 1.5*fres, nf);
 
 % Define the a
-na = 300;
+na = 60;
 amax = 1e-1;
 amin = 1e-4;
 a = logspace(log10(amin), log10(amax), na);
 
 % Define cf and rho for constant impedance of fluid
-nf = 750;
+nf = 10;
 cfmin = 100;
 cfmax = 3000;
 cf = linspace(cfmin, cfmax, nf);
@@ -32,7 +32,5 @@ secndvarnames = {'cf', 'rho_fluid'};
 secndvar = {cf, rho_fluid};
 
 %% Do the simulations
-for i = 1:n
-    startMultipleBatchSimulations(prefix, primvarnames, primvar,...
+startMultipleBatchSimulations(prefix, primvarnames, primvar,...
         secndvarnames, secndvar, p)
-end
