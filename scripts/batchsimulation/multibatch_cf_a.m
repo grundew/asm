@@ -1,4 +1,4 @@
-% script for varying a and cf, keeping the impedance constant
+% script for varying a and cf, keeping the impedance constant as in water
 simdir = 'multibatch_cf_a';
 mkdir(simdir);
 cd(simdir);
@@ -6,16 +6,16 @@ cd(simdir);
 %% Get default parameters
 p = parseAsmInput();
 fres = 0.5*p.cp/p.thickness;
-z = p.cf*p.rho_fluid;
+z = 1000*1500;
 
-nf = 5000;
-f = linspace(0.7*fres, 1.5*fres, nf);
+nf = 1000;
+p.f = linspace(0.95*fres, 1.05*fres, nf);
 
 % Define the a
 na = 60;
-amax = 1e-1;
-amin = 1e-4;
-a = logspace(log10(amin), log10(amax), na);
+logamax = -1;
+logamin = -4;
+a = logspace(logamin, logamax, na);
 
 % Define cf and rho for constant impedance of fluid
 nf = 10;
