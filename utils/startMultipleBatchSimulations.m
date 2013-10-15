@@ -12,6 +12,7 @@ np = length(primvar{1});
 ns = length(secndvar{1});
 curdir = pwd();
 p.savemat = true;
+p.filenamevars = secndvarnames;
 for i = 1:ns
     
     % Update the secondary variable
