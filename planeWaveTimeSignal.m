@@ -1,4 +1,4 @@
-function [xR, t, R] = planeWaveTimeSignal(model, xPulse, tPulse, theta, dist, nfft)
+function [xR, xT, t, R] = planeWaveTimeSignal(model, xPulse, tPulse, theta, dist, nfft)
 % [xR, xT, t] = planeWaveTimeSignal(model, xPulse, tPulse)
 %
 % Calculates the response of a solid plate embedded in a fluid and
@@ -30,8 +30,11 @@ elseif nargin < 6
     nfft = 2^13;
 end
 
+
+%f = fftshift((0:nfft-1)*fs/nfft);
 fs = 1/(tPulse(2)-tPulse(1));
-f = (0:nfft-1)*fs/nfft;
+df = fs/(nfft);
+f = fftshift(((0:(nfft-1))'-floor(nfft/2))*df);
 
 % Fourier transform of the pulse
 Ypulse = ifft(xPulse, nfft);
@@ -47,5 +50,6 @@ Et = exp(1i*kt*dist);
 
 % Convolve the pulse and the reflection/transmission coefficient
 xR = fft(Ypulse(:).*R(:).*Er(:), nfft);
+xT = fft(Ypulse(:).*R(:).*Et(:), nfft);
 t = (0:length(xR)-1)/fs;
 end
