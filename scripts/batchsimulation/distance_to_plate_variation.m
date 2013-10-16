@@ -9,7 +9,7 @@ p.savemat = true;
 p.cf = 1500;
 fres = 0.5*p.cp/p.thickness;
 nf = 2000;
-f = linspace(0.7, 1.3*fres, nf);
+f = linspace(0.7*fres, 1.3*fres, nf);
 
 % Set aRx and aTx such that the fresnel distance is 1
 p.aRx = sqrt(p.cf/fres);
