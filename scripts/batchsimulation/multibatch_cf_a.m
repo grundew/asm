@@ -8,19 +8,19 @@ p = parseAsmInput();
 fres = 0.5*p.cp/p.thickness;
 z = 1000*1500;
 
-nf = 1000;
-p.f = linspace(0.95*fres, 1.05*fres, nf);
+nf = 1500;
+p.f = linspace(0.8*fres, 1.1*fres, nf);
 
 % Define the a
-na = 60;
-logamax = -1;
+na = 100;
+logamax = 0;
 logamin = -4;
 a = logspace(logamin, logamax, na);
 
 % Define cf and rho for constant impedance of fluid
-nf = 10;
+nf = 100;
 cfmin = 100;
-cfmax = 3000;
+cfmax = 6000;
 cf = linspace(cfmin, cfmax, nf);
 rho_fluid = z./cf;
 
