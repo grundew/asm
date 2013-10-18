@@ -16,7 +16,7 @@ z = p.cp*p.rho_solid;
 nn = 1000;
 cfmin = 50;
 cfmax = 8000;
-cf = linpsace(cfmin, cfmax, nn);
+cf = linspace(cfmin, cfmax, nn);
 
 % Pack it up
 fnvar = {'cf'};

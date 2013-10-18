@@ -17,7 +17,7 @@ nn = 400;
 cpmin = 500;
 cpmax = 8000;
 nu = 0.2752;
-cp = linpsace(cpmin, cpmax, nn);
+cp = linspace(cpmin, cpmax, nn);
 cs = cp./(sqrt(2*(1 - nu)./(1 - 2*nu)));
 rho_solid = z./cp;
 
