@@ -1,5 +1,5 @@
 % script for varying a and cf, keeping the impedance constant as in water
-simdir = 'multibatch_cf_a';
+simdir = 'multibatch-cf-a';
 mkdir(simdir);
 cd(simdir);
 
