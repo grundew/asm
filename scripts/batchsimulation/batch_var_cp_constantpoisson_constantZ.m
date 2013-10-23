@@ -1,5 +1,5 @@
-% script for varying poisson ratio
-simdir = 'varcf';
+% script for varying cp, keeping the impedance and poisson ratio constant
+simdir = 'varcp_constantmu_constantz';
 mkdir(simdir);
 cd(simdir);
 
@@ -12,16 +12,26 @@ nf = 4000;
 p.f = linspace(0.5*fres, 1.5*fres, nf);
 z = p.cp*p.rho_solid;
 
-% Vary Poisson's ratio
-nn = 1000;
-cfmin = 50;
-cfmax = 8000;
-cf = linspace(cfmin, cfmax, nn);
+% Vary cp
+nn = 400;
+cpmin = 500;
+cpmax = 8000;
+nu = 0.2752;
+cp = linspace(cpmin, cpmax, nn);
 
-% Pack it up
-fnvar = {'cf'};
+% Keep poisson's ratio constant
+cs = cp./(sqrt(2*(1 - nu)./(1 - 2*nu)));
+% Keep impedance constant
+rho = z./cp;
+
+% Variables written to file
+fnvar = {'cp', 'cs', 'rho_solid'};
 
 %% Do the simulations
 for i = 1:nn
-    startAsmSimulation('cf', cf(i), 'filenamevars', fnvar);
+    startAsmSimulation(...
+        'cp', cp(i),...
+        'cs', cs(i),...
+        'rho_solid', rho(i),...
+        'filenamevars', fnvar);
 end

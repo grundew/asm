@@ -1,4 +1,4 @@
-% script for varying poisson ratio
+% Script for varying cp
 simdir = 'varcf-constantpoisson';
 mkdir(simdir);
 cd(simdir);
