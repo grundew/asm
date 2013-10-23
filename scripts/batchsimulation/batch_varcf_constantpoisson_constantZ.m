@@ -1,5 +1,5 @@
-% script for cp contsant poisson and constant z
-simdir = 'varcp-constantpoisson-constantZ';
+% script for cf contsant poisson and constant z
+simdir = 'varcf-constantpoisson-constantZ';
 mkdir(simdir);
 cd(simdir);
 
