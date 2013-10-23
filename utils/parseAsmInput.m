@@ -45,8 +45,8 @@ p.addParamValue('f', def_f, validatorfunvec);
 p.addParamValue('thetamax', def_thetamax, validatorfun);
 % Admin stuff
 p.addParamValue('filenamevars', {}, @iscell);
-p.addParamValue('savemat', false, @islogical);
-p.addParamValue('debug', true, @islogical);
+p.addParamValue('savemat', true, @islogical);
+p.addParamValue('debug', false, @islogical);
 
 % Parse
 p.parse(varargin{:});
