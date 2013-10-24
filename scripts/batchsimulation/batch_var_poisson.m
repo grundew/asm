@@ -20,9 +20,10 @@ cp = p.cp;
 cs = cp./(sqrt(2*(1 - nu)./(1 - 2*nu)));
 
 % Pack it up
-fnvar = {'cs', 'cp'};
+p.filenamevars = {'cs', 'cp'};
 
 %% Do the simulations
 for i = 1:nn
-    startAsmSimulation('cs', cs(i), 'filenamevars', fnvar);
+    p.cs = cs(i);
+    startAsmSimulation(p);
 end

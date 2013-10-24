@@ -25,13 +25,12 @@ cs = cp./(sqrt(2*(1 - nu)./(1 - 2*nu)));
 rho = z./cp;
 
 % Variables written to file
-fnvar = {'cp', 'cs', 'rho_solid'};
+p.filenamevars = {'cp', 'cs', 'rho_solid'};
 
 %% Do the simulations
 for i = 1:nn
-    startAsmSimulation(...
-        'cp', cp(i),...
-        'cs', cs(i),...
-        'rho_solid', rho(i),...
-        'filenamevars', fnvar);
+    p.cp = cp(i);
+    p.cs = cs(i);
+    p.rho_solid = rho(i);
+    startAsmSimulation(p);
 end

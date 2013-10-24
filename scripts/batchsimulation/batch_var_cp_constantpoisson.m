@@ -20,9 +20,11 @@ cp = linspace(cpmin, cpmax, nn);
 cs = cp./(sqrt(2*(1 - nu)./(1 - 2*nu)));
 
 % Pack it up
-fnvar = {'cs', 'cp'};
+p.filenamevars = {'cs', 'cp'};
 
 %% Do the simulations
 for i = 1:nn
-    startAsmSimulation('cp', cp(i), 'cs', cs(i), 'filenamevars', fnvar);
+    p.cp = cp(i);
+    p.cs = cs(i);
+    startAsmSimulation(p);
 end

@@ -1,4 +1,4 @@
-% script for varying poisson ratio
+% Script for varying cf
 simdir = 'varcf';
 mkdir(simdir);
 cd(simdir);
@@ -10,18 +10,18 @@ fres = 0.5*p.cp/p.thickness;
 % Define freuencies
 nf = 4000;
 p.f = linspace(0.5*fres, 1.5*fres, nf);
-z = p.cp*p.rho_solid;
 
-% Vary Poisson's ratio
-nn = 1000;
+% Vary cf
+nn = 200;
 cfmin = 50;
 cfmax = 8000;
 cf = linspace(cfmin, cfmax, nn);
 
 % Pack it up
-fnvar = {'cf'};
+p.filenamevars = {'cf'};
 
 %% Do the simulations
 for i = 1:nn
-    startAsmSimulation('cf', cf(i), 'filenamevars', fnvar);
+    p.cf = cf(i);
+    startAsmSimulation(p);
 end

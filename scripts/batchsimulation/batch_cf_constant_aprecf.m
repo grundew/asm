@@ -24,10 +24,12 @@ cf = linspace(cfmin, cfmax, nc);
 a = aperc*cf;
 
 % Pack it up
-fnvar = {'cf', 'aTx', 'aRx'};
+p.filenamevars = {'cf', 'aTx', 'aRx'};
 
 %% Do the simulations
 for i = 1:nc
-    fnvar = {'cf', 'aTx', 'aRx'};
-    startAsmSimulation('cf', cf(i), 'aRx', a(i), 'aTx', a(i), 'filenamevars', fnvar);
+    p.cf = cf(i);
+    p.aRx = a(i);
+    p.aTx = a(i);
+    startAsmSimulation(p);
 end

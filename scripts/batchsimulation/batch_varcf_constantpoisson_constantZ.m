@@ -22,9 +22,12 @@ cs = cp./(sqrt(2*(1 - nu)./(1 - 2*nu)));
 rho_solid = z./cp;
 
 % Pack it up
-fnvar = {'cs', 'cp'};
+p.filenamevars = {'cs', 'cp'};
 
 %% Do the simulations
 for i = 1:nn
-    startAsmSimulation('cp', cp(i), 'cs', cs(i), 'rho_solid', rho_solid(i), 'filenamevars', fnvar);
+    p.cp = cp(i);
+    p.cs = cs(i);
+    p.rho_solid = rho_solid(i);
+    startAsmSimulation(p);
 end
