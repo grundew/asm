@@ -1,5 +1,5 @@
 %% Batch simulation of varying impdance from Z = 525 to 1.5e6
-simdir = 'distanceTx_variation';
+simdir = 'distanceTx_variation_aperlambda_3';
 mkdir(simdir);
 cd(simdir);
 
@@ -12,7 +12,10 @@ nf = 2000;
 f = linspace(0.7*fres, 1.3*fres, nf);
 
 % Set aRx and aTx such that the fresnel distance is 1
-p.aRx = sqrt(p.cf/fres);
+% p.aRx = sqrt(p.cf/fres);
+
+% Set aRx and aTx such that a/lambda = 3
+p.aRx = 3*p.cf/fres;
 p.aTx = p.aRx;
 
 n = 750;
