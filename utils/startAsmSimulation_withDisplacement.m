@@ -1,4 +1,4 @@
-function [pt, f, params] = startAsmSimulation(varargin)
+function [pt, f, params] = startAsmSimulation_withDisplacement(varargin)
 % startAsmSimulation('param1', value1, 'param2', value2, ...)
 % 
 % Valid parameters (all of them have default values)
@@ -20,11 +20,11 @@ function [pt, f, params] = startAsmSimulation(varargin)
 % 'distanceTx' - Distance from the transmitter to the plate
 % 'distanceRx' - Distance from receiver to the plate
 % 'alpha' - Misalignment angle of transducer (not implemented)
-
+% 'x0' - Displacement of the receiver
 %
 % Sampling stuff:
 % 'f'
-% 'thetamax' - Integration limit
+% 'thetamax'
 %
 % Admin stuff:
 % 'filenamevars' - Cell array of parameters with value included in the filename
@@ -52,6 +52,8 @@ d1 = params.distanceTx;
 d3 = params.distanceRx;
 alphaLambda_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
+cf = params.cf;
+x0 = params.x0;
 
 %% Integrate over all angles for the point on the axis
 tic
@@ -64,10 +66,12 @@ for i = 1:nf
         tic
     end
     
-    freq = f(i);
-    fun = @(xx) integrandFluidSolidFluidTransmission_withLoss(xx, freq, aRx, aTx,...
-       v_fluid, rho_fluid, d1, d3, model, alphaLambda_dB);
-    pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    w = 2*pi*f(i);
+    k = w/cf;
+    fun = @(xx) integrandFluidSolidFluidTransmission_withLossAndDisplacement(xx, w, aRx, aTx,...
+        v_fluid, rho_fluid, d1, d3, model, x0, alphaLambda_dB);
+    % Integrate over k_r from 0 to k
+    pt(i) = quadgk(fun, 0, k);
 
     
     % Time it
