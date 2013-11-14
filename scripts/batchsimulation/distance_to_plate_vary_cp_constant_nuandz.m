@@ -1,6 +1,6 @@
 function distance_to_plate_vary_cp_constant_nuandz(C, cp)
 %% Batch simulation of varying impdance from Z = 525 to 1.5e6
-simdir = sprintf('distanceTx_variation_aperlambda_%.1f', C);
+simdir = sprintf('distanceTx_variation_aperlambda_%.1f_cp_%.1f', C, cp);
 mkdir(simdir);
 cd(simdir);
 
