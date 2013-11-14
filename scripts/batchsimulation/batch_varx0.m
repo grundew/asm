@@ -25,6 +25,6 @@ p.filenamevars = {'displaceRx'};
 %% Do the simulations
 for i = 1:nn
     p.displaceRx = x0(i);
-    startAsmSimulation(p);
+    startAsmSimulation_withDisplacement(p);
 end
 cd('..')

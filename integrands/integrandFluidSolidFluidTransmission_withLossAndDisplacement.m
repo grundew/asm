@@ -35,17 +35,17 @@ S_Rx = planePistonPressureAngularSpectrum(k_r, aRx, c, rho);
 S_Tx = planePistonPressureAngularSpectrum(k_r, aTx, c, rho);
 
 %% Displacement factor
-dispRx = quadgk(@(x) (exp(1i*kr*cos(x)*x0)), 0, 2*pi);
+dispRx = arrayfun(@(k_r_) quadgk(@(x) (exp(1i*k_r_*cos(x)*x0)), 0, 2*pi), k_r);
 
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear
 if alphaLambda_dB > 0
-    alphaL = 10.^(alphaLambda_dB*f/model.solid.v/20);
+    alphaL = 10.^(alphaLambda_dB*w/2/pi/model.solid.v/20);
 else
     alphaL = 0;
 end
 
-T = transmissionCoefficientAnalytical(f, sintheta_z, model, alphaL);
+T = transmissionCoefficientAnalytical(w/2/pi, sintheta_z, model, alphaL);
 
 %% Phase shift from transmitter to plate and from plate to receiver
 Phase = exp(1i*k_z*(d1 + d3));
