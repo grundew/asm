@@ -53,7 +53,7 @@ d3 = params.distanceRx;
 alphaLambda_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 cf = params.cf;
-x0 = params.x0;
+x0 = params.displaceRx;
 
 %% Integrate over all angles for the point on the axis
 tic
