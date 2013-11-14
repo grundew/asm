@@ -20,11 +20,11 @@ x0max = 20e-2;
 x0 = linspace(x0min, x0max, nn);
 
 % Pack it up
-p.filenamevars = {'x0'};
+p.filenamevars = {'displaceRx'};
 
 %% Do the simulations
 for i = 1:nn
-    p.x0 = x0(i);
+    p.displaceRx = x0(i);
     startAsmSimulation(p);
 end
 cd('..')
