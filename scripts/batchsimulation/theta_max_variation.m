@@ -30,5 +30,6 @@ p.filenamevars = {'thetamax'};
 
 %% Do the simulations
 for i = 1:n
+    p.thetamax = thetamax(i);
     startAsmSimulation(p);
 end
