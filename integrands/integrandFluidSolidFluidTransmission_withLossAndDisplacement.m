@@ -35,7 +35,7 @@ S_Rx = planePistonPressureAngularSpectrum(k_r, aRx, c, rho);
 S_Tx = planePistonPressureAngularSpectrum(k_r, aTx, c, rho);
 
 %% Displacement factor
-dispRx = arrayfun(@(k_r_) quadgk(@(x) (exp(1i*k_r_*cos(x)*x0)), 0, 2*pi), k_r);
+dispRx = 2*pi*besselj(0, x0*kr);
 
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear

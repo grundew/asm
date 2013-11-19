@@ -16,8 +16,9 @@ p.f = linspace(0, 2e6, nf);
 % Vary x0
 nn = 50;
 x0min = 0;
-x0max = 20e-2;
-x0 = linspace(x0min, x0max, nn);
+x0max = 0.2;
+dx0 = 0.01;
+x0 = x0min:dx0:x0max;
 
 % Pack it up
 p.filenamevars = {'displaceRx'};
