@@ -52,11 +52,16 @@ d1 = params.distanceTx;
 d3 = params.distanceRx;
 alphaLambda_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
+x0 = params.displaceRx;
 
 %% Integrate over all angles for the point on the axis
 tic
+refl = params.reflection;
+displaced = x0 ~= 0;
+
 nf = numel(f);
 pt = zeros(size(f));
+
 for i = 1:nf
     % Time it
     if i == 1
@@ -65,10 +70,31 @@ for i = 1:nf
     end
     
     freq = f(i);
-    fun = @(xx) integrandFluidSolidFluidTransmission_withLoss(xx, freq, aRx, aTx,...
-       v_fluid, rho_fluid, d1, d3, model, alphaLambda_dB);
-    pt(i) = 2*pi*quadgk(fun, 0, thetamax);
-
+    w = 2*pi*f(i);
+    k = w/v_fluid;
+    
+    if refl && displaced
+        % Reflection and displaced receiver
+        % Integrate over k_r from 0 to k
+        fun = @(xx) integrandFluidSolidFluidReflection_withLossAndDisplacement(xx, w, aRx, aTx,...
+            v_fluid, rho_fluid, d1, d3, model, x0, alphaLambda_dB);
+        pt(i) = quadgk(fun, 0, k);
+    elseif refl && ~displaced
+        % Reflection in pulse-echo mode with same rx and tx
+        fun = @(xx) integrandFluidSolidFluidReflection(xx, freq, aRx, aTx,...
+            v_fluid, rho_fluid, d1, d3, model);
+        pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    elseif ~refl && ~displaced
+        % Transmission and rx and tx on same axis
+        fun = @(xx) integrandFluidSolidFluidTransmission_withLoss(xx, freq, aRx, aTx,...
+            v_fluid, rho_fluid, d1, d3, model, alphaLambda_dB);
+        pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    elseif ~refl && displaced
+        % Transmission with receiver displaced
+        error('Not implemented transmission with displaced receiver');
+    else
+        error('Something went haywire');
+    end
     
     % Time it
     if i == 300
@@ -86,12 +112,18 @@ if params.savemat
     fprintf('Saved to %s\n', outfilename);
     save(outfilename, 'params', 'pt', 'f', 'fres');
 end
+
 end
 
 function outfilename = generateFilenameString(parameters, dtestr)
 prefix = 'asm';
 fnvars = parameters.filenamevars;
-c = cellfun(@(x) sprintf('%s_%d', x, parameters.(x)) , fnvars, 'uni', 0);
-paramstr = strjoin(c, '_');
-outfilename = sprintf('%s_%s_%s.mat', prefix, paramstr, dtestr);
+if isempty(fnvars)
+    outfilename = sprintf('%s_%s.mat', prefix, dtestr);
+else
+    c = cellfun(@(x) sprintf('%s_%d', x, parameters.(x)) , fnvars, 'uni', 0);
+    paramstr = strjoin(c, '_');
+    outfilename = sprintf('%s_%s_%s.mat', prefix, paramstr, dtestr);
+end
+
 end

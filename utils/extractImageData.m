@@ -1,4 +1,4 @@
-function [C, x, y] = extractImageData(himage)
+function [C, X, Y] = extractImageData(himage)
 % [C, x, y] = extractImageData(himage)
 %
 % Extracts the data in an image object.
@@ -11,10 +11,11 @@ function [C, x, y] = extractImageData(himage)
 % x - x-axis ('XData')
 % y - y-axis ('YData')
 
-assert(~isempty(himage) & ishandle(himage) & strcmp(get(himage, 'Type'), 'image'),...
+assert(~isempty(himage) & ishandle(himage) & any(strcmp(get(himage, 'Type'), {'surface', 'image'})),...
     'HW:InputError', 'Input or gco needs to be an image handle');
 
 C = get(himage, 'CData');
-x = get(himage, 'XData');
-y = get(himage, 'YData');
+X = get(himage, 'XData');
+Y = get(himage, 'YData');
+
 end

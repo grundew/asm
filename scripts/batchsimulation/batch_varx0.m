@@ -7,18 +7,20 @@ cd(simdir);
 p = parseAsmInput();
 fres = 0.5*p.cp/p.thickness;
 p.cf = 1500;
+p.rho_fluid = 1000;
 p.savemat = true;
 
 % Define freuencies
-nf = 4000;
-p.f = linspace(0, 2e6, nf);
+nfft = 2^10;
+fs = 2e6;
+p.f = linspace(0, 1e6, nfft);
 
 % Vary x0
-nn = 50;
 x0min = 0;
 x0max = 0.2;
-dx0 = 0.01;
-x0 = x0min:dx0:x0max;
+nx0 = 20;
+x0 = linspace(x0min, x0max, nx0);
+nn = length(x0);
 
 % Pack it up
 p.filenamevars = {'displaceRx'};
@@ -26,6 +28,6 @@ p.filenamevars = {'displaceRx'};
 %% Do the simulations
 for i = 1:nn
     p.displaceRx = x0(i);
-    startAsmSimulation_withDisplacement(p);
+    startAsmSimulation(p);
 end
 cd('..')

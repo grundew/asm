@@ -18,6 +18,7 @@ def_aRx = 3e-3; % Radius (m)
 def_distanceTx = 40e-3; % m
 def_distanceRx = 40e-3; % m
 def_displaceRx = 0; % m;
+def_reflection = true;
 
 % Sampling stuff
 def_f = (0:2^15-1)*2e6/2^15;
@@ -51,6 +52,7 @@ p.addParamValue('aRx', def_aRx, validatorsgtz);
 p.addParamValue('distanceTx', def_distanceTx, validatorsgtz);
 p.addParamValue('distanceRx', def_distanceRx, validatorsgtz);
 p.addParamValue('displaceRx', def_displaceRx, validatorsgoretz);
+p.addParamValue('reflection', def_reflection, @islogical);
 
 % Sampling stuff
 p.addParamValue('f', def_f, validatorfunvec);

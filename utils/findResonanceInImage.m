@@ -1,6 +1,10 @@
-function [x, y] = findResonanceInImage(himage, xl, yl)
+function [x, y] = findResonanceInImage(himage, dim, xl, yl)
 
 [C, xx, yy] = extractImageData(himage);
+
+if ~exist('dir', 'var')
+    dim = 1;
+end
 
 % Crop Cdata to limits yl and xl
 if ~exist('xl', 'var')
@@ -19,7 +23,14 @@ C = C(idy, idx);
 x = xx(idx);
 y = yy(idy);
 
-[~, idmax] = max(C, [], 2);
+[~, idmax] = max(C, [], dim);
 
-x = x(idmax);
+if dim==1
+    y = y(idmax);
+elseif dim==2
+    x = x(idmax);
+else
+    error('HW:InputError', 'dim must be either 1 or 2');
+end
+
 end

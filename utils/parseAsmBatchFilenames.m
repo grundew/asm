@@ -11,8 +11,8 @@ for i = 1:length(filenamevars)
     var = filenamevars{i};
     [~, endidx] = arrayfun(@(x) regexp(x.name(idstart:end), filenamevars{i}), filenames);
     assert(length(unique(endidx))==1, 'Somethings fishy with the filenames');
-    endidx = endidx + idstart - 1 + length(var);
-    data = arrayfun(@(x) textscan(x.name(endidx:end), '%f'), filenames, 'uni', 1);
+    endidx = endidx + idstart - 1;
+    data = arrayfun(@(x) textscan(x.name(endidx:end), '%*s %f %*[^\n]', 'delimiter', '_'), filenames, 'uni', 1);
     results.(var) = cell2mat(data);
 end
 
