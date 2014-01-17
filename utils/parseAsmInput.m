@@ -19,6 +19,7 @@ def_distanceTx = 40e-3; % m
 def_distanceRx = 40e-3; % m
 def_displaceRx = 0; % m;
 def_reflection = true;
+def_alpha_plate = 0;
 
 % Sampling stuff
 def_f = (0:2^15-1)*2e6/2^15;
@@ -34,6 +35,8 @@ validatorsgoretz = @(x) validateattributes(x,...
     {'numeric'}, {'scalar', 'real', 'nonempty', '>=', 0});
 validatorfunvec = @(x) validateattributes(x,...
     {'numeric'}, {'vector', 'real', 'nonempty'});
+validatorfuncreal = @(x) validateattributes(x,...
+    {'numeric'}, {'scalar', 'real', 'nonempty'});
 
 % Solid
 p.addParamValue('thickness', def_thickness, validatorsgtz)
@@ -53,6 +56,7 @@ p.addParamValue('distanceTx', def_distanceTx, validatorsgtz);
 p.addParamValue('distanceRx', def_distanceRx, validatorsgtz);
 p.addParamValue('displaceRx', def_displaceRx, validatorsgoretz);
 p.addParamValue('reflection', def_reflection, @islogical);
+p.addParamValue('alpha_plate', def_alpha_plate, validatorfuncreal);
 
 % Sampling stuff
 p.addParamValue('f', def_f, validatorfunvec);
