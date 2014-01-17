@@ -51,4 +51,3 @@ T = transmissionCoefficientAnalytical(w/2/pi, sintheta_z, model, alphaL);
 Phase = exp(1i*k_z*(d1 + d3));
 I = k_r.*dispRx.*k_z/k/rho/c.*Phase.*S_Rx.*S_Tx.*T;
 end
-
