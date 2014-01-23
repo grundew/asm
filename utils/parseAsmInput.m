@@ -20,6 +20,7 @@ def_distanceRx = 40e-3; % m
 def_displaceRx = 0; % m;
 def_reflection = true;
 def_alpha_plate = 0;
+def_tx_focus = false;
 
 % Sampling stuff
 def_f = (0:2^15-1)*2e6/2^15;
@@ -57,6 +58,7 @@ p.addParamValue('distanceRx', def_distanceRx, validatorsgtz);
 p.addParamValue('displaceRx', def_displaceRx, validatorsgoretz);
 p.addParamValue('reflection', def_reflection, @islogical);
 p.addParamValue('alpha_plate', def_alpha_plate, validatorfuncreal);
+p.addParamValue('tx_focus', def_tx_focus, @islogical);
 
 % Sampling stuff
 p.addParamValue('f', def_f, validatorfunvec);

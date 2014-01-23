@@ -28,4 +28,3 @@ end
 
 fres = mat.params.cp/2/mat.params.thickness;
 end
-

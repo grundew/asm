@@ -19,8 +19,9 @@ function [pt, f, params] = startAsmSimulation(varargin)
 % 'aRx' - Radius of receiver
 % 'distanceTx' - Distance from the transmitter to the plate
 % 'distanceRx' - Distance from receiver to the plate
+% 'alphaLambda_db' - Loss in the plate
 % 'alpha' - Misalignment angle of transducer (not implemented)
-
+% 'reflection' - (Boolean) Reflection coefficient is used if true
 %
 % Sampling stuff:
 % 'f'
@@ -54,59 +55,51 @@ alphaLambda_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 x0 = params.displaceRx;
 alpha_plate = params.alpha_plate;
+refl = params.reflection;
+tx_focus = params.tx_focus;
 
 %% Integrate over all angles for the point on the axis
-tic
-refl = params.reflection;
-displaced = x0 ~= 0;
-% alpha = 0;
-
 nf = numel(f);
 pt = zeros(size(f));
+
+if abs(alpha_plate) > 0
+    thetamin = -thetamax;
+else
+    thetamin = 0;
+end
 
 for i = 1:nf
     % Time it
     if i == 1
         fprintf('Started: %s\n', datestr(now, 'dd-mm-yyyy_HHMMSS'));
-        tic
+        tstart = tic();
     end
     
     freq = f(i);
     w = 2*pi*f(i);
     k = w/v_fluid;
     
-    if refl && displaced
-        % Reflection and displaced receiver
-        % Integrate over k_r from 0 to k
-        fun = @(xx) integrandFluidSolidFluidReflection_withLossAndDisplacement(xx, w, aRx, aTx,...
-            v_fluid, rho_fluid, d1, d3, model, x0, alphaLambda_dB);
-        pt(i) = quadgk(fun, 0, k);
-    elseif refl && ~displaced
-        % Reflection in pulse-echo mode with same rx and tx
-        fun = @(xx) integrandFluidSolidFluidReflection(xx, freq, aRx, aTx,...
-            v_fluid, rho_fluid, d1, d3, model);
-        pt(i) = 2*pi*quadgk(fun, 0, thetamax);
-    elseif ~refl && ~displaced
-        % Transmission and rx and tx on same axis
-        fun = @(xx) integrandFluidSolidFluidTransmission_withLoss(xx, freq, aRx, aTx,...
-            v_fluid, rho_fluid, d1, d3, model, alphaLambda_dB);
-        pt(i) = 2*pi*quadgk(fun, 0, thetamax);
-    elseif ~refl && displaced
-        % Transmission with receiver displaced
-        fun = @(xx) integrandFluidSolidFluidTransmission_withLossAndDisplacement(xx, w, aRx, aTx,...
-            v_fluid, rho_fluid, d1, d3, model, x0, alphaLambda_dB);
-        pt(i) = quadgk(fun, 0, k);
-    elseif alpha_plate ~= 0
-        fun = @(xx) integrandFluidSolidFluid_withAngle(xx, freq, aRx, aTx,...
-            v_fluid, rho_fluid, d1, model, alpha);
-        pt(i) = 2*pi*quadgk(fun, 0, thetamax);
+    if ~tx_focus
+        % Plane piston with out focus
+        fun = @(theta) integrandFluidSolidFluid_planepiston(...
+            theta, freq, aRx, aTx,...
+            v_fluid, rho_fluid, d1, d3,...
+            model, x0, alphaLambda_dB, refl, alpha_plate);
+        pt(i) = quadgk(fun, thetamin, thetamax);
+    elseif tx_focus
+        % Plane piston and focused receiver
+        fun = @(xx) integrandFluidSolidFluid_focusedtx(...
+            xx, freq, aRx, aTx,...
+            v_fluid, rho_fluid, d1, d3,...
+            model, x0, alphaLambda_dB, refl, alpha_plate);
+        pt(i) = quadgk(fun, 0, thetamax);
     else
         error('Something went haywire');
-    end
+    end        
     
     % Time it
     if i == 300
-        tme = toc/60*length(f)/i;
+        tme = toc(tstart)/60*length(f)/i;
         fprintf('Estimated time of arrival: %f min\n', tme)
     end
 
