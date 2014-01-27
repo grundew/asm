@@ -9,6 +9,8 @@ function [pt, f, params] = startAsmSimulation(varargin)
 % 'cs'
 % 'rho_solid'
 % 'alphaLambda_dB' - Damping in the solid.
+% 'alpha' - Misalignment angle of transducer (not implemented)
+% 'reflection' - (Boolean) Reflection coefficient is used if true
 %
 % Fluid properties:
 % 'cf'
@@ -19,9 +21,6 @@ function [pt, f, params] = startAsmSimulation(varargin)
 % 'aRx' - Radius of receiver
 % 'distanceTx' - Distance from the transmitter to the plate
 % 'distanceRx' - Distance from receiver to the plate
-% 'alphaLambda_db' - Loss in the plate
-% 'alpha' - Misalignment angle of transducer (not implemented)
-% 'reflection' - (Boolean) Reflection coefficient is used if true
 %
 % Sampling stuff:
 % 'f'
@@ -99,8 +98,11 @@ for i = 1:nf
     
     % Time it
     if i == 300
-        tme = toc(tstart)/60*length(f)/i;
-        fprintf('Estimated time of arrival: %f min\n', tme)
+        tme = toc(tstart)*length(f)/i;
+        nn = datenum(0, 0, 0, 0, 0, tme);
+        nnvec = datevec(nn);
+        fprintf('Estimated time of arrival: %.0f HOURS %.0f MIN %.0f SEC\n',...
+            nnvec(end-2), nnvec(end-1), ceil(nnvec(end)));
     end
 
 end

@@ -41,7 +41,10 @@ idltalpha = theta <= alpha_plate;
 
 %% Transmitter spatial sensitivity
 % No angle adjustment
-PhiTx = planePistonPressureAngularSpectrum(kr, aTx, c, rho);
+xx = kr*aTx;
+W = besselj(1, xx)./xx;
+W(xx==0) = 0.5;
+PhiTx = 2*W;
 
 %% Receiver spatial sensitivities
 % Angle is updated due to misalignment
@@ -51,7 +54,10 @@ theta_rx = theta - 2*alpha_plate;
 theta_rx(idltalpha) = 2*alpha_plate - theta(idltalpha);
 q_rx = sin(theta_rx);
 kr_rx = k*q_rx;
-PhiRx = planePistonPressureAngularSpectrum(kr_rx, aRx, c, rho);
+xx = kr_rx*aTx;
+W = besselj(1, xx)./xx;
+W(xx==0) = 0.5;
+PhiRx = 2*W;
 
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear
@@ -82,5 +88,7 @@ end
 
 %% Phase shift from transmitter to plate and from plate to receiver
 Phase = exp(1i*kz*(d1 + d3));
+
+%% Assemble integrand
 I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p;
 end
