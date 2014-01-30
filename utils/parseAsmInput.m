@@ -6,7 +6,7 @@ def_thickness = 10e-3; % m
 def_cs = 3158; % m/s
 def_cp = 5850; % m/s
 def_rho_solid = 7850; % m/s
-def_alphaLambda = 0.008; % dB
+def_alphaLambda = 0; % dB
 
 % Fluid
 def_cf = 342.21; % m/s
@@ -44,7 +44,7 @@ p.addParamValue('thickness', def_thickness, validatorsgtz)
 p.addParamValue('cp', def_cp, validatorsgtz);
 p.addParamValue('cs', def_cs, validatorsgtz);
 p.addParamValue('rho_solid', def_rho_solid, validatorsgtz);
-p.addParamValue('alphaLambda_dB', def_alphaLambda, validatorsgtz);
+p.addParamValue('alphaLambda_dB', def_alphaLambda, validatorsgoretz);
 
 % Fluid
 p.addParamValue('cf', def_cf, validatorsgtz);
