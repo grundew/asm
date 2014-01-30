@@ -1,5 +1,5 @@
 function I = integrandFluidSolidFluid_planepiston(theta, f, aRx, aTx,...
-    c, rho, d1, d3, model, x0, alphaLambda_dB, reflection, alpha_plate)
+    c, d1, d3, model, x0, alphaLambda_dB, reflection, alpha_plate)
 % I = orofinoIntegrand(theta, f, aRx, aTx,...
 %                      c, rho, d1, d3, model,...
 %                      alphaLambda_dB, reflection, alpha_plate)
@@ -54,7 +54,8 @@ theta_rx = theta - 2*alpha_plate;
 theta_rx(idltalpha) = 2*alpha_plate - theta(idltalpha);
 q_rx = sin(theta_rx);
 kr_rx = k*q_rx;
-xx = kr_rx*aTx;
+
+xx = kr_rx*aRx;
 W = besselj(1, xx)./xx;
 W(xx==0) = 0.5;
 PhiRx = 2*W;
