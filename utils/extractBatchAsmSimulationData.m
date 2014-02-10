@@ -43,7 +43,7 @@ for i = 1:nsplit
     for j = 2:length(fnsort)
         matfn = fullfile(datDir, fnsort(j).name);
         mat = load(matfn);
-        xx(:, i) = mat.pt;
+        xx(:, j) = mat.pt;
         p(j) = mat.params;
         ff{j} = matfn;
     end
