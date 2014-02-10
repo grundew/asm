@@ -42,6 +42,7 @@ model = MultiLayerModel(fluid1, layer, fluid3, params.thickness);
 %% Samplings stuff
 f = params.f;
 thetamax = params.thetamax;
+thetamin = 0;
 
 %% Unpack parameters
 aRx = params.aRx;
@@ -53,19 +54,12 @@ d3 = params.distanceRx;
 alphaLambda_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 x0 = params.displaceRx;
-alpha_plate = params.alpha_plate;
 refl = params.reflection;
 tx_focus = params.tx_focus;
 
 %% Integrate over all angles for the point on the axis
 nf = numel(f);
 pt = zeros(size(f));
-
-if abs(alpha_plate) > 0
-    thetamin = -thetamax;
-else
-    thetamin = 0;
-end
 
 for i = 1:nf
     % Time it
@@ -82,15 +76,15 @@ for i = 1:nf
         % Plane piston with out focus
         fun = @(xx) integrandFluidSolidFluid_planepiston(...
             xx, freq, aRx, aTx,...
-            v_fluid, d1, d3, model, x0, alphaLambda_dB, refl, alpha_plate);
+            v_fluid, d1, d3, model, x0, alphaLambda_dB, refl);
         pt(i) = quadgk(fun, thetamin, thetamax);
     elseif tx_focus
         % Plane piston and focused receiver
         fun = @(xx) integrandFluidSolidFluid_focusedtx(...
             xx, freq, aRx, aTx,...
             v_fluid, d1, d3,...
-            model, x0, alphaLambda_dB, refl, alpha_plate);
-        pt(i) = quadgk(fun, 0, thetamax);
+            model, x0, alphaLambda_dB, refl);
+        pt(i) = quadgk(fun, 0, thetamax, 'MaxIntervalCount', 5000);
     else
         error('Something went haywire');
     end        

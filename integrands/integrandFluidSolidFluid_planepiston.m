@@ -1,5 +1,5 @@
 function I = integrandFluidSolidFluid_planepiston(theta, f, aRx, aTx,...
-    c, d1, d3, model, x0, alphaLambda_dB, reflection, alpha_plate)
+    c, d1, d3, model, x0, alphaLambda_dB, reflection)
 % I = orofinoIntegrand(theta, f, aRx, aTx,...
 %                      c, rho, d1, d3, model,...
 %                      alphaLambda_dB, reflection, alpha_plate)
@@ -36,9 +36,6 @@ k = w./c;
 kr = k*q;
 kz = k*p;
 
-%% Indices of angles less than alpha (the misaligment angle of the plate)
-idltalpha = theta <= alpha_plate;
-
 %% Transmitter spatial sensitivity
 % No angle adjustment
 xx = kr*aTx;
@@ -47,15 +44,7 @@ W(xx==0) = 0.5;
 PhiTx = 2*W;
 
 %% Receiver spatial sensitivities
-% Angle is updated due to misalignment
-% See confluence page on Angular Spectrum Method for details on the
-% relations between the angles
-theta_rx = theta - 2*alpha_plate;
-theta_rx(idltalpha) = 2*alpha_plate - theta(idltalpha);
-q_rx = sin(theta_rx);
-kr_rx = k*q_rx;
-
-xx = kr_rx*aRx;
+xx = kr*aRx;
 W = besselj(1, xx)./xx;
 W(xx==0) = 0.5;
 PhiRx = 2*W;
@@ -77,14 +66,11 @@ else
 end
 
 %% Reflection/Transmission coefficient
-theta_plate = theta - alpha_plate;
-theta_plate(idltalpha) = alpha_plate - theta(idltalpha);
-q_plate = sin(theta_plate);
 if reflection
     % TODO: Add loss
-    Plate = analyticRTFast(w/2/pi, theta_plate, model);
+    Plate = analyticRTFast(w/2/pi, theta, model);
 else
-    Plate = transmissionCoefficientAnalytical(f, q_plate, model, alphaL);
+    Plate = transmissionCoefficientAnalytical(f, q, model, alphaL);
 end
 
 %% Phase shift from transmitter to plate and from plate to receiver
