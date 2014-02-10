@@ -1,30 +1,59 @@
-function [X, varsort, f, fres, p] = extractBatchAsmSimulationData(datDir, filenamevar, prefix)
+function out = extractBatchAsmSimulationData(datDir, sortfilenamevar, splitfilenamevar)
 
-if nargin < 3
-    prefix = '';
+if nargin < 2
+    error('HW:INPUTERROR', 'Not enough input paramaters');
 end
+
 fn = dir(fullfile(datDir, '*.mat'));
-var = parseAsmBatchFilenames(fn, {filenamevar}, prefix);
-[varsort, idsort] = sort(var.(filenamevar));
-fnsort = fn(idsort);
+var = parseAsmBatchFilenames(fn);
 
-matfn = fullfile(datDir, fnsort(1).name);
-mat = load(matfn);
-X = zeros(length(mat.pt), length(fnsort));
-X(:, 1) = mat.pt;
-p([1, length(fnsort)]) = mat.params;
-for i = 2:length(fnsort)
-    matfn = fullfile(datDir, fnsort(i).name);
+if ~isfield(var, splitfilenamevar) || ~isfield(var, sortfilenamevar)
+    error('HW:INPUTERROR', 'Filename variables does not exist')
+end
+
+splitvar = [var.(splitfilenamevar)];
+unisplitvar = unique(splitvar);
+nsplit = length(unisplitvar);
+out(nsplit) = struct('X', [], sortfilenamevar, [], splitfilenamevar, [], 'f', [], 'p', [], 'fn', '');
+
+fnsplit = cell(1, nsplit);
+vars = cell(1, nsplit);
+splitvars = cell(1, nsplit);
+for i = 1:nsplit
+    splitvarid = (splitvar==unisplitvar(i));
+    fnsplit{i} = fn(splitvarid);
+    vars{i} = var(splitvarid);
+    splitvars{i} = splitvar(splitvarid);
+end
+
+for i = 1:nsplit
+
+    fns = fnsplit{i};
+    v = vars{i};
+    [vsort, idsort] = sort([v.(sortfilenamevar)]);
+    fnsort = fns(idsort);
+    matfn = fullfile(datDir, fnsort(1).name);
     mat = load(matfn);
-    X(:, i) = mat.pt;
-    p(i) = mat.params;
+
+    xx = zeros(length(mat.pt), length(fnsort));
+    ff = cell(1, length(fns));
+    xx(:, 1) = mat.pt;
+    ff{1} = matfn;
+    p(1) = mat.params;
+    for j = 2:length(fnsort)
+        matfn = fullfile(datDir, fnsort(i).name);
+        mat = load(matfn);
+        xx(:, i) = mat.pt;
+        p(j) = mat.params;
+        ff{j} = matfn;
+    end
+
+    out(i).X = xx;
+    out(i).fn = ff;
+    out(i).(splitfilenamevar) = splitvars{i};
+    out(i).(sortfilenamevar) = vsort;
+    out(i).p = p;
+    out(i).f = mat.f;
 end
 
-if isfield(mat.params, 'f')
-    f = mat.params.f;
-else
-    f = (0:mat.params.nfft-1)*mat.params.fs/mat.params.nfft;
-end
-
-fres = mat.params.cp/2/mat.params.thickness;
 end
