@@ -114,6 +114,18 @@ end
 function outfilename = generateFilenameString(parameters, dtestr)
 prefix = 'asm';
 fnvars = parameters.filenamevars;
+idf = strcmp(fnvars, 'f');
+if any(idf)
+    fnvars = {fnvars{~idf}, 'fmin', 'fmax'};
+    parameters.('fmin') = min(parameters.f);
+    parameters.('fmax') = max(parameters.f);
+    df = diff(parameters.f);
+    if length(unique(df)) == 1
+        parameters.df = unique(df);
+        fnvars{end+1} = 'df';
+    end
+end
+    
 if isempty(fnvars)
     outfilename = sprintf('%s_%s.mat', prefix, dtestr);
 else
