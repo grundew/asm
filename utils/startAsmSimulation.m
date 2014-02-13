@@ -115,6 +115,7 @@ function outfilename = generateFilenameString(parameters, dtestr)
 prefix = 'asm';
 fnvars = parameters.filenamevars;
 idf = strcmp(fnvars, 'f');
+
 if any(idf)
     fnvars = {fnvars{~idf}, 'fmin', 'fmax'};
     parameters.('fmin') = min(parameters.f);

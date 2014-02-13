@@ -1,6 +1,5 @@
 function [result, p] = parseAsmInput(varargin)
 %% Default values
-
 % Solid
 def_thickness = 10e-3; % m
 def_cs = 3158; % m/s
@@ -32,10 +31,13 @@ p = inputParser();
 % Validator, true if x is a scalar greater than zero (gtz)
 validatorsgtz = @(x) validateattributes(x,...
     {'numeric'}, {'scalar', 'real', 'nonempty', '>', 0});
+% Validator, true if x is a scalar greater or equal to zero (gtz)
 validatorsgoretz = @(x) validateattributes(x,...
     {'numeric'}, {'scalar', 'real', 'nonempty', '>=', 0});
+% Validator, true if x is a vector of real numbers
 validatorfunvec = @(x) validateattributes(x,...
     {'numeric'}, {'vector', 'real', 'nonempty'});
+% Validator, true if x is a scalar and a real number
 validatorfuncreal = @(x) validateattributes(x,...
     {'numeric'}, {'scalar', 'real', 'nonempty'});
 
@@ -69,7 +71,18 @@ p.addParamValue('filenamevars', {}, @iscell);
 p.addParamValue('savemat', true, @islogical);
 p.addParamValue('debug', false, @islogical);
 
-% Parse
+% Parse and validate filenamevars
 p.parse(varargin{:});
+validateFilenameVars(p);
 result = p.Results;
+end
+
+function t = validateFilenameVars(p)
+fnv = p.Results.filenamevars;
+idf = cellfun(@(x) any(strcmp(x, p.Parameters)), fnv);
+if nnz(idf) ~= length(fnv)
+    t = false;
+    error('HW:INPUTERROR', 'Unknown filenamevar %s. ', fnv{~idf});
+end
+t = true;
 end
