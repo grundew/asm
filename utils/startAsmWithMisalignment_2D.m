@@ -100,6 +100,6 @@ end
 
 function outfilename = generateFilenameString(alpha_plate, dtestr)
 prefix = 'asm';
-paramstr = sprintf('alpha-plate_%.2f', alpha_plate*180/pi);
+paramstr = sprintf('alphaplate_%.2f', alpha_plate*180/pi);
 outfilename = sprintf('%s_%s_%s.mat', prefix, paramstr, dtestr);
 end
