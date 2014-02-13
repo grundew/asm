@@ -91,22 +91,15 @@ if params.savemat
     %% Save results
     dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
     fprintf('Finnished: %s\n', dtstr);
-    outfilename = generateFilenameString(params, dtstr);
+    outfilename = generateFilenameString(alpha_plate, dtstr);
     fprintf('Saved to %s\n', outfilename);
     save(outfilename, 'params', 'pt', 'f', 'fres');
 end
 
 end
 
-function outfilename = generateFilenameString(parameters, dtestr)
+function outfilename = generateFilenameString(alpha_plate, dtestr)
 prefix = 'asm';
-fnvars = parameters.filenamevars;
-if isempty(fnvars)
-    outfilename = sprintf('%s_%s.mat', prefix, dtestr);
-else
-    c = cellfun(@(x) sprintf('%s_%d', x, parameters.(x)) , fnvars, 'uni', 0);
-    paramstr = strjoin(c, '_');
-    outfilename = sprintf('%s_%s_%s.mat', prefix, paramstr, dtestr);
-end
-
+paramstr = sprintf('alpha-plate_%.2f', alpha_plate*180/pi);
+outfilename = sprintf('%s_%s_%s.mat', prefix, paramstr, dtestr);
 end
