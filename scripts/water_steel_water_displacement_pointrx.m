@@ -1,8 +1,8 @@
 function water_steel_water_displacement_pointrx(x0)
 
 %% Samplings stuff
-fs = 2e6;
-nfft = 2^13;
+fs = 5e6;
+nfft = 2^15;
 ntheta = 2^12;
 thetamax = pi/2;
 f = (0:nfft-1)*fs/nfft;
@@ -56,9 +56,9 @@ for i = 1:nf
 end
 
 %% Finnished
-dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
+dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
 fprintf('Finnished: %s\n', dtstr)
-outfile = sprintf('asm_alpha_%d_%s.mat', x0*1e-2, dtstr);
+outfile = sprintf('asm_displaceRx_%d_%s.mat', x0*1e-3, dtstr);
 fprintf('Saved to %s\n', outfile)
 save(outfile);
 
