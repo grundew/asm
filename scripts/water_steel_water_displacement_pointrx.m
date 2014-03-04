@@ -56,9 +56,9 @@ for i = 1:nf
 end
 
 %% Finnished
-dtstr = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
+dtstr = datestr(now, 'dd-mm-yyyy_HHMMSS');
 fprintf('Finnished: %s\n', dtstr)
-outfile = sprintf('asm_alpha_%d_%s.mat', x0*1e-2, dtstr);
+outfile = sprintf('asm_displaceRx_%d_%s.mat', x0*1e-2, dtstr);
 fprintf('Saved to %s\n', outfile)
 save(outfile);
 

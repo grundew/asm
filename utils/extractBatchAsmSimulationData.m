@@ -1,59 +1,40 @@
-function out = extractBatchAsmSimulationData(datDir, sortfilenamevar, splitfilenamevar)
-
-if nargin < 2
-    error('HW:INPUTERROR', 'Not enough input paramaters');
-end
+function [X, ff, p, var] = extractBatchAsmSimulationData(datDir, sortvar)
 
 fn = dir(fullfile(datDir, '*.mat'));
 var = parseAsmBatchFilenames(fn);
+nfn = length(fn);
 
-if ~isfield(var, splitfilenamevar) || ~isfield(var, sortfilenamevar)
-    error('HW:INPUTERROR', 'Filename variables does not exist')
+if exist('sortvar', 'var')
+    assert(any(strcmp(fieldnames(var), sortvar)),...
+        'HW:INPUTERROR',...
+        'Variable %s doesn''t exist in the file names',...
+        sortvar)
+    [~, idsort] = sort([var.(sortvar)]);
+    var = var(idsort);
+    fn = fn(idsort);
 end
 
-splitvar = [var.(splitfilenamevar)];
-unisplitvar = unique(splitvar);
-nsplit = length(unisplitvar);
-out(nsplit) = struct('X', [], sortfilenamevar, [], splitfilenamevar, [], 'f', [], 'p', [], 'fn', '');
+matfn = fullfile(datDir, fn(1).name);
+mat = load(matfn);
 
-fnsplit = cell(1, nsplit);
-vars = cell(1, nsplit);
-splitvars = cell(1, nsplit);
-for i = 1:nsplit
-    splitvarid = (splitvar==unisplitvar(i));
-    fnsplit{i} = fn(splitvarid);
-    vars{i} = var(splitvarid);
-    splitvars{i} = splitvar(splitvarid);
-end
-
-for i = 1:nsplit
-
-    fns = fnsplit{i};
-    v = vars{i};
-    [vsort, idsort] = sort([v.(sortfilenamevar)]);
-    fnsort = fns(idsort);
-    matfn = fullfile(datDir, fnsort(1).name);
-    mat = load(matfn);
-
-    xx = zeros(length(mat.pt), length(fnsort));
-    ff = cell(1, length(fns));
-    xx(:, 1) = mat.pt;
-    ff{1} = matfn;
+X = zeros(length(mat.pt), nfn);
+ff = cell(1, nfn);
+X(:, 1) = mat.pt;
+ff{1} = matfn;
+if isfield(mat, 'params')
     p(1) = mat.params;
-    for j = 2:length(fnsort)
-        matfn = fullfile(datDir, fnsort(j).name);
-        mat = load(matfn);
-        xx(:, j) = mat.pt;
-        p(j) = mat.params;
-        ff{j} = matfn;
-    end
+else
+    p = 0;
+end
 
-    out(i).X = xx;
-    out(i).fn = ff;
-    out(i).(splitfilenamevar) = splitvars{i};
-    out(i).(sortfilenamevar) = vsort;
-    out(i).p = p;
-    out(i).f = mat.f;
+for j = 2:nfn
+    matfn = fullfile(datDir, fn(j).name);
+    mat = load(matfn);
+    X(:, j) = mat.pt;
+    if isfield(mat, 'params')
+        p(j) = mat.params;
+    end
+    ff{j} = matfn;
 end
 
 end
