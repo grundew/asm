@@ -1,19 +1,19 @@
 function I = integrandFluidSolidFluid_pointrx(theta_z, f, aTx,...
     c, rho, d, x0, model, reflection)
 % Angular frequency and total length of wave vector
+% Remember to multiply with 4*pi*k/rho/c/a
 w = 2*pi*f;
 k = w./c;
-q = sin(theta_z);
 p = cos(theta_z);
+q = sin(theta_z);
+k_z = k*p;
+k_rho = k*q;
 
 %% Transmitter spatial spectrum
-xx = k*q*aTx;
-W = besselj(1, xx)./xx;
-W(xx==0) = 0.5;
-PhiTx = 2*W;
+Tx = besselj(1, k_z*aTx);
 
 %% Plate response, angular
-%% Reflection/Transmission coefficient
+% Reflection/Transmission coefficient
 if reflection
     % TODO: Add loss
     Plate = analyticRTFast(w/2/pi, theta_z, model);
@@ -23,12 +23,15 @@ else
 end
 
 %% Phase shift from transmitter to plate and from plate to receiver
-Phase = exp(1i*k*(p*d + q*x0));
+Phase_z = exp(1i*k_z*d);
+F = besselj(0, k_rho*x0);
 
-I = Plate.*k.*q.*p/rho/c.*PhiTx.*Phase*k.*p;
+%% Integrand
+I = F.*Tx.*p.^2.*Plate.*Phase_z;
 
 if any(isnan(I))
-    fprintf('NaN value detected at frequency %f and angle %f\n', f, theta_z(isnan(I)));
+    fprintf('NaN value detected at frequency %f and angle %f\n',...
+    f, theta_z(isnan(I)));
 end
 
 end
