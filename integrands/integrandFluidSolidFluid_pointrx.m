@@ -10,7 +10,7 @@ k_z = k*p;
 k_rho = k*q;
 
 %% Transmitter spatial spectrum
-Tx = besselj(1, k_z*aTx);
+Tx = besselj(1, k_rho*aTx);
 
 %% Plate response, angular
 % Reflection/Transmission coefficient

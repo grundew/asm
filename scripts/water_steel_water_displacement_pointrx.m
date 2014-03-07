@@ -3,11 +3,11 @@ function [pt, f] = water_steel_water_displacement_pointrx(x0, savemat)
 %% Samplings stuff
 fs = 2e6;
 nfft = 2^14;
-% ntheta = 2^12;
+ntheta = 2^12;
 thetamin = 0;
 thetamax = pi/2;
 f = (0:nfft-1)*fs/nfft;
-% theta = linspace(0, thetamax, ntheta);
+theta = linspace(thetamin, thetamax, ntheta);
 
 %% Transducer specs
 aTx = 9e-3;
@@ -43,13 +43,12 @@ for i = 1:nf/2+1
     end
     
     freq = f(i);
-    k = 2*pi*freq/v_fluid;
-    % I = integrandFluidSolidFluid_pointrx(theta, freq, aTx,...
-    %    v_fluid, rho_fluid, d_z, x0, model, reflection);
-    fun = @(theta) integrandFluidSolidFluid_pointrx(theta, freq, aTx,...
+    I = integrandFluidSolidFluid_pointrx(theta, freq, aTx,...
         v_fluid, rho_fluid, d_z, x0, model, reflection);
-    % pt(i) = k*trapz(theta, I);
-    pt(i) = k*quadgk(fun, thetamin, thetamax);
+    pt(i) = trapz(theta, I);
+    % fun = @(theta) integrandFluidSolidFluid_pointrx(theta, freq, aTx,...
+    %     v_fluid, rho_fluid, d_z, x0, model, reflection);
+    % pt(i) = k*quadgk(fun, thetamin, thetamax);
     
     % Time it
     if i == 300
@@ -58,7 +57,9 @@ for i = 1:nf/2+1
     end
     
 end
-pt = 4*pi/rho_fluid/v_fluid/aTx*pt;
+k = 2*pi*f'/v_fluid;
+pt = 4*pi/rho_fluid/v_fluid/aTx*k.*pt;
+
 %% Finnished
 dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
 fprintf('Finnished: %s\n', dtstr)
