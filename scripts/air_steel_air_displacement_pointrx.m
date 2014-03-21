@@ -43,7 +43,7 @@ for i = 1:nf/2+1
     freq = f(i);
     fun = @(theta) integrandFluidSolidFluid_pointrx(theta, freq, aTx,...
         v_fluid, rho_fluid, d_z, x0, model, reflection);
-    pt(i) = k*quadgk(fun, thetamin, thetamax);
+    pt(i) = quadgk(fun, thetamin, thetamax);
     
     % Time it
     if i == 300
