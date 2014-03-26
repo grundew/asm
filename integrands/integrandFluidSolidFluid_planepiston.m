@@ -53,7 +53,7 @@ PhiRx = 2*W;
 % Multiply with wave length and convert from dB to linear
 %% Loss parameter
 if alphaLambda_dB > 0
-    alphaL = 10.^(alphaLambda_dB*f/model.solid.v/20);
+    alphaL = log(10.^(alphaLambda_dB*f/model.solid.v/20));
 else
     alphaL = 0;
 end
