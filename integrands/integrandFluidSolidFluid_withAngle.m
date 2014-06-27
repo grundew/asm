@@ -37,13 +37,11 @@ q = sin(gamma);
 p = sqrt(1-q.^2);
 kx = k*q;
 PhiTx = planePistonPressureAngularSpectrum(kx, aTx, c, rho);
-idltgamma = gamma <= alpha;
 
 %% Receiver spatial spectrum
 % See confluence page on Angular Spectrum Method for details on the
 % relations between the angles
 gamma_rx = gamma - 2*alpha;
-gamma_rx(idltgamma) = 2*alpha - gamma(idltgamma);
 q_rx = sin(gamma_rx);
 kx = k*q_rx;
 PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
