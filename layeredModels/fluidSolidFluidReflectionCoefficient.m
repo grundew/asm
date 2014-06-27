@@ -28,12 +28,22 @@ rho_solid = model.solid.density;
 % Thickness of plate
 d = model.thickness;
 
+alpha_L = model.alphaLambda*log(10.^(abs(freq)/model.solid.v/20));
+alpha_S = (alpha_L/2)*(vLong/vShear)^3;
+
+% Equation 5 & 6 from Ref(2)
+vLong = vLong./(1 + 1i*alpha_L*vLong./freq/2/pi);
+vShear = vShear./(1 + 1i*alpha_S*vShear./freq/2/pi);
+
 % Absorption
 % alpha_front = 1000;
 % alpha_back = 1;
 % alpha_L = 10;
 % alpha_S = 10;
 
+% pm = utils.ProgressMonitor([], 1);
+% pm.start(nf*nt, 'Generating reflection coeff');
+% cnt = 1;
 for i = 1:nf
     
     f = freq(i);
@@ -47,8 +57,8 @@ for i = 1:nf
     % Wavenumbers
     
     % Length of wavenumber vector in the steel (S = shear, L = longitudenal)
-    k_S = w/vShear;
-    k_L = w/vLong;
+    k_S = w./vShear(i);
+    k_L = w./vLong(i);
     
     % Length of wavenumber vector in fluids
     k_front = w/c_front;
@@ -62,8 +72,8 @@ for i = 1:nf
         k_z_front = k_front*cos(theta);
         
         % Horizontal part of wavenumber in steel
-        k_z_S = sqrt(k_S^2 - K^2);
-        k_z_L = sqrt(k_L^2 - K^2);
+        k_z_S = sqrt(k_S.^2 - K^2);
+        k_z_L = sqrt(k_L.^2 - K^2);
 
         % Step 1:
         % Calculate input matrix
@@ -99,6 +109,9 @@ for i = 1:nf
             V(j, i) = -G(2, 1)/G(2, 2);
             W(j, i) = G(1, 1) - G(1, 2)*G(2, 1)/G(2, 2);
         end
+        
+%         pm.update(cnt);
+%         cnt = cnt + 1;
     end
     
 end

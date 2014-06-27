@@ -7,6 +7,7 @@ fs = 5e6;
 nfft = 2^15;
 ntheta = 2^12;
 thetamax = 0.8;
+thetamin = -0.8;
 % thetamax = pi/2;
 
 f = (0:(nfft-1))*fs/nfft;
@@ -33,8 +34,8 @@ model = MultiLayerModel(fluid1, layer, fluid3, d, dist, dist, aTx, aRx, alphaLam
 thresh = 1e-10;
 
 % Misalignment angle
-% alpha = 1.5/180*pi;
-alpha = 0;
+alpha = 0.5/180*pi;
+% alpha = 0;
 
 %% Excitation pulse
 tend = 50e-6;
@@ -81,11 +82,11 @@ for i = 1:length(ix)
     end
     
     freq = f(ix(i));
-    
-    fun = @(xx) integrandFluidSolidFluid_withAngle(xx, freq, aRx, aTx,...
-       [], [], dist, model, alpha);
-    pt(ix(i)) = 2*pi*quadgk(fun, 0, thetamax);    
-    
+        
+    fun = @(xx) integrandFluidSolidFluid_2Dangle(xx, freq, aRx, aTx,...
+       v_fluid, rho_fluid, dist, model, alpha);
+    pt(ix(i)) = 2*pi*quadgk(fun, thetamin, thetamax);
+
     % Ht = integrandFluidSolidFluid_withAngle(theta, freq, aRx, aTx,...
     %     v_fluid, rho_fluid, dist, model, alpha);
     % pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
