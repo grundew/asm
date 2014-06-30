@@ -1,8 +1,10 @@
-function [pt, f] = water_steel_water_displacement_pointrx(x0, savemat)
+function [pt, f] = water_steel_water_displacement_pointrx(x0, alpha, savemat)
+% x0 - Displacment of hydrophon (m)
+% alpha - Angle of transducer (rad)
 
 %% Samplings stuff
-fs = 2e6;
-nfft = 2^14;
+fs = 5e6;
+nfft = 2^13;
 ntheta = 2^12;
 thetamin = 0;
 thetamax = pi/2;
@@ -44,7 +46,7 @@ for i = 1:nf/2+1
     
     freq = f(i);
     I = integrandFluidSolidFluid_pointrx(theta, freq, aTx,...
-        v_fluid, rho_fluid, d_z, x0, model, reflection);
+        v_fluid, rho_fluid, d_z, x0, model, alpha, reflection);
     pt(i) = trapz(theta, I);
     % fun = @(theta) integrandFluidSolidFluid_pointrx(theta, freq, aTx,...
     %     v_fluid, rho_fluid, d_z, x0, model, reflection);
@@ -64,7 +66,8 @@ pt = 4*pi/rho_fluid/v_fluid/aTx*k.*pt;
 dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
 fprintf('Finnished: %s\n', dtstr)
 if exist('savemat', 'var') && savemat
-    outfile = sprintf('asm_displaceRx_%d_%s.mat', x0*1e3, dtstr);
+    outfile = sprintf('asm_displaceRx_%d_alpha_%d_%s.mat',...
+        x0*1e3, alpha*180/pi, dtstr);
     fprintf('Saved to %s\n', outfile)
     save(outfile);
 end
