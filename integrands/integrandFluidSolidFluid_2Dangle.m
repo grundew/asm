@@ -1,5 +1,5 @@
 function I = integrandFluidSolidFluid_2Dangle(theta_z, f, aRx, aTx,...
-    c, rho, d, model, alpha)
+    c, rho, d, model, alpha, refl)
 % Angular frequency and total length of wave vector
 w = 2*pi*f;
 k = w./c;
@@ -27,7 +27,11 @@ PhiRx = 2*W;
 theta_plate = alpha - theta_z;
 %% Reflection coefficient
 % Todo: add loss
-Plate = analyticRTFast(w/2/pi, theta_plate, model);
+if refl
+    Plate = analyticRTFast(w/2/pi, theta_plate, model);
+else
+    [~, Plate] = analyticRTFast(w/2/pi, theta_plate, model);
+end
 %% Phase shift from transmitter to plate and from plate to receiver
 z = d + d*cos(2*alpha);
 x = -d*sin(2*alpha);
