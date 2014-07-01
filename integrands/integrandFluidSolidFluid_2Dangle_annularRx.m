@@ -1,5 +1,5 @@
 function I = integrandFluidSolidFluid_2Dangle_annularRx(theta_z, f, aRx, aTx,...
-    c, rho, d, model, alpha)
+    c, rho, d, model, alpha, refl)
 % Angular frequency and total length of wave vector
 w = 2*pi*f;
 k = w./c;

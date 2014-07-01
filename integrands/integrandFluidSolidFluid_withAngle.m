@@ -26,6 +26,9 @@ function I = integrandFluidSolidFluid_withAngle(gamma, f, aRx, aTx,...
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
 
 % Angular frequency and total length of wave vector
+c = model.fluid(1).v;
+rho = model.fluid(1).density;
+
 w = 2*pi*f;
 k = w./c;
 
@@ -49,10 +52,12 @@ PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
 theta = gamma - alpha;
 theta(idltgamma) = alpha - gamma(idltgamma);
 R = analyticRTFast(f, theta, model);
+% R = fluidSolidFluidReflectionCoefficient(f, theta, model);
+% R = R.';
 
 %% Phase shift from transmitter to plate and from plate to receiver
 z = d + d*cos(2*alpha);
-r = d*sin(2*alpha);
+r = -d*sin(2*alpha);
 kz = k*p;
 kr = k*q;
 Phase = exp(1i*(kr*r + kz*z));

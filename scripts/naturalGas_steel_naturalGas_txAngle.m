@@ -1,16 +1,16 @@
 %% Do the whole she bang!
 debug = false;
-saveresults = true;
+saveresults = false;
 
 %% Samplings stuff
-fs = 2.5e6;
+fs = 5e6;
 nfft = 2^15;
 ntheta = 2^12;
 thetamax = 0.8;
 thetamin = -0.8;
 % thetamax = pi/2;
 
-f = (0:nfft-1)*fs/nfft;
+f = (0:(nfft-1))*fs/nfft;
 
 %% Transducer specs
 aTx = 6e-3;
@@ -29,7 +29,8 @@ d = 25e-3;
 fres = 0.5*v_layer/d;
 
 % Fluid-solid-fluid model
-model = MultiLayerModel(fluid1, layer, fluid3, d);
+alphaLambda = 8e-3;
+model = MultiLayerModel(fluid1, layer, fluid3, d, dist, dist, aTx, aRx, alphaLambda);
 thresh = 1e-10;
 
 % Misalignment angle
@@ -68,19 +69,24 @@ nf = length(f);
 pt = zeros(nf, 1);
 theta = linspace(0, thetamax, ntheta);
 dtheta = theta(2) - theta(1);
+ix = find(f > 0.7*f0 & f < 1.3*f1);
+%%
+pm = utils.ProgressMonitor([], 1);
+pm.start(length(ix),'');        
 
-for i = 1:nf
+for i = 1:length(ix)
     % Time it
     if i == 1
         fprintf('Started: %s\n', datestr(now, 'dd-mm-yyyy_HH-MM-SS'));
         tic
     end
     
-    freq = f(i);
-
+    freq = f(ix(i));
+        
     fun = @(xx) integrandFluidSolidFluid_2Dangle(xx, freq, aRx, aTx,...
        v_fluid, rho_fluid, dist, model, alpha);
-    pt(i) = 2*pi*quadgk(fun, thetamin, thetamax);
+    pt(ix(i)) = 2*pi*quadgk(fun, thetamin, thetamax);
+
     % Ht = integrandFluidSolidFluid_withAngle(theta, freq, aRx, aTx,...
     %     v_fluid, rho_fluid, dist, model, alpha);
     % pt(i) = 2*pi*2*dtheta*(0.5*(Ht(1) + Ht(end)) + sum(Ht(2:end-1)));
@@ -94,10 +100,15 @@ for i = 1:nf
     if debug
         debugplots(theta, freq, Phi, T, Ht, E); %#ok<UNRCH>
     end
+    pm.update(i);
 end
-
+pm.stop();
 %% Convolve the pulse and the impulse response of the observation point
-yt = conv(y, fft(pt, nfft));
+Yt = pt.*Y;
+w = tukeywin(length(ix), 0.2);
+Yt(ix) = Yt(ix).*w;
+yt = real(ifft(conj(Yt)));
+%yt = conv(y, fft(pt, nfft));
 tt = (0:length(yt)-1)/fs;
 
 %% Finnished
