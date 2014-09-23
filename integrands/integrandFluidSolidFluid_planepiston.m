@@ -41,13 +41,13 @@ kz = k*p;
 xx = kr*aTx;
 W = besselj(1, xx)./xx;
 W(xx==0) = 0.5;
-PhiTx = 2*W;
+PhiTx = 2*pi*aTx^2*W;
 
 %% Receiver spatial sensitivities
 xx = kr*aRx;
-W = besselj(1, xx)./xx;
-W(xx==0) = 0.5;
-PhiRx = 2*W;
+Wouter = besselj(1, xx)./xx;
+Wouter(xx==0) = 0.5;
+PhiRx = 2*pi*aRx^2*Wouter;
 
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear
@@ -60,9 +60,9 @@ end
 
 %% Displacement factor
 if x0 > 0
-    dispRx = 2*pi*besselj(0, x0*kr);
+    dispRx = besselj(0, x0*kr);
 else
-    dispRx = 2*pi;
+    dispRx = 1;
 end
 
 %% Reflection/Transmission coefficient
