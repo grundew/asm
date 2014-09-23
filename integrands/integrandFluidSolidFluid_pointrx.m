@@ -13,7 +13,7 @@ k_rho = k*q;
 xx = k*sin(theta_z+alpha)*aTx;
 W = besselj(1, xx)./xx;
 W(xx==0) = 0.5;
-Tx = 2*aTx^2*W;
+Tx = 2*pi*aTx^2*W;
 
 %% Plate response, angular
 % Reflection/Transmission coefficient
@@ -34,7 +34,7 @@ I = k.^2*F.*Tx.*p.^2.*q.*Plate.*Phase_z/rho/c;
 
 if any(isnan(I))
     fprintf('NaN value detected at frequency %f and angle %f\n',...
-    f, theta_z(isnan(I)));
+        f, theta_z(isnan(I)));
 end
 
 end
