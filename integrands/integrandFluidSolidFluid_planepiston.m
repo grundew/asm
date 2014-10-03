@@ -1,4 +1,4 @@
-function I = integrandFluidSolidFluid_planepiston(theta, f, aRx, aTx,...
+function I = integrandFluidSolidFluid_planepiston(theta_z, f, aRx, aTx,...
     c, d1, d3, model, x0, alphaLambda_dB, reflection)
 % I = orofinoIntegrand(theta, f, aRx, aTx,...
 %                      c, rho, d1, d3, model,...
@@ -9,7 +9,7 @@ function I = integrandFluidSolidFluid_planepiston(theta, f, aRx, aTx,...
 %   the fluid on both sides of the solid plate have the same properties.
 % 
 % Input:
-% theta - Angle (scalar or vector)
+% theta_z - Angle (scalar or vector)
 % f - Frequency (scalar)
 % aRx - Radius of the receiver
 % aTx - Raidus of the transmitter
@@ -29,12 +29,15 @@ function I = integrandFluidSolidFluid_planepiston(theta, f, aRx, aTx,...
 % References:
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
 
-q = sin(theta);
+
+%% Compute wave numbers
+q = sin(theta_z);
 p = sqrt(1-q.^2);
 w = 2*pi*f;
 k = w./c;
 kr = k*q;
 kz = k*p;
+
 
 %% Transmitter spatial sensitivity
 % No angle adjustment
@@ -43,20 +46,32 @@ W = besselj(1, xx)./xx;
 W(xx==0) = 0.5;
 PhiTx = 2*pi*aTx^2*W;
 
-%% Receiver spatial sensitivities
+
+%% Receiver spatial sensitivity
 xx = kr*aRx;
-Wouter = besselj(1, xx)./xx;
-Wouter(xx==0) = 0.5;
-PhiRx = 2*pi*aRx^2*Wouter;
+Wrx = besselj(1, xx)./xx;
+Wrx(xx==0) = 0.5;
+PhiRx = 2*pi*aRx^2*Wrx;
+
 
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear
-%% Loss parameter
+% Loss parameter
 if alphaLambda_dB > 0
     alphaL = log(10.^(alphaLambda_dB*f/model.solid.v/20));
 else
     alphaL = 0;
 end
+
+
+%% Reflection/Transmission coefficient
+if reflection
+    % TODO: Add loss
+    Plate = analyticRTFast(w/2/pi, theta_z, model);
+else
+    Plate = transmissionCoefficientAnalytical(f, q, model, alphaL);
+end
+
 
 %% Displacement factor
 if x0 > 0
@@ -65,17 +80,13 @@ else
     dispRx = 1;
 end
 
-%% Reflection/Transmission coefficient
-if reflection
-    % TODO: Add loss
-    Plate = analyticRTFast(w/2/pi, theta, model);
-else
-    Plate = transmissionCoefficientAnalytical(f, q, model, alphaL);
-end
 
 %% Phase shift from transmitter to plate and from plate to receiver
 Phase = exp(1i*kz*(d1 + d3));
 
+
 %% Assemble integrand
 I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p;
+
+
 end

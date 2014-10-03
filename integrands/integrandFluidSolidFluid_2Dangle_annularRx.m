@@ -25,15 +25,17 @@ PhiRx = 2*(Wouter - W);
 % See confluence page on Angular Spectrum Method for details on the
 % relations between the angles
 theta_plate = alpha - theta_z;
+
 %% Reflection coefficient
 % Todo: add loss
 Plate = analyticRTFast(w/2/pi, theta_plate, model);
+
 %% Phase shift from transmitter to plate and from plate to receiver
 z = d + d*cos(2*alpha);
 x = -d*sin(2*alpha);
 Phase = exp(1i*k*(cos(theta_z)*z + sin(theta_z)*x));
 
-I = k*rho*c*cos(theta_z).*cos(theta_z + 2*alpha).*Plate.*PhiRx.*PhiTx.*Phase;
+I = rho*c*k*cos(theta_z).*cos(theta_z + 2*alpha).*Plate.*PhiRx.*PhiTx.*Phase;
 
 if any(isnan(I))
     fprintf('NaN value detected at frequency %f and angle %f\n', f, theta_z(isnan(I)));

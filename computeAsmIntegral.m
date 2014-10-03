@@ -1,5 +1,20 @@
-function [pt, f, params] = startAsmSimulation(varargin)
-% startAsmSimulation('param1', value1, 'param2', value2, ...)
+function [pt, f, params] = startAsmSimulation(func, varargin)
+% startAsmSimulation(func, 'param1', value1, 'param2', value2, ...)
+% 
+% Input:
+% func - Cell array. First element must be a function handle and the rest
+%        of the elements are the non-default arguments to the function. 
+%        The function must take the following arguments (but might ignore them):
+%          1. Angle of incidence for the plane wave (radians)
+%          2. Frequency (Hz)
+%          3. Radius of receiver (m)
+%          4. Radius of transmitter (m)
+%          5. Speed of sound in fluid (m/s)
+%          6. Distance from transmitter to target (m)
+%          7. Distance from receiver to target (m)
+%          8. Model object/struct
+%          9. Loss in steel, $\alpha \lambda$ (dB)
+%          10. Reflection, true if reflection, false if transmission
 % 
 % Valid parameters (all of them have default values)
 %
@@ -9,7 +24,6 @@ function [pt, f, params] = startAsmSimulation(varargin)
 % 'cs'
 % 'rho_solid'
 % 'alphaLambda_dB' - Damping in the solid.
-% 'alpha' - Misalignment angle of transducer (not implemented)
 % 'reflection' - (Boolean) Reflection coefficient is used if true
 %
 % Fluid properties:
@@ -21,23 +35,34 @@ function [pt, f, params] = startAsmSimulation(varargin)
 % 'aRx' - Radius of receiver
 % 'distanceTx' - Distance from the transmitter to the plate
 % 'distanceRx' - Distance from receiver to the plate
+% 'displaceRx' - Displacement of receiver perpendicular to the acuostical
+%                axis (m)
 %
 % Sampling stuff:
 % 'f'
+% 'thetamin' - Integration lower limit
 % 'thetamax' - Integration limit
 %
 % Admin stuff:
 % 'filenamevars' - Cell array of parameters with value included in the filename
 
-%% Parse the input
+%% Pare default arguments
+if isa(func, 'function_handle')
+    func_args = {};
+elseif iscell(func) && isa(func{1}, 'function_handle')
+    if length(func) > 1
+        func_args = func{2:end};
+    else
+        func_args = {};
+    end
+    func_handle = func{1};
+else
+    
+end
+
+%% Parse the parameters
 params = parseAsmInput(varargin{:});
 
-fluid1 = struct('v', params.cf, 'density', params.rho_fluid);
-fluid3 = fluid1;
-layer = struct('v', params.cp, 'density', params.rho_solid, 'vShear', params.cs);
-
-% Fluid-solid-fluid model
-model = MultiLayerModel(fluid1, layer, fluid3, params.thickness);
 
 %% Samplings stuff
 f = params.f;
@@ -55,7 +80,17 @@ alphaLambda_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 x0 = params.displaceRx;
 refl = params.reflection;
-tx_focus = params.tx_focus;
+
+
+%% Pack the parameters for the model
+fluid1 = struct('v', params.cf, 'density', params.rho_fluid);
+fluid3 = fluid1;
+layer = struct('v', params.cp, 'density', params.rho_solid, 'vShear', params.cs);
+
+% Fluid-solid-fluid model
+model = struct('fluid', [fluid1, fluid3],...
+    'solid', layer, 'thickness', params.thickness,...
+    'alphaLambda', alphaLambda_dB);
 
 %% Integrate over all angles for the point on the axis
 nf = numel(f);
@@ -72,22 +107,10 @@ for i = 1:nf
     w = 2*pi*f(i);
     k = w/v_fluid;
     
-    if ~tx_focus
-        % Plane piston with out focus
-        fun = @(xx) integrandFluidSolidFluid_planepiston(...
-            xx, freq, aRx, aTx,...
-            v_fluid, d1, d3, model, x0, alphaLambda_dB, refl);
-        pt(i) = quadgk(fun, thetamin, thetamax);
-    elseif tx_focus
-        % Plane piston and focused receiver
-        fun = @(xx) integrandFluidSolidFluid_focusedtx(...
-            xx, freq, aRx, aTx,...
-            v_fluid, d1, d3,...
-            model, x0, alphaLambda_dB, refl);
-        pt(i) = quadgk(fun, 0, thetamax, 'MaxIntervalCount', 5000);
-    else
-        error('Something went haywire');
-    end        
+    fun = @(theta_z) func(...
+        theta_z, freq, aRx, aTx,...
+        v_fluid, d1, d3, model, x0, alphaLambda_dB, refl, func_args{:});
+    pt(i) = quadgk(fun, thetamin, thetamax, 'MaxIntervalCount', 5000);
     
     % Time it
     if i == 300

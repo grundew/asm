@@ -1,5 +1,5 @@
-function I = integrandFluidSolidFluidTransmission_withLossAndDisplacement(k_r, w, aRx, aTx,...
-    c, rho, d1, d3, model, x0, alphaLambda_dB)
+function I = integrandFluidSolidFluid_focusedRx(theta, f, aRx, aTx,...
+    c, rho, d1, d3, model, x0, alphaLambda_dB, reflection)
 % I = orofinoIntegrand(theta, f, aRx, aTx, c, rho, d1, d3, model, alphaLambda)
 %   orofinoIntegrand is the integrand in equation (28) in Ref. 1. This is
 %   used as an input to the waveNumberIntegration function. It uses an
@@ -7,16 +7,18 @@ function I = integrandFluidSolidFluidTransmission_withLossAndDisplacement(k_r, w
 %   the fluid on both sides of the solid plate have the same properties.
 % 
 % Input:
-% k_r - Wave number in the x,y-plane
-% w - Angular frequency (scalar)
+% theta - Angle (scalar or vector)
+% f - Frequency (scalar)
 % aRx - Radius of the receiver
 % aTx - Raidus of the transmitter
 % c - Speed of sound in the propagation fluid
 % rho - Density of the propagation fluid
 % d1 - Distance from transmitter to the solid plate
 % d3 - Distance from receiver to the solid plate
+% x0 - Displacement of receiver from the acoustical axis of the transmitter
 % model - MultiLayerModel object
 % alphaLambda - Damping factor
+% reflection - (Boolean) True if reflection coeffecient should be used
 % 
 % Output:
 % I - Integrand evaluated at theta
@@ -24,30 +26,43 @@ function I = integrandFluidSolidFluidTransmission_withLossAndDisplacement(k_r, w
 % References:
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
 %
+q = sin(theta);
+p = sqrt(1-q.^2);
+w = 2*pi*f;
 k = w./c;
-
-% k_r - input
-k_z = sqrt(k^2 - k_r.^2);
-sintheta_z = k_r/k;
+kx = k*q;
+kz = k*p;
 
 %% Transducer spacial sensitivities
-S_Rx = planePistonPressureAngularSpectrum(k_r, aRx, c, rho);
-S_Tx = planePistonPressureAngularSpectrum(k_r, aTx, c, rho);
-
-%% Displacement factor
-dispRx = 2*pi*besselj(0, x0*k_r);
+PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
+PhiTx = planePistonPressureAngularSpectrum(kx, aTx, c, rho);
 
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear
+
+%% Loss parameter
 if alphaLambda_dB > 0
-    alphaL = 10.^(alphaLambda_dB*w/2/pi/model.solid.v/20);
+    alphaL = 10.^(alphaLambda_dB*f/model.solid.v/20);
 else
     alphaL = 0;
 end
 
-T = transmissionCoefficientAnalytical(w/2/pi, sintheta_z, model, alphaL);
+%% Displacement factor
+if x0 > 0
+    dispRx = 2*pi*besselj(0, x0*k_r);
+else
+    dispRx = 2*pi;
+end
+
+%% Reflection/Transmission coefficient
+if reflection
+    % TODO: Add loss
+    Plate = analyticRTFast(w/2/pi, asin(sintheta_z), model);
+else
+    Plate = transmissionCoefficientAnalytical(f, q, model, alphaL);
+end
 
 %% Phase shift from transmitter to plate and from plate to receiver
-Phase = exp(1i*k_z*(d1 + d3));
-I = k_r.*dispRx.*k_z/k/rho/c.*Phase.*S_Rx.*S_Tx.*T;
+Phase = exp(1i*kz*(d1 + d3));
+I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p;
 end
