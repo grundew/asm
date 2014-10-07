@@ -9,6 +9,7 @@ Implemented features
 - Pulse-echo setup
 - Throughtransmission
 - (Misalignment) angle between transmitter and the layered media
+- Displaced receiver from the acoustical axis
 
 References
 ---
@@ -17,8 +18,3 @@ References
 
 [Evaluation of angle-dependent spectral distortion for infinite, planar elastic media via angular spectrum decomposition - Donald P. Orofino and Peder C. Pedersen - J. Acoust. Soc. Am. 93 (3), March 1993](http://dx.doi.org/10.1121/1.405408)
 
-TODO
----
-Test damping factor vs simulated signal and data
-
-Track down the numerical error in reflection/transmission coefficient (evanescent waves, theta is greater than the critical angles)
