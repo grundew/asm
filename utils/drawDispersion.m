@@ -20,15 +20,15 @@ function drawDispersion(f, theta, varargin)
 %
 
 %% Parse the input
-[params, p] = parseAsmInput(varargin{:});
+params = parseAsmInput(varargin{:});
 
-invalidparams = {'fs', 'thetamax', 'distanceTx', 'distanceRx',...
-    'aTx', 'aRx', 'filenamevars', 'nfft'};
-invid = cellfun(@(x) ~any(strcmp(x, p.UsingDefaults)), invalidparams);
-if any(invid)
-    errorstr = sprintf('Invalid parameter specified: %s', invalidparams{~invid});
-    error('InputError:InvalidParameter', errorstr);
-end
+% invalidparams = {'fs', 'thetamax', 'distanceTx', 'distanceRx',...
+%     'aTx', 'aRx', 'filenamevars', 'nfft'};
+% invid = cellfun(@(x) ~any(strcmp(x, p.UsingDefaults)), invalidparams);
+% if any(invid)
+%     errorstr = sprintf('Invalid parameter specified: %s', invalidparams{~invid});
+%     error('InputError:InvalidParameter', errorstr);
+% end
 
 fluid1 = struct('v', params.cf, 'density', params.rho_fluid);
 fluid3 = fluid1;

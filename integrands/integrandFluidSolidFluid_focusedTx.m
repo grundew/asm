@@ -1,4 +1,4 @@
-function I = integrandFluidSolidFluid_focusedRx(theta, f, aRx, aTx,...
+function I = integrandFluidSolidFluid_focusedTx(theta_z, f, aRx, aTx,...
     c, rho, d1, d3, model, x0, alphaLambda_dB, reflection)
 % I = orofinoIntegrand(theta, f, aRx, aTx, c, rho, d1, d3, model, alphaLambda)
 %   orofinoIntegrand is the integrand in equation (28) in Ref. 1. This is
@@ -7,7 +7,7 @@ function I = integrandFluidSolidFluid_focusedRx(theta, f, aRx, aTx,...
 %   the fluid on both sides of the solid plate have the same properties.
 % 
 % Input:
-% theta - Angle (scalar or vector)
+% theta_z - Angle (scalar or vector)
 % f - Frequency (scalar)
 % aRx - Radius of the receiver
 % aTx - Raidus of the transmitter
@@ -26,19 +26,28 @@ function I = integrandFluidSolidFluid_focusedRx(theta, f, aRx, aTx,...
 % References:
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
 %
-q = sin(theta);
+q = sin(theta_z);
 p = sqrt(1-q.^2);
 w = 2*pi*f;
 k = w./c;
-kx = k*q;
+kr = k*q;
 kz = k*p;
 
-%% Transducer spacial sensitivities
-PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
-PhiTx = planePistonPressureAngularSpectrum(kx, aTx, c, rho);
 
-%% Plate response, angular
-% Multiply with wave length and convert from dB to linear
+%% Transmitter spatial sensitivity
+% No angle adjustment
+xx = kr*aTx;
+W = besselj(1, xx)./xx;
+W(xx==0) = 0.5;
+PhiTx = 2*pi*aTx^2*W;
+
+
+%% Receiver spatial sensitivity
+xx = kr*aRx;
+Wrx = besselj(1, xx)./xx;
+Wrx(xx==0) = 0.5;
+PhiRx = 2*pi*aRx^2*Wrx;
+
 
 %% Loss parameter
 if alphaLambda_dB > 0
@@ -63,6 +72,6 @@ else
 end
 
 %% Phase shift from transmitter to plate and from plate to receiver
-Phase = exp(1i*kz*(d1 + d3));
+Phase = exp(1i*kz*d3);
 I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p;
 end

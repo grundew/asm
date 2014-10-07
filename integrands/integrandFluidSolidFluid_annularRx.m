@@ -1,4 +1,4 @@
-function I = integrandFluidSolidFluid_annularRx(theta, f, aRx_min, aRx_max, aTx,...
+function I = integrandFluidSolidFluid_annularRx(theta_z, f, aRx_min, aRx_max, aTx,...
     c, rho, d1, d3, model)
 % I = integrandFluidSolidFluidTransmission(theta, f, aRx_min, aRx_max, aTx, c, rho, d1, d3, model, alphaLambda)
 %   orofinoIntegrand is the integrand in equation (28) in Ref. 1. This is
@@ -23,7 +23,7 @@ function I = integrandFluidSolidFluid_annularRx(theta, f, aRx_min, aRx_max, aTx,
 % References:
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
 
-q = sin(theta);
+q = sin(theta_z);
 p = sqrt(1-q.^2);
 w = 2*pi*f;
 k = w./c;
@@ -34,12 +34,18 @@ kz = k*p;
 PhiRx = planePistonRingPressureAngularSpectrum(kx, aRx_min, aRx_max, c, rho);
 PhiTx = planePistonPressureAngularSpectrum(kx, aTx, c, rho);
 
-%% Plate response, angular
-R = analyticRTFast(f, theta, model);
+
+%% Reflection/Transmission coefficient
+if reflection
+    % TODO: Add loss
+    Plate = analyticRTFast(w/2/pi, asin(sintheta_z), model);
+else
+    Plate = transmissionCoefficientAnalytical(f, q, model, alphaL);
+end
 
 %% Phase shift from transmitter to plate and from plate to receiver
 Phase = exp(1i*kz*(d1 + d3));
 
-I = R.*k.*q.*PhiRx.*PhiTx.*Phase.*k.*p;
+I = Plate.*k.*q.*PhiRx.*PhiTx.*Phase.*k.*p;
 end
 
