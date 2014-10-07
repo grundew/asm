@@ -1,4 +1,4 @@
-function [R, T] = analyticRTFast(freq, theta, model)
+function [R, T] = analyticRTFast(freq, theta, model, alpha_L, alpha_S)
 
 q = sin(theta);
 % L is half the thickness
@@ -14,12 +14,25 @@ theta_L = asin(c_L/c_F*q);
 theta_S = asin(c_S/c_F*q);
 
 
-alpha_L = model.alphaLambda*log(10.^(abs(freq)/c_L/20));
-alpha_S = (alpha_L/2)*(c_L/c_S)^3;
+%% Handle absorption as complex wave velocity
+% Check for complex speeds of sound
+if nargin < 4
+    alpha_L = 0;
+    alpha_S = 0;
+elseif nargin < 5
+    % Ref(2) equation 11
+    alpha_S = (alpha_L/2)*(c_Lr/c_Sr)^3;
+end
 
-% Equation 5 & 6 from Ref(2)
-c_L = c_L./(1 + 1i*alpha_L*c_L./freq/2/pi);
-c_S = c_S./(1 + 1i*alpha_S*c_S./freq/2/pi);
+if alpha_L == 0
+    c_L = c_Lr;
+    c_S = c_Sr;
+else
+    % Equation 5 & 6 from Ref(2)
+    c_L = c_Lr./(1 + 1i*alpha_L*c_Lr./freq/2/pi);
+    c_S = c_Sr./(1 + 1i*alpha_S*c_Sr./freq/2/pi);
+end
+
 
 % Calculate wave vectors in the solid, total and vertical
 % Total (angle independent)
