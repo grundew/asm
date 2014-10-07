@@ -26,9 +26,9 @@ classdef TestWater < matlab.unittest.TestCase
             p = parseAsmInput('cp', 1500,...
                 'rho_fluid', 1000, 'f', f, 'savemat', false);
             this.params = p;
-            tic
+            tic;
             this.V = computeAsmIntegral(@integrandFluidSolidFluid_planepiston, p);
-            this.cputime = toc
+            this.cputime = toc;
         end
         
     end
@@ -45,22 +45,25 @@ classdef TestWater < matlab.unittest.TestCase
         function visualInspection(this)
             
             p = this.params;
-            figure
-            plot(p.f, abs(this.V))
-            figure
-            plot(p.f, unwrap(angle(this.V)))
+            figure;
+            plot(p.f, abs(this.V));
+            figure;
+            plot(p.f, unwrap(angle(this.V)));
 
         end
          
         function testValue(this)
             
             res = load('testValue_water.mat');
-            this.verifyEqual(this.V, res.pt)
+            this.verifyEqual(this.V, res.pt);
             
         end
         
         function testCpuTime(this)
             cpuupperlimit = 7;
+            fprintf('\n\n============== Computation speed ==============\n\n');
+            fprintf('Time spent: %f s\n\n', this.cputime);
+            fprintf('============== Computation speed ==============\n\n');
             this.verifyLessThanOrEqual(this.cputime, cpuupperlimit);
         end
         
