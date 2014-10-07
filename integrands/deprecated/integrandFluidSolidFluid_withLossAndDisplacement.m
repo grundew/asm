@@ -1,5 +1,9 @@
 function I = integrandFluidSolidFluid_withLossAndDisplacement(theta_z, f, aRx, aTx,...
-    c, rho, d1, d3, model, x0, alphaLambda_dB, reflection)
+    c, d1, d3, model, x0, alphaLambda_dB, reflection)
+
+%
+% For some unknown reason this runs quicker than integrandeFluidSolidFluid_planepiston
+%
 % I = orofinoIntegrand(theta, f, aRx, aTx, c, rho, d1, d3, model, alphaLambda)
 %   orofinoIntegrand is the integrand in equation (28) in Ref. 1. This is
 %   used as an input to the waveNumberIntegration function. It uses an
@@ -30,7 +34,7 @@ function I = integrandFluidSolidFluid_withLossAndDisplacement(theta_z, f, aRx, a
 k = 2*pi*f./c;
 k_z = k*cos(theta_z);
 sintheta_z = sin(theta_z);
-k_r = k*sintheta_z;
+kr = k*sintheta_z;
 
 
 %% Transmitter spatial sensitivity
@@ -49,8 +53,11 @@ PhiRx = 2*pi*aRx^2*Wrx;
 
 
 %% Displacement factor
-dispRx = 2*pi*besselj(0, x0*k_r);
-
+if x0 > 0
+    dispRx = besselj(0, x0*kr);
+else
+    dispRx = 1;
+end
 
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear
@@ -69,7 +76,7 @@ end
 
 %% Phase shift from transmitter to plate and from plate to receiver
 Phase = exp(1i*k_z*(d1 + d3));
-I = k_r.*dispRx.*k_z/k/rho/c.*Phase.*PhiRx.*PhiTx.*Plate;
+I = kr.*dispRx.*k_z/k/c.*Phase.*PhiRx.*PhiTx.*Plate;
 
 
 end
