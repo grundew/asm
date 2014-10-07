@@ -1,81 +1,38 @@
-function [pt, f, params] = computeAsmIntegral(func, varargin)
-% startAsmSimulation(func, 'param1', value1, 'param2', value2, ...)
+function [pt, f] = computeAsmIntegral(func, asmParams, varargin)
+% computeAsmIntegral(func, 'param1', value1, 'param2', value2, ...)
+%
 % 
-% Input:
-% func - Cell array. First element must be a function handle and the rest
-%        of the elements are the non-default arguments to the function. 
-%        The function must take the following arguments (but might ignore them):
-%          1. Angle of incidence for the plane wave (radians)
-%          2. Frequency (Hz)
-%          3. Radius of receiver (m)
-%          4. Radius of transmitter (m)
-%          5. Speed of sound in fluid (m/s)
-%          6. Distance from transmitter to target (m)
-%          7. Distance from receiver to target (m)
-%          8. Model object/struct
-%          9. Loss in steel, $\alpha \lambda$ (dB)
-%          10. Reflection, true if reflection, false if transmission
-% 
-% Valid parameters (all of them have default values)
-%
-% Solid properties:
-% 'thickness'
-% 'cp'
-% 'cs'
-% 'rho_solid'
-% 'alphaLambda_dB' - Damping in the solid.
-% 'reflection' - (Boolean) Reflection coefficient is used if true
-%
-% Fluid properties:
-% 'cf'
-% 'rho_fluid'
-%
-% Geometric setup:
-% 'aTx' - Radius of transmitter
-% 'aRx' - Radius of receiver
-% 'distanceTx' - Distance from the transmitter to the plate
-% 'distanceRx' - Distance from receiver to the plate
-% 'displaceRx' - Displacement of receiver perpendicular to the acuostical
-%                axis (m)
-%
-% Sampling stuff:
-% 'f'
-% 'thetamin' - Integration lower limit
-% 'thetamax' - Integration limit
-%
-% Admin stuff:
-% 'filenamevars' - Cell array of parameters with value included in the filename
+% Example:
+% p = generateAsmConfig('water', 'steel');
+% p.f = linspace(100e3, 500e3, 500);
+% [pt, f] = computeAsmIntegral(@integrandFluidSolidFluid_planepiston, p,...
+%                               'MaxIntervalCount', 1000);
+% figure
+% plot(f, abs(pt))
 
-%% Pare default arguments
-if isa(func, 'function_handle')
-    func_args = {};
-    func_handle = func;
-elseif iscell(func) && isa(func{1}, 'function_handle')
-    if length(func) > 1
-        func_args = func{2:end};
-    else
-        func_args = {};
-    end
-    func_handle = func{1};
-else
-    
+%% Pars default arguments
+if nargin < 2
+    fprintf('Must have at least to input arguments.\n');
+    return;
 end
 
-%% Parse the parameters
-params = parseAsmInput(varargin{:});
+if ~isa(func, 'function_handle')
+    fprintf('First input must be a function handle.\n');
+    return;
+end
 
 
 %% Integrate over all angles for the point on the axis
-pt = func_handle(params, func_args{:});
+[pt, f] = func(asmParams, varargin{:});
 
 
-if params.savemat
+if asmParams.savemat
     %% Save results
     dtstr = datestr(now, 'dd_mm_yyyy_HHMMSS');
     fprintf('Finnished: %s\n', dtstr);
-    outfilename = generateFilenameString(params, dtstr);
+    outfilename = generateFilenameString(asmParams, dtstr);
     fprintf('Saved to %s\n', outfilename);
-    save(outfilename, 'params', 'pt', 'f', 'fres');
+    save(outfilename, 'asmParams', 'pt', 'f');
 end
 
 end

@@ -5,14 +5,9 @@ q = sin(theta);
 L = 0.5*model.thickness;
 rho_F = model.fluid.density;
 rho_S = model.solid.density;
-c_L = model.solid.v;
-c_S = model.solid.vShear;
+c_Lr = model.solid.v;
+c_Sr = model.solid.vShear;
 c_F = model.fluid.v;
-
-% Calculate angles (independent of frequency)
-theta_L = asin(c_L/c_F*q);
-theta_S = asin(c_S/c_F*q);
-
 
 %% Handle absorption as complex wave velocity
 % Check for complex speeds of sound
@@ -33,6 +28,9 @@ else
     c_S = c_Sr./(1 + 1i*alpha_S*c_Sr./freq/2/pi);
 end
 
+% Calculate angles (independent of frequency)
+theta_L = asin(c_L/c_F*q);
+theta_S = asin(c_S/c_F*q);
 
 % Calculate wave vectors in the solid, total and vertical
 % Total (angle independent)

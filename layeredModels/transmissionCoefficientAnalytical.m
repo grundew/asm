@@ -34,6 +34,7 @@ end
 L = 0.5*model.thickness;
 rho_F = model.fluid.density;
 rho_S = model.solid.density;
+
 % The real wave velocities
 c_Lr = model.solid.v;
 c_Sr = model.solid.vShear;
