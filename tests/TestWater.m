@@ -24,7 +24,7 @@ classdef TestWater < matlab.unittest.TestCase
             this.nfft = 500;
             f = linspace(100e3, 300e3, this.nfft);
             p = parseAsmInput('cp', 1500,...
-                'rho_fluid', 1000, 'f', f, 'savemat', false);
+                'rho_fluid', 1000, 'f', f, 'savemat', true);
             this.params = p;
             tic;
             this.V = computeAsmIntegral(@integrandFluidSolidFluid_planepiston, p);
