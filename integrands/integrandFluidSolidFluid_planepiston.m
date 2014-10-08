@@ -1,35 +1,16 @@
 function [X, f] = integrandFluidSolidFluid_planepiston(params, varargin)
-% I = orofinoIntegrand(theta, f, aRx, aTx,...
-%                      c, rho, d1, d3, model,...
-%                      alphaLambda_dB, reflection, alpha_plate)
-%   orofinoIntegrand is the integrand in equation (28) in Ref. 1. This is
-%   used as an input to the waveNumberIntegration function. It uses an
-%   analytical expression for the transmission coefficient, assuming that
-%   the fluid on both sides of the solid plate have the same properties.
-% 
-% Input:
-% theta_z - Angle (scalar or vector)
-% f - Frequency (scalar)
-% aRx - Radius of the receiver
-% aTx - Raidus of the transmitter
-% c - Speed of sound in the propagation fluid
-% rho - Density of the propagation fluid
-% d1 - Distance from transmitter to the solid plate
-% d3 - Distance from receiver to the solid plate
-% x0 - Displacement of receiver from the acoustical axis of the transmitter
-% model - MultiLayerModel object
-% alphaLambda - Damping factor
-% reflection - (Boolean) True if reflection coeffecient should be used
-% alpha_plate - Angle of misalignment of the plate
+% [X, f] = integrandFluidSolidFluid_planepiston(params varargin)
 %
 % Output:
-% I - Integrand evaluated at theta
+% X - Computed integral at frequencies, f
+% f - Frequencies
 %
 % References:
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
 
 %% Check sanity of parameters and give warnings or errors
-
+% TODO: IMPLEMENT THIS.
+% Give warning when 
 
 %% Samplings stuff
 f = params.f;
@@ -69,7 +50,7 @@ for i = 1:length(f)
         al_dB, refl, rho_F, rho_S, cp, cs, thick, x0);
     
     
-    X(i) = quadgk(fun, thetamin, thetamax, 'MaxIntervalCount', 5000);
+    X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
     
     % Time it
     if i == 500
@@ -143,6 +124,5 @@ Phase = exp(1i*kz*(d1 + d3));
 
 %% Assemble integrand
 I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p.^2;
-
 
 end
