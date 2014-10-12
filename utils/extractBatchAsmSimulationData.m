@@ -21,8 +21,8 @@ X = zeros(length(mat.pt), nfn);
 ff = cell(1, nfn);
 X(:, 1) = mat.pt;
 ff{1} = matfn;
-if isfield(mat, 'params')
-    p(1) = mat.params;
+if isfield(mat, 'asmParams')
+    p(1) = mat.asmParams;
 else
     p = 0;
 end

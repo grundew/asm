@@ -21,6 +21,20 @@ if ~isa(func, 'function_handle')
     return;
 end
 
+if ~asmParams.debug
+    pdir = pwd();
+    cd(fileparts(mfilename('fullpath')));
+    gitStatus = git('status');
+    
+    isunmodified = ~isempty(regexp(gitStatus, 'modified', 'ONCE'));
+    isnotup2date = ~isempty(regexp(gitStatus, 'up-to-date', 'ONCE'));
+    if  isunmodified || isnotup2date
+        warning('The ASM repos is modified or not up-to-date!')
+    else
+        asmParams.gitInfo = getGitInfo();
+    end
+    cd(pdir)
+end
 
 %% Integrate over all angles for the point on the axis
 [pt, f] = func(asmParams, varargin{:});
