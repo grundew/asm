@@ -1,4 +1,4 @@
-function [X, f] = integrandFluidSolidFluid_planepiston(params, varargin)
+function [X, f] = integrandFluidSolidFluid_focusedTx(params, varargin)
 % [X, f] = integrandFluidSolidFluid_planepiston(params varargin)
 %
 % Output:
@@ -7,10 +7,11 @@ function [X, f] = integrandFluidSolidFluid_planepiston(params, varargin)
 %
 % References:
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
+% 2. Angelsen, 2000. Ultrasonic imaging
 
 %% Check sanity of parameters and give warnings or errors
-% TODO: IMPLEMENT THIS.
-% Give warning when 
+% TODO: Implement sanity checks. Give warnings.
+
 
 %% Samplings stuff
 f = params.f;

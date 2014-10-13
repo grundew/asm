@@ -51,7 +51,7 @@ for i = 1:length(f)
     w = 2*pi*f(i);
     k = w/c_F;
     fun = @(theta_z) integrand(theta_z, f(i), k, d1, d3, aTx, aRx, c_F,...
-        al_dB, refl, rho_F, rho_S, cp, cs, thick, x0);
+        al_dB, refl, rho_F, rho_S, cp, cs, thick, x0, r0);
     
     
     X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
@@ -67,15 +67,8 @@ for i = 1:length(f)
 
 end
 
-%% Apply time delay
-% Coming from propagation from transducer to focal point
-% It's applied as time delay because the pressure is only known in the 
-% focal plane. This is an approximation i guess.
-omega = 2*pi*f;
-delta_t = d1/c_F;
-delay = exp(1i*delta_t*omega);
-X = X.*delay;
 end
+
 
 function I = integrand(theta_z, f, k, d1, d3, aTx, aRx, c_F,...
     al_dB, refl, rho_F, rho_S, c_Lr, c_Sr, thick, x0, r0)
@@ -87,9 +80,8 @@ kr = k*q;
 kz = k*p;
 
 %% Focused transmitter spatial sensitivity
-% TODO Is ka/R0 correct?
 % TODO What is the constant in front?
-id = kr <= k*a/r0;
+id = kr <= k*aTx/r0;
 PhiTx = zeros(size(kr));
 PhiTx(id) = 2*pi*aTx^2;
 
