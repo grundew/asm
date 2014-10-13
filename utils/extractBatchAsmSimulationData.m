@@ -31,8 +31,8 @@ for j = 2:nfn
     matfn = fullfile(datDir, fn(j).name);
     mat = load(matfn);
     X(:, j) = mat.pt;
-    if isfield(mat, 'params')
-        p(j) = mat.params;
+    if isfield(mat, 'asmParams')
+        p(j) = mat.asmParams;
     end
     ff{j} = matfn;
 end
