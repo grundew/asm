@@ -1,14 +1,15 @@
 % ASM
-% Version xxx dd-mmm-yyyy
+% Version 100 13-oct-2014
 %
-% computeAsmIntegral() is the main function that integrates the specified function
-% wrt the $\theta_z$ angle. It takes a function handle and a parameter struct as input. 
+% computeAsmIntegral() is the main function that integrates the specified
+% function wrt the $\theta_z$ angle. It takes a function handle and a
+% parameter struct as input.
 %
-% Additional parameter-value inputs are sent to the integration function, quadgk. 
-% See the online MATLAB documentation for quadgk for details.
+% Additional parameter-value inputs are sent to the integration function,
+% quadgk. See the online MATLAB documentation for quadgk for details.
 % 
-% The functions in the "integrand" subfolder defines the function that is integrated in computeAsmIntegral.
-% They have a fixed 
+% The functions in the "integrand" subfolder defines the function that is
+% integrated in computeAsmIntegral.
 % 
 % Example:
 % p = generateAsmConfig('air', 'steel', 'distanceRx', 10e-2);
@@ -25,7 +26,8 @@
 % 1. Orofino 1993 - http://dx.doi.org/10.1121/1.405408
 %
 % Files
-%   computeAsmIntegral  - computeAsmIntegral(func, 'param1', value1, 'param2', value2, ...)
+%   computeAsmIntegral  - computeAsmIntegral(func, 'param1', value1,
+%                                            'param2', value2, ...) 
 %   planeWaveTimeSignal - [xR, xT, t] = planeWaveTimeSignal(model, xPulse, tPulse)
 %   runasmtests         - runasmtests Runs all test cases in the tests folder
 %
