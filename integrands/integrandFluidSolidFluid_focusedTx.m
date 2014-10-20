@@ -11,15 +11,12 @@ function [X, f] = integrandFluidSolidFluid_focusedTx(params, varargin)
 % 2. Angelsen, 2000. Ultrasonic imaging
 %
 
-%% Check sanity of parameters and give warnings or errors
-if isempty(params.tx_focus)
-	error('No Tx focal distance defined')
-end
 
 %% Samplings stuff
 f = params.f;
 thetamax = params.thetamax;
 thetamin = 0;
+
 
 %% Unpack parameters
 aRx = params.aRx;
@@ -37,6 +34,12 @@ fres = 0.5*params.cp/params.thickness;
 x0 = params.displaceRx;
 refl = params.reflection;
 r0 = params.tx_focus;
+
+
+%% Check sanity of parameters and give warnings or errors
+assert(r0>0, 'asm:paramerror', 'Radius of curvature must be a positive scalar');
+assert(al_dB>=0, 'asm:paramerror', 'Damping parameter must be zero or positive');
+
 
 %% Pack the parameters for the model
 X = zeros(size(f));
@@ -80,10 +83,8 @@ kr = k*q;
 kz = k*p;
 
 %% Focused transmitter spatial sensitivity
-% TODO What is the constant in front?
-id = kr <= k*aTx/r0;
-PhiTx = zeros(size(kr));
-PhiTx(id) = 2*pi*aTx^2;
+nr = 128;
+PhiTx = focusedTxASM(d1, kr, aTx, r0, k, c_F, nr);
 
 
 %% Receiver spatial sensitivity
@@ -128,5 +129,4 @@ Phase = exp(1i*kz*(d1 + d3));
 
 %% Assemble integrand
 I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p.^2;
-
 end

@@ -1,4 +1,4 @@
-function [X, f] = integrandFluidSolidFluid_focusedTx(params, varargin)
+function [X, f] = integrandFluidSolidFluid_planepiston(params, varargin)
 % [X, f] = integrandFluidSolidFluid_planepiston(params varargin)
 %
 % Output:
@@ -7,10 +7,6 @@ function [X, f] = integrandFluidSolidFluid_focusedTx(params, varargin)
 %
 % References:
 % 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
-% 2. Angelsen, 2000. Ultrasonic imaging
-
-%% Check sanity of parameters and give warnings or errors
-% TODO: Implement sanity checks. Give warnings.
 
 
 %% Samplings stuff
@@ -33,6 +29,11 @@ al_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 x0 = params.displaceRx;
 refl = params.reflection;
+
+
+%% Check sanity of parameters and give warnings or errors
+% TODO: Implement sanity checks. Throw errors.
+assert(al_dB >=0, 'asm:paramerror', 'The damping must be a positive number.');
 
 
 %% Pack the parameters for the model
@@ -93,7 +94,7 @@ PhiRx = 2*pi*aRx^2*Wrx;
 %% Plate response, angular
 % Multiply with wave length and convert from dB to linear
 % Loss parameter
-if al_dB > 0
+if al_dB ~= 0
     % log(10)/10 = 0.2303
     alphaL = al_dB*0.2303*f/c_F;
 else
