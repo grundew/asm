@@ -94,7 +94,7 @@ for i = 1:nf
         
         % Step 3:
         % Calculate the output matrix.
-        k_z_back = k_back*cos(theta);
+        k_z_back = sqrt(k_back.^2 - K.*2);
         % output = outputMatrix(rho_fluidBack, w, k_z_back);
         rhow2 = rho_fluidBack*w^2;
         output = [0, -1/rhow2;...
