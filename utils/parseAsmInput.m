@@ -77,6 +77,9 @@ p.addParamValue('debug', false, @islogical);
 % Version control
 p.addParamValue('gitInfo', gitInfo, @isstruct);
 
+% Info to screen
+p.addParamValue('progressbar', false, @islogical);
+
 % Parse and validate filenamevars
 p.parse(varargin{:});
 validateFilenameVars(p);
