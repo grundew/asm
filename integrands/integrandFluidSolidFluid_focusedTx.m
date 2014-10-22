@@ -34,7 +34,7 @@ fres = 0.5*params.cp/params.thickness;
 x0 = params.displaceRx;
 refl = params.reflection;
 r0 = params.tx_focus;
-
+prgbar = params.progressbar;
 
 %% Check sanity of parameters and give warnings or errors
 assert(r0>0, 'asm:paramerror', 'Radius of curvature must be a positive scalar');
@@ -44,11 +44,24 @@ assert(al_dB>=0, 'asm:paramerror', 'Damping parameter must be zero or positive')
 %% Pack the parameters for the model
 X = zeros(size(f));
 
-for i = 1:length(f)
-    % Time it
-    if i == 1
-        fprintf('Started: %s\n', datestr(now, 'dd-mm-yyyy_HHMMSS'));
-        tstart = tic();
+% ASCII Progress bar
+if prgbar
+    nnn  = progress('init', 'Wait');
+    tic       % only if not already called
+    t0 = toc; % or toc if tic has already been called
+    tm = t0;
+end
+
+nf = length(f);
+for i = 1:nf
+    % ASCII Progress bar
+    if prgbar
+        tt = ceil((toc-t0)*(nf-i)/i);
+        nn = datenum(0, 0, 0, 0, 0, tt);
+        nnvec = datevec(nn);
+        prgstr = sprintf('ETA: %.0f HOURS %.0f MIN %.0f SEC',...
+            nnvec(end-2), nnvec(end-1), ceil(nnvec(end)));
+        progress(i/nf, sprintf('%i/%i (%s)', i, nf, prgstr));
     end
     
     w = 2*pi*f(i);
@@ -59,15 +72,6 @@ for i = 1:length(f)
     
     X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
     
-    % Time it
-    if i == 500
-        tme = toc(tstart)*length(f)/i;
-        nn = datenum(0, 0, 0, 0, 0, tme);
-        nnvec = datevec(nn);
-        fprintf('Estimated time of arrival: %.0f HOURS %.0f MIN %.0f SEC\n',...
-            nnvec(end-2), nnvec(end-1), ceil(nnvec(end)));
-    end
-
 end
 
 end

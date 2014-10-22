@@ -29,6 +29,7 @@ al_dB = params.alphaLambda_dB;
 fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 x0 = params.displaceRx;
 refl = params.reflection;
+prgbar = params.progressbar;
 
 
 %% Check sanity of parameters and give warnings or errors
@@ -36,14 +37,25 @@ refl = params.reflection;
 assert(al_dB >=0, 'asm:paramerror', 'The damping must be a positive number.');
 
 
-%% Pack the parameters for the model
-X = zeros(size(f));
+% ASCII Progress bar
+if prgbar
+    nnn  = progress('init', 'Wait');
+    tic       % only if not already called
+    t0 = toc; % or toc if tic has already been called
+    tm = t0;
+end
 
-for i = 1:length(f)
-    % Time it
-    if i == 1
-        fprintf('Started: %s\n', datestr(now, 'dd-mm-yyyy_HHMMSS'));
-        tstart = tic();
+X = zeros(size(f));
+nf = length(f);
+for i = 1:nf
+    % ASCII Progress bar
+    if prgbar
+        tt = ceil((toc-t0)*(nf-i)/i);
+        nn = datenum(0, 0, 0, 0, 0, tt);
+        nnvec = datevec(nn);
+        prgstr = sprintf('ETA: %.0f HOURS %.0f MIN %.0f SEC',...
+            nnvec(end-2), nnvec(end-1), ceil(nnvec(end)));
+        progress(i/nf, sprintf('%i/%i (%s)', i, nf, prgstr));
     end
     
     w = 2*pi*f(i);
