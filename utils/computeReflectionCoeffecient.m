@@ -1,31 +1,52 @@
-function [X, f, theta, p] = computeReflectionCoeffecient(ntheta, varargin)
-% X = computeReflectionCoeffecient(ntheta, varargin)
+function [X, f, theta] = computeReflectionCoeffecient(ntheta, params)
+% [X, f, theta] = computeReflectionCoeffecient(ntheta, params)
 %
 
-%% Parse the parameters
-p = parseAsmInput(varargin{:});
 
-fluid1 = struct('v', p.cf, 'density', p.rho_fluid);
-fluid3 = fluid1;
-layer = struct('v', p.cp, 'density', p.rho_solid, 'vShear', p.cs);
+%% Unpack parameters
+aRx = params.aRx;
+aTx = params.aTx;
+c_F = params.cf;
+rho_F = params.rho_fluid;
+rho_S = params.rho_solid;
+cp = params.cp;
+cs = params.cs;
+thick = params.thickness;
+d1 = params.distanceTx;
+d3 = params.distanceRx;
+al_dB = params.alphaLambda_dB;
+fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
+x0 = params.displaceRx;
+refl = params.reflection;
 
-% Fluid-solid-fluid model
-model = MultiLayerModel(fluid1, layer, fluid3, p.thickness);
 
 %% Samplings stuff
-f = p.f;
+f = params.f;
 nf = length(f);
-thetamax = p.thetamax;
+thetamax = params.thetamax;
 thetamin = 0;
 theta = linspace(thetamin, thetamax, ntheta);
+q = sin(theta);
 
 X = zeros(ntheta, nf);
 for i = 1:nf
-    %% Reflection/Transmission coefficient
-    if p.reflection
-        Plate = analyticRTFast(f(i), theta, model);
+    %% Plate response, angular
+    % Multiply with wave length and convert from dB to linear
+    % Loss parameter
+    if al_dB ~= 0
+        % log(10)/10 = 0.2303
+        alphaL = al_dB*0.2303*f(i)/c_F;
     else
-        Plate = transmissionCoefficientAnalytical(f(i), sin(theta), model);
+        alphaL = 0;
+    end
+    
+    %% Reflection/Transmission coefficient
+    if refl
+        Plate = reflectionCoefficientAnalytical(f(i), q,...
+            thick, rho_F, rho_S, cp, cs, c_F, alphaL);
+    else
+        [~, Plate] = reflectionCoefficientAnalytical(f(i), q,...
+            thick, rho_F, rho_S, cp, cs, c_F, alphaL);
     end
     
     X(:, i) = Plate;
