@@ -35,25 +35,11 @@ alpha_S = (alpha_L/2)*(vLong/vShear)^3;
 vLong = vLong./(1 + 1i*alpha_L*vLong./freq/2/pi);
 vShear = vShear./(1 + 1i*alpha_S*vShear./freq/2/pi);
 
-% Absorption
-% alpha_front = 1000;
-% alpha_back = 1;
-% alpha_L = 10;
-% alpha_S = 10;
-
-% pm = utils.ProgressMonitor([], 1);
-% pm.start(nf*nt, 'Generating reflection coeff');
-% cnt = 1;
 for i = 1:nf
     
     f = freq(i);
     w = 2*pi*f;
     
-    %     if f == 0
-    %         V(:, i) = ones(nt, 1);
-    %         W(:, i) = zeros(nt, 1);
-    %         continue
-    %     end
     % Wavenumbers
     
     % Length of wavenumber vector in the steel (S = shear, L = longitudenal)
@@ -77,7 +63,6 @@ for i = 1:nf
 
         % Step 1:
         % Calculate input matrix
-        % input = inputMatrix(rho_fluidFront, w, k_z_front);
         rhow2m = -rho_fluidFront*w^2;
         input = [k_z_front, -k_z_front;...
             rhow2m, rhow2m];
@@ -95,7 +80,6 @@ for i = 1:nf
         % Step 3:
         % Calculate the output matrix.
         k_z_back = sqrt(k_back.^2 - K.*2);
-        % output = outputMatrix(rho_fluidBack, w, k_z_back);
         rhow2 = rho_fluidBack*w^2;
         output = [0, -1/rhow2;...
             -1, -k_z_back/rhow2];
@@ -109,9 +93,7 @@ for i = 1:nf
             V(j, i) = -G(2, 1)/G(2, 2);
             W(j, i) = G(1, 1) - G(1, 2)*G(2, 1)/G(2, 2);
         end
-        
-%         pm.update(cnt);
-%         cnt = cnt + 1;
+
     end
     
 end
