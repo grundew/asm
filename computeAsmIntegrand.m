@@ -6,10 +6,11 @@ function [X, theta] = computeAsmIntegrand(func, ntheta, params)
 % p = generateAsmConfig('water', 'steel');
 % p.f = linspace(100e3, 500e3, 500);
 % ntheta = 500;
-% [X, f] = computeAsmIntegrand(@integrandFluidSolidFluid_planepiston, ntheta, p);
+% [X, theta] = computeAsmIntegrand(...
+%                 @integrandFluidSolidFluid_planepiston, ntheta, p);
 %
 % figure
-% plot(f, abs(X))
+% imagesc(p.f, theta, abs(X))
 
 %% Pars default arguments
 if nargin < 3

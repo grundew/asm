@@ -29,7 +29,7 @@ if ~asmParams.debug
     isunmodified = ~isempty(regexp(gitStatus, 'modified', 'ONCE'));
     isnotup2date = ~isempty(regexp(gitStatus, 'up-to-date', 'ONCE'));
     if  isunmodified || isnotup2date
-        warning('The ASM repos is modified or not up-to-date!')
+        warning('ASM:NOTUPTODATE', 'The ASM repos is modified or not up-to-date!')
     else
         asmParams.gitInfo = getGitInfo();
     end

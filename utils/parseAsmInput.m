@@ -24,6 +24,7 @@ def_tx_focus = []; % Focal distance (m)
 % Sampling stuff
 def_f = (0:2^15-1)*2e6/2^15;
 def_thetamax = 0.8;
+def_thetamin = 0;
 
 % Version control
 gitInfo = struct('branch', '', 'hash', '', 'remote', '', 'url', '');
@@ -68,6 +69,7 @@ p.addParamValue('tx_focus', def_tx_focus);
 % Sampling stuff
 p.addParamValue('f', def_f, validatorfunvec);
 p.addParamValue('thetamax', def_thetamax, validatorsgtz);
+p.addParamValue('thetamin', def_thetamin, validatorsgoretz);
 
 % Admin stuff
 p.addParamValue('filenamevars', {}, @iscell);
