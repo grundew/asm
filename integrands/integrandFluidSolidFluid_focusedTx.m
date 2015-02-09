@@ -36,6 +36,7 @@ refl = params.reflection;
 r0 = params.tx_focus;
 prgbar = params.progressbar;
 
+
 %% Check sanity of parameters and give warnings or errors
 assert(r0>0, 'asm:paramerror', 'Radius of curvature must be a positive scalar');
 assert(al_dB>=0, 'asm:paramerror', 'Damping parameter must be zero or positive');
@@ -70,9 +71,9 @@ for i = 1:nf
         al_dB, refl, rho_F, rho_S, cp, cs, thick, x0, r0);
     
     
-    X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
-    
+    X(i) = quadgk(fun, thetamin, thetamax, varargin{:});    
 end
+
 
 end
 
@@ -85,6 +86,7 @@ p = sqrt(1-q.^2);
 
 kr = k*q;
 kz = k*p;
+
 
 %% Focused transmitter spatial sensitivity
 nr = 128;
