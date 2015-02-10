@@ -1,4 +1,4 @@
-function [X, f] = integralPerfectReflector_planepiston(params, varargin)
+function [X, f] = integrandPerfectReflector_planepiston(params, varargin)
 % [X, f] = integrandPerfectReflector_planepiston(params varargin)
 %
 % Output:
