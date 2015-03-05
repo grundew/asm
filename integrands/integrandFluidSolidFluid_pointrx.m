@@ -1,16 +1,26 @@
-function I = integrandFluidSolidFluid_pointrx(theta_z, f, aTx,...
-    c, rho, d, x0, model, alpha, reflection, al_dB)
-% Angular frequency and total length of wave vector
-% Remember to multiply with 4*pi*k/rho/c/a
-w = 2*pi*f;
-k = w./c;
-p = cos(theta_z);
+function I = integrandFluidSolidFluid_pointrx(theta_z, f, k, d1, d3, aTx, c_F,...
+    al_dB, refl, rho_F, rho_S, c_Lr, c_Sr, thick, x0)
+
+
+%% Compute wave numbers
 q = sin(theta_z);
-k_z = k*p;
-k_rho = k*q;
+p = sqrt(1-q.^2);
+
+kr = k*q;
+kz = k*p;
 
 
-%% Loss parameter
+%% Transmitter spatial sensitivity
+% No angle adjustment
+xx = kr*aTx;
+W = besselj(1, xx)./xx;
+W(xx==0) = 0.5;
+PhiTx = 2*pi*aTx^2*W;
+
+
+%% Plate response, angular
+% Multiply with wave length and convert from dB to linear
+% Loss parameter
 if al_dB ~= 0
     % log(10)/10 = 0.2303
     alphaL = al_dB*0.2303*f/c_F;
@@ -19,35 +29,28 @@ else
 end
 
 
-%% Transmitter spatial spectrum
-xx = k*sin(theta_z+alpha)*aTx;
-W = besselj(1, xx)./xx;
-W(xx==0) = 0.5;
-Tx = 2*pi*aTx^2*W;
-
-
-%% Plate response, angular
-% Reflection/Transmission coefficient
-if reflection
-    % TODO: Add loss
-    Plate = analyticRTFast(w/2/pi, theta_z, model);
+%% Reflection/Transmission coefficient
+if refl
+    Plate = reflectionCoefficientAnalytical(f, q,...
+        thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
 else
-    % TODO: Add loss
-    Plate = transmissionCoefficientAnalytical(f, q, model, alphaL);
+    [~, Plate] = reflectionCoefficientAnalytical(f, q,...
+        thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
+end
+
+
+%% Displacement factor
+if x0 > 0
+    dispRx = besselj(0, x0*kr);
+else
+    dispRx = 1;
 end
 
 
 %% Phase shift from transmitter to plate and from plate to receiver
-Phase_z = exp(1i*k_z*d);
-F = 2*pi*besselj(0, k_rho*x0);
+Phase = exp(1i*kz*(d1 + d3));
 
 
-%% Integrand
-I = k.^2*F.*Tx.*p.^2.*q.*Plate.*Phase_z/rho/c;
-
-if any(isnan(I))
-    fprintf('NaN value detected at frequency %f and angle %f\n',...
-        f, theta_z(isnan(I)));
-end
-
+%% Assemble integrand
+I = Plate.*k.*q.*dispRx.*PhiTx.*Phase.*k.*p.^2;
 end
