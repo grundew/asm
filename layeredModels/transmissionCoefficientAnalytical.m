@@ -16,6 +16,10 @@ function T = transmissionCoefficientAnalytical(freq, q, model, alpha_L, alpha_S)
 %            alpha_L is given, alpha_S is calculated based on alpha_L. See
 %            Equation 11 in [2].
 %
+% 
+% Output:
+% T        - Complex transmission coefficient, length(freq) x length(q)
+%
 %
 % [1] - MEASUREMENTS AND 3D SIMULATIONS OF ULTRASONIC DIRECTIVE BEAM
 %       TRANSMISSION THROUGH A WATER-IMMERSED STEEL PLATE
