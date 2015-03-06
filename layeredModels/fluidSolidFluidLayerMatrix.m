@@ -1,14 +1,35 @@
 function B = fluidSolidFluidLayerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d, thresh)
-% Function for calculating the solid layer matrix.
-%
 % B = fluidSolidFluidLayer(rho, w, k_z_S, k_z_L, K, d, mu)
 %
-% J. AcoustS. oc.A m.8 9 (4), Pt. 1, April 1991
-% A new efficient algorithm to compute the exact reflection
-% and transmission factors for plane waves in layered absorbing
-% media (liquids and solids)
-% Pierre Cervenka and Pascal Challande
-% Equation 24 pp. 1582
+%
+% Function for calculating the solid layer matrix when the solid
+% is in a fluid-solid-fluid sandwich. Equation 24 pp. 1582 [1].
+%
+%
+% Input:
+% rho    - Density of soild (kg/m^3)
+% w      - Angular frequency (rad/s)
+% k_z_S  - Vertical wave number, shear (1/m)
+% k_z_L  - Vertical wave number, longitudenal (1/m)
+% K      - Horizontal wave number (1/m)
+% k_S    - Wave number, shear (1/m)
+% d      - Thickness (m)
+% thresh - Threshold for dropping the longitudenal wave propagation
+%          (exp(-alpha_L*d) < thresh)
+%
+%
+% Output:
+% B      - 2x2 Matrix
+%
+%
+% [1] - A new efficient algorithm to compute the exact reflection
+%       and transmission factors for plane waves in 
+%       layered absorbing media (liquids and solids)
+%       Cervenka, Pierre and Challande, Pascal,
+%
+%       The Journal of the Acoustical Society of America,
+%       89, 1579-1589 (1991), DOI:http://dx.doi.org/10.1121/1.400993
+
 
 S = K/k_S;
 C2 = 1 - 2*S^2;

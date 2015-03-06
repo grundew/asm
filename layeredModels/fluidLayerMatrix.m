@@ -1,14 +1,29 @@
 function B = fluidLayerMatrix(rho, w, k_z_L, d)
-% Function for calculating the fluid layer matrix.
-% 
-% A = solidLayerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d)
+% B = fluidLayerMatrix(rho, w, k_z_L, d)
 %
-% J. AcoustS. oc.A m.8 9 (4), Pt. 1, April 1991
-% A new efficient algorithm to compute the exact reflection
-% and transmission factors for plane waves in layered absorbing
-% media (liquids and solids)
-% Pierre Cervenka and Pascal Challande
-% Equation 29.
+%
+% Function for calculating the fluid layer matrix or solid layer matrix
+% when $\theta = 0$, given on page 1588 in [1].
+%
+% 
+% Input:
+% rho   - Density (kg/m^3)
+% w     - Angular frequency (rad/s)
+% k_z_L - Horizontal component of longitudenal wave number (1/m)
+% d     - Thickness (m)
+%
+%
+% Output:
+% B     - 2x2 Matrix
+%
+%
+% [1] - A new efficient algorithm to compute the exact reflection
+%       and transmission factors for plane waves in 
+%       layered absorbing media (liquids and solids)
+%       Cervenka, Pierre and Challande, Pascal,
+%
+%       The Journal of the Acoustical Society of America,
+%       89, 1579-1589 (1991), DOI:http://dx.doi.org/10.1121/1.400993
 
 rhow2 = rho*w^2;
 
