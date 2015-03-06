@@ -1,14 +1,34 @@
 function A = solidLayerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d)
-% Function for calculating the solid layer matrix.
-% 
 % A = solidLayerMatrix(rho, w, k_z_S, k_z_L, K, k_S, d)
 %
-% J. AcoustS. oc.A m.8 9 (4), Pt. 1, April 1991
-% A new efficient algorithm to compute the exact reflection
-% and transmission factors for plane waves in layered absorbing
-% media (liquids and solids)
-% Pierre Cervenka and Pascal Challande
-% Equation 14.
+%
+% Function for calculating the solid layer matrix defined
+% in Equation 14 in [1].
+%
+%
+% Input:
+% rho   - Density of the solid (kg/m^3)
+% w     - Angular frequency (rad/s)
+% k_z_S - Component of the shear wave number, z-direction (vertical, 1/m)
+% k_z_L - Component of the longitudenal wave number, z-direction (1/m)
+% K     - Horizontal wave number (1/m)
+% k_S   - Length of shear wave number (1/m)
+% d     - Thickness of layer (m)
+%
+%
+% Output:
+% A     - 4x4 Matrix
+%
+%
+% [1] - A new efficient algorithm to compute the exact reflection
+%       and transmission factors for plane waves in 
+%       layered absorbing media (liquids and solids)
+%       Cervenka, Pierre and Challande, Pascal,
+%
+%       The Journal of the Acoustical Society of America,
+%       89, 1579-1589 (1991), DOI:http://dx.doi.org/10.1121/1.400993
+
+
 
 % a(d) = MxP(d)xM-1
 
@@ -38,17 +58,24 @@ else
     d_L = S_L/k_z_L;
 end
 
-% Calculate matrix elements used twice or more
-A13 = K*(C_S - C_L)/rho/w^2;
-A22 = C2*C_L + 2*S^2*C_S;
-A12 = K*C2*d_L - 2*S*m_L/k_S;
-A11 = C2*C_S + S^2*C_L;
-A21 = -(K*C2*d_S - 2*S*m_L/k_S);
-A31 = 2*rho*w^2*S*C2*(C_S - C_L)/k_S;
+A = zeros(4,4);
+A(1,1) = C2*C_S + 2*S^2*C_L;
+A(1,2) = K*C2*d_L - 2*S*m_S/k_S;
+A(1,3) = K*(C_S - C_L)/rho/w^2;
+A(1,4) = -(K^2*d_L + m_S)/rho/w^2;
 
-% Put together the whole shebang
-A = [A11, A12, A13, -(K^2*d_L + m_S)/rho/w^2;...
-     A21, A22, -(K^2*d_S + m_L)/rho/w^2, A13;...
-     A31, -rho*w^2*(C2^2*d_L + 4*S^2*m_S/(k_S)^2), A22, A12;...
-     -rho*w^2*(C2^2*d_S + 4*S^2*m_L/k_S^2), A31, A21, A11];
+A(2,1) = -(K*C2*d_S - 2*S*m_L/k_S);
+A(2,2) = C2*C_L + 2*S^2*C_S;
+A(2,3) = -(K^2*d_S + m_L)/rho/w^2;
+A(2,4) = A(1,3);
+
+A(3,1) = 2*rho*w^2*S*C2*(C_S-C_L)/k_S;
+A(3,2) = -rho*w^2*(C2^2*d_L + 4*S^2*m_S/k_S^2);
+A(3,3) = A(2,2);
+A(3,4) = A(1,2);
+
+A(4,1) = -rho*w^2*(C2^2*d_S + 4*S^2*m_L/k_S^2);
+A(4,2) = A(3,1);
+A(4,3) = A(2,1);
+A(4,4) = A(1,1);
 end
