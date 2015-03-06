@@ -38,7 +38,7 @@ PhiTx = planePistonPressureAngularSpectrum(kx, aTx, c, rho);
 %% Reflection/Transmission coefficient
 if reflection
     % TODO: Add loss
-    Plate = analyticRTFast(w/2/pi, asin(sintheta_z), model);
+    Plate = reflectionTransmissionCoffecientAnalytical(w/2/pi, asin(sintheta_z), model);
 else
     Plate = transmissionCoefficientAnalytical(f, q, model, alphaL);
 end

@@ -1,4 +1,31 @@
-function [R, T] = analyticRTFast(freq, theta, model, alpha_L, alpha_S)
+function [R, T] = reflectionTransmissionCoffecientAnalytical(freq, theta, model, alpha_L, alpha_S)
+% [R, T] = reflectionTransmissionCoffecientAnalytical(freq, theta, model, alpha_L, alpha_S)
+%
+%
+% reflectionTransmissionCoffecientAnalytical computes the transmission coefficient for a solid
+% elastic plate embedded in a fluid (same fluid on both sides).
+% Equation (1) in Ref(1) is used.
+% 
+% Input:
+% freq    - Frequency (scalar, Hz)
+% theta   - Angle of incidence in the fluid (rad)
+% model   - A MultiLayerModel object.
+% alpha_L - Damping coefficient (optional, scalar, 1/m). Default = 0.
+% alpha_S - Damping coefficient (optinoal, scalar, 1/m). If not given, and
+%           alpha_L is given, alpha_S is calculated based on alpha_L. See
+%           Equation 11 in [2].
+%
+%
+% [1] - MEASUREMENTS AND 3D SIMULATIONS OF ULTRASONIC DIRECTIVE BEAM
+%       TRANSMISSION THROUGH A WATER-IMMERSED STEEL PLATE
+%       Kjetil Daae Lohne, Per Lunde, Magne Vestrheim
+%       Proceedings of the 34th Scandinavian Symposium on Physical Acoustics, Geilo 30 January ? 2 February, 2011
+%
+% [2] - Modal resonance analysis of acoustic transmission and reflection
+%       losses in viscoelastic plates
+%       Walter Madigosky and Ralph Fiorito
+%       JASA 65 page 1105
+
 
 q = sin(theta);
 % L is half the thickness

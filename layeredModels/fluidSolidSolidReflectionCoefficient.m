@@ -1,6 +1,34 @@
 function V = fluidSolidSolidReflectionCoefficient(freq, theta_in, model, thresh)
-% Modeling a fluid-solid-solid system using method from Cervanka without
+% V = fluidSolidFluidReflectionCoefficient(freq, theta_in, model, thresh)
+%
+%
+% Modeling a fluid-solid-solid system using method from Cervanka[1] without
 % taking into account over attenuated longitudenal waves.
+%
+%
+% Input:
+% freq     - Frequency (Hz)
+% theta_in - Angle of incidence (rad)
+% model    - Model struct, contains densities and speed of sounds of the
+%            materials
+% thresh   - [Not implemented here] Threshold for dropping the
+%            longitudenal wave propagation (exp(-alpha_L*d) < thresh)
+%
+%
+% Output:
+% V        - Complex reflecetion coefficient, length(freq) x length(theta_in)
+%
+%
+% [1] - A new efficient algorithm to compute the exact reflection
+%       and transmission factors for plane waves in 
+%       layered absorbing media (liquids and solids)
+%       Cervenka, Pierre and Challande, Pascal,
+%
+%       The Journal of the Acoustical Society of America,
+%       89, 1579-1589 (1991), DOI:http://dx.doi.org/10.1121/1.400993
+
+
+
 
 if ~exist('thresh', 'var')
     % Threshold for where the algorithm stops propagating longitudenal

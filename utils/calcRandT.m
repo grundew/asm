@@ -62,7 +62,7 @@ for i = 1:nf
     
     freq = f(i);
     
-    R(i, :) = analyticRTFast(freq, theta, model);
+    R(i, :) = reflectionTransmissionCoffecientAnalytical(freq, theta, model);
     T(i, :) = transmissionCoefficientAnalytical(freq, sin(theta), model, 0);
     
     

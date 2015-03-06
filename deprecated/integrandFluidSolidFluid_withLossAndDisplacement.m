@@ -68,7 +68,7 @@ else
 end
 
 if reflection
-    Plate = analyticRTFast(f, theta_z, model);
+    Plate = reflectionTransmissionCoffecientAnalytical(f, theta_z, model);
 else
     Plate = transmissionCoefficientAnalytical(f, sintheta_z, model, alphaL);
 end

@@ -42,7 +42,7 @@ fres = params.cp/params.thickness/2;
 % Calculate the reflection coefficient for all f and theta
 R = zeros(length(f), length(theta));
 for i = 1:length(f)
-    R(i, :) = analyticRTFast(f(i), theta, model);
+    R(i, :) = reflectionTransmissionCoffecientAnalytical(f(i), theta, model);
 end
 
 %% Solid layer immersed in a fluid

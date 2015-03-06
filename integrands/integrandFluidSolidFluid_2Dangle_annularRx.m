@@ -28,7 +28,7 @@ theta_plate = alpha - theta_z;
 
 %% Reflection coefficient
 % Todo: add loss
-Plate = analyticRTFast(w/2/pi, theta_plate, model);
+Plate = reflectionTransmissionCoffecientAnalytical(w/2/pi, theta_plate, model);
 
 %% Phase shift from transmitter to plate and from plate to receiver
 z = d + d*cos(2*alpha);

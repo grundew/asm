@@ -51,7 +51,7 @@ PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
 % relations between the angles
 theta = gamma - alpha;
 theta(idltgamma) = alpha - gamma(idltgamma);
-R = analyticRTFast(f, theta, model);
+R = reflectionTransmissionCoffecientAnalytical(f, theta, model);
 % R = fluidSolidFluidReflectionCoefficient(f, theta, model);
 % R = R.';
 
