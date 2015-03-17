@@ -1,10 +1,12 @@
-function I = integrandPerfectReflection_withDisplacement(theta_z, w, aRx, aTx,...
-    c, rho, d1, d3, ~, x0, ~)
-% I = integrandPerfectReflection_withDisplacement(k_r, w, aRx, aTx,...
-%    c, rho, d1, d3, ~, x0, ~)
+function I = integrandPerfectReflectorPointRx(theta_z, w, aTx,...
+    c, rho, d1, d3, x0)
+% integrandPerfectReflector computes the integrand for a pitch-catch setup
+% on a perfect reflector, with possibly displaced receiver.
+% 
+% Usage:
+% I = integrandPerfectReflector(k_r, w, aRx, aTx,...
+%    c, rho, d1, d3, x0)
 %
-% This function returns the integrand for a pitch-catch setup on a perfect
-% reflector, with possibly displaced receiver.
 % 
 % Input:
 % k_r - Wave number in the x,y-plane
@@ -24,18 +26,24 @@ function I = integrandPerfectReflection_withDisplacement(theta_z, w, aRx, aTx,..
 % I - Integrand evaluated at theta
 %
 k = w./c;
+q = sin(theta_z);
+p = sqrt(1-q.^2);
+k_r = k*q;
+k_z = k*p;
 
-% k_r - input
-k_z = sqrt(k^2 - k_r.^2);
 
 %% Transducer spacial sensitivities
-S_Rx = planePistonPressureAngularSpectrum(k_r, aRx, c, rho);
-S_Tx = planePistonPressureAngularSpectrum(k_r, aTx, c, rho);
+xx = k_r*aTx;
+W = besselj(1, xx)./xx;
+W(xx==0) = 0.5;
+PhiTx = 2*pi*aTx^2*W;
+
 
 %% Displacement factor
 dispRx = 2*pi*besselj(0, x0*k_r);
 
+
 %% Phase shift from transmitter to plate and from plate to receiver
 Phase = exp(1i*k_z*(d1 + d3));
-I = k_r.*dispRx.*k_z/k/rho/c.*Phase.*S_Rx.*S_Tx;
+I = k.*q.*dispRx.*PhiTx.*Phase.*k.*p.^2/rho/c;
 end

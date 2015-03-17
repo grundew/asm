@@ -1,4 +1,4 @@
-function [X, f] = integralFluidSolidFluid_planepiston(params, varargin)
+function [X, f] = integralFluidSolidFluidPlanePiston(params, varargin)
 % [X, f] = integrandFluidSolidFluid_planepiston(params varargin)
 %
 % Output:

@@ -1,4 +1,4 @@
-function [X, f] = integralFluidSolidFluid_pointrx(params, varargin)
+function [X, f] = integralFluidSolidFluidPointRx(params, varargin)
 % [X, f] = integrandFluidSolidFluid_pointrx(params varargin)
 %
 % Output:
@@ -57,7 +57,7 @@ for i = 1:nf
     
     w = 2*pi*f(i);
     k = w/c_F;
-    fun = @(theta_z) integrandFluidSolidFluid_pointrx(...
+    fun = @(theta_z) integrandFluidSolidFluidPointRx(...
         theta_z, f(i), k, d1, d3, aTx, c_F,...
         al_dB, refl, rho_F, rho_S, cp, cs, thick, x0);
     X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
