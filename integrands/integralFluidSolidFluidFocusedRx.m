@@ -1,4 +1,4 @@
-function [X, f] = integrandFluidSolidFluid_focusedTx(params, varargin)
+function [X, f] = integralFluidSolidFluidFocusedRx(params, varargin)
 % [X, f] = integrandFluidSolidFluid_planepiston(params varargin)
 %
 %
