@@ -1,5 +1,7 @@
 function [X, f] = integralFluidSolidFluidPlanePiston(params, varargin)
-% [X, f] = integrandFluidSolidFluid_planepiston(params varargin)
+% integrandFluidSolidFluidPlanePistion
+%
+% [X, f] = integrandFluidSolidFluidPlanePiston(params, varargin)
 %
 % Output:
 % X - Computed integral at frequencies, f
@@ -26,7 +28,6 @@ thick = params.thickness;
 d1 = params.distanceTx;
 d3 = params.distanceRx;
 al_dB = params.alphaLambda_dB;
-fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
 x0 = params.displaceRx;
 refl = params.reflection;
 prgbar = params.progressbar;

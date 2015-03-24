@@ -1,10 +1,15 @@
-function [X, f] = integralPerfectReflectorPointRx(params, varargin)
-% [X, f] = integrandFluidSolidFluid_pointrx(params varargin)
+function [X, f] = integralFluidSolidFluid(params, varargin)
+% integrandFluidSolidFluidPlanePistion - computes the integral for an axial
+% symmetric model with either a point, plane or focused source.
+%
+% [X, f] = integrandFluidSolidFluidPlanePiston(params, varargin)
 %
 % Output:
-% X - Computed integral at frequencies f
+% X - Computed integral at frequencies, f
 % f - Frequencies
 %
+% References:
+% 1. Orofino, 1992. http://dx.doi.org/10.1121/1.405408
 
 
 %% Samplings stuff
@@ -13,19 +18,28 @@ thetamax = params.thetamax;
 thetamin = 0;
 
 %% Unpack parameters
-aTx = params.aTx;
 aRx = params.aRx;
+aTx = params.aTx;
 c_F = params.cf;
 rho_F = params.rho_fluid;
-d1 = params.distanceTx;
-d3 = params.distanceRx;
+rho_S = params.rho_solid;
+cp = params.cp;
+cs = params.cs;
+thick = params.thickness;
+zTx = params.distanceTx;
+zRx = params.distanceRx;
+al_dB = params.alphaLambda_dB;
 x0 = params.displaceRx;
+reflection = params.reflection;
+perfReflection = params.perfectReflection;
 prgbar = params.progressbar;
+focusRx = params.focusRx;
+focusTx = params.focusTx;
 
 
 %% Check sanity of parameters and give warnings or errors
 % TODO: Implement sanity checks. Throw errors.
-
+assert(al_dB >=0, 'asm:paramerror', 'The damping must be a positive number.');
 
 
 % ASCII Progress bar
@@ -51,8 +65,12 @@ for i = 1:nf
     
     w = 2*pi*f(i);
     k = w/c_F;
-    fun = @(theta_z) integrandPerfectReflector(...
-        theta_z, w, aTx, aRx, c_F, rho_F, d1, d3, x0);
+    
+    
+    fun = @(theta_z ) integrandFluidSolidFluidAxialSymmetric(...
+        theta_z, f(i), k, zTx, zRx, aTx, aRx, c_F, rho_F, x0, focusRx, focusTx,...
+    reflection, perfReflection, al_dB, rho_S, cp, cs, thick);
+
     X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
     
 end
