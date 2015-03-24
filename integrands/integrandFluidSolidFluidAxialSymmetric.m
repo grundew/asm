@@ -1,4 +1,4 @@
-function I = integrandFluidSolidFluidAxialSymmetric(theta_z, f, k,...
+function I = integrandFluidSolidFluidAxialSymmetric(theta_z, f,...
     zTx, zRx, aTx, aRx, c_F, rho_F, displaceRx, focusRx, focusTx,...
     reflection, perfectReflection, al_dB, rho_S, c_Lr, c_Sr, thick)
 % integrandFluidSolidFluidAxialSymmetric computes the integrand for an axis
@@ -44,7 +44,7 @@ function I = integrandFluidSolidFluidAxialSymmetric(theta_z, f, k,...
 %% Compute wave numbers
 q = sin(theta_z);
 p = sqrt(1-q.^2);
-
+k = 2*pi*f/c_F;
 kr = k*q;
 kz = k*p;
 
@@ -135,9 +135,13 @@ end
 
 %% Displacement factor
 if displaceRx > 0
+    
     dispRx = besselj(0, displaceRx*kr);
+    
 else
+    
     dispRx = 1;
+    
 end
 
 
@@ -146,7 +150,7 @@ Phase = exp(1i*kz*(zTx + zRx));
 
 
 %% Assemble integrand
-I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p.^2;
+I = rho_F*c_F*Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p.^2;
 
 
 end

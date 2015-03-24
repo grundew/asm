@@ -1,4 +1,4 @@
-% ASM
+% asm
 % Version 100 13-oct-2014
 %
 %
@@ -14,13 +14,20 @@
 % subfolder defines the function that is integrated in computeAsmIntegral.
 %
 %
+%
 % Dependencies:
-% The following third party apss must be included in the MATLAB path as
-% well as git.exe in the windows path. This is optional, but this saves the
-% git revision information with the computed data.
+% Version control
+% The following third party apps must be included in the MATLAB path as
+% well as git.exe in the windows path. This is optional, but when available
+% the git revision information will be stored with the computed data.
 %
 % <https://github.com/manur/MATLAB-git MATLAB-git>
 % <https://github.com/quantentunnels/matlab-getgitinfo matlab-getgitinfo>
+%
+%
+% Progress bar (ASCII):
+% <http://www.mathworks.com/matlabcentral/fileexchange/8564-progress progress>
+%
 %
 %
 % Example:
@@ -29,8 +36,10 @@
 % [V, f] = computeAsmIntegral(func, p, 'MaxIntervalCount', 2000);
 %
 %
+%
 % See also quadgk, generateAsmConfig, computeAsmIntegral,
 % integrands/Contents
+%
 %
 %
 % Unit tests:
@@ -38,8 +47,10 @@
 %   runasmtests();
 %
 %
+%
 % References:
 % 1. Orofino 1993 - http://dx.doi.org/10.1121/1.405408
+%
 %
 %
 % Files:

@@ -9,7 +9,7 @@
 %           functions.
 %
 %
-% Parameter handleing functions:
+% Parameter handling functions:
 % integralFluidSolidFluid - Computes the integrand for an axial symmetric
 %                           model using
 %                           integrandFluidSolidFluidAxialSymmetric. Handles
@@ -25,10 +25,14 @@
 %             Integrand for the axial symmetric model, used by
 %             integralFluidSolidFluid. Plate is either embedded in a fluid
 %             or a perfect reflector.
+%
 % integrandFluidSolidFluid2Dangle
 %             Integrand for 2D model with misalignment between plate and
 %             transducers. Only plane piston. Note that this function
 %             should be integrated from $-pi/2$ to $pi/2$.
+%
+% integrandFluidSolidFluid_withAngle
+%             3D model with misaligned plate. Not implemented properly.
 %
 %
 % Sources:

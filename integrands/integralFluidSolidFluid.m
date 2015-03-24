@@ -63,12 +63,9 @@ for i = 1:nf
         progress(i/nf, sprintf('%i/%i (%s)', i, nf, prgstr));
     end
     
-    w = 2*pi*f(i);
-    k = w/c_F;
-    
     
     fun = @(theta_z ) integrandFluidSolidFluidAxialSymmetric(...
-        theta_z, f(i), k, zTx, zRx, aTx, aRx, c_F, rho_F, x0, focusRx, focusTx,...
+        theta_z, f(i), zTx, zRx, aTx, aRx, c_F, rho_F, x0, focusRx, focusTx,...
     reflection, perfReflection, al_dB, rho_S, cp, cs, thick);
 
     X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
