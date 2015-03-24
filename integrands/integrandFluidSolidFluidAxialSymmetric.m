@@ -97,7 +97,7 @@ elseif aRx > 0
 end
 
 
-%% Plate response, angular
+%% Loss in plate
 % Multiply with wave length and convert from dB to linear
 % Loss parameter
 if al_dB ~= 0
@@ -117,14 +117,17 @@ if perfectReflection
 else
 
     if reflection
+        
         % Reflection coefficient is used
         Plate = reflectionCoefficientAnalytical(f, q,...
             thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
 
     else
+        
         % Transmission coefficient is used
         [~, Plate] = reflectionCoefficientAnalytical(f, q,...
             thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
+        
     end
     
 end
