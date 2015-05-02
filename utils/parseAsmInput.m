@@ -1,4 +1,50 @@
 function [result, p] = parseAsmInput(varargin)
+% [result, p] = parseAsmInput() returns the default parameters in
+% the struct, result, and a inputParser object, p.
+% 
+% [result, p] = parseAsmInput('param1', value1, 'param2', value2, ...) returns 
+% the parameter struct, result, with the parameters given in the argument, and
+% default parameter values for the rest.
+%
+% 
+% Parameters:
+%
+% Properties of the solid:
+% Name - Description - Default value - Unit
+% thickness   - Solid plate thickness         - 10e-3 - m
+% cs          - Shear speed of sound          - 3158  - m/s
+% cp          - Compressional speed of sound  - 5850  - m/s
+% rho_solid   - Density of the solid          - 7850  - m/s
+% alphaLambda - Absorption times wavelength   - 0     - dB
+%                in the solid
+% 
+% Propertios of the fluid
+% Name - Description - Default value - Unit
+% cf        - Speed of sound - 342.21 - m/s
+% rho_fluid - Density        -   1.5  - kg/m^3
+%
+% Geometry of the setup
+% Name - Description - Default value - Unit
+% aTx  - Radius of the transmitter - 9e-3 - m
+% aRx  - Radius of the receiver    - 3e-3 - m
+% distanceTx - Distance from transmitter to target - 40e-3 - m
+% distanceRx - Distance from receiver to target    - 40e-3 - m
+% displaceRx - Displacement of the receivers       -  0    - m
+%               from the acoustical axis
+% tx_focus    - Focal distance of the transmitter   - []    - m
+% reflection  - If true, the reflection coefficient - true  - NA
+%                is used, otherwise the 
+%                transmission coefficient is used
+% alpha_plate - Misalignment between transmitter and - 0    - radians
+%                the solid plate
+%
+% Sampling and integration parameters
+% f - Frequency to compute the integral - (0:2^15-1)*2e6/2^15 - Hz
+% thetamax - Upper integration limit for $\theta_z$ - 0.8 - radians
+% thetamin - Lower integration limit for $\theta_z$ - 0   - radians
+
+
+
 %% Default values
 % Solid
 def_thickness = 10e-3; % m
