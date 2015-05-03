@@ -100,49 +100,49 @@ validatorfuncreal = @(x) validateattributes(x,...
 
 
 % Solid
-p.addParamValue('thickness', def_thickness, validatorsgtz)
-p.addParamValue('cp', def_cp, validatorsgtz);
-p.addParamValue('cs', def_cs, validatorsgtz);
-p.addParamValue('rho_solid', def_rho_solid, validatorsgtz);
-p.addParamValue('alphaLambda_dB', def_alphaLambda, validatorsgoretz);
+p.addParameter('thickness', def_thickness, validatorsgtz)
+p.addParameter('cp', def_cp, validatorsgtz);
+p.addParameter('cs', def_cs, validatorsgtz);
+p.addParameter('rho_solid', def_rho_solid, validatorsgtz);
+p.addParameter('alphaLambda_dB', def_alphaLambda, validatorsgoretz);
 
 
 % Fluid
-p.addParamValue('cf', def_cf, validatorsgtz);
-p.addParamValue('rho_fluid', def_rho_fluid, validatorsgtz);
+p.addParameter('cf', def_cf, validatorsgtz);
+p.addParameter('rho_fluid', def_rho_fluid, validatorsgtz);
 
 
 % Geometric setup
-p.addParamValue('aTx', def_aTx, validatorsgtz);
-p.addParamValue('aRx', def_aRx, validatorsgtz);
-p.addParamValue('distanceTx', def_distanceTx, validatorsgtz);
-p.addParamValue('distanceRx', def_distanceRx, validatorsgtz);
-p.addParamValue('displaceRx', def_displaceRx, validatorsgoretz);
-p.addParamValue('reflection', def_reflection, @islogical);
-p.addParamValue('perfectReflection', def_perfectReflection, @islogical);
-p.addParamValue('alpha_plate', def_alpha_plate, validatorfuncreal);
-p.addParamValue('focusTx', def_focusTx, validatorsgoretz);
-p.addParamValue('focusRx', def_focusRx, validatorsgoretz);
+p.addParameter('aTx', def_aTx, validatorsgtz);
+p.addParameter('aRx', def_aRx, validatorsgtz);
+p.addParameter('distanceTx', def_distanceTx, validatorsgtz);
+p.addParameter('distanceRx', def_distanceRx, validatorsgtz);
+p.addParameter('displaceRx', def_displaceRx, validatorsgoretz);
+p.addParameter('reflection', def_reflection, @islogical);
+p.addParameter('perfectReflection', def_perfectReflection, @islogical);
+p.addParameter('alpha_plate', def_alpha_plate, validatorfuncreal);
+p.addParameter('focusTx', def_focusTx, validatorsgoretz);
+p.addParameter('focusRx', def_focusRx, validatorsgoretz);
 
 
 % Sampling stuff
-p.addParamValue('f', def_f, validatorfunvec);
-p.addParamValue('thetamax', def_thetamax, validatorsgtz);
-p.addParamValue('thetamin', def_thetamin, validatorsgoretz);
+p.addParameter('f', def_f, validatorfunvec);
+p.addParameter('thetamax', def_thetamax, validatorsgtz);
+p.addParameter('thetamin', def_thetamin, validatorsgoretz);
 
 
 % Admin stuff
-p.addParamValue('filenamevars', {}, @iscell);
-p.addParamValue('savemat', true, @islogical);
-p.addParamValue('debug', false, @islogical);
+p.addParameter('filenamevars', {}, @iscell);
+p.addParameter('savemat', true, @islogical);
+p.addParameter('debug', false, @islogical);
 
 
 % Version control
-p.addParamValue('gitInfo', gitInfo, @isstruct);
+p.addParameter('gitInfo', gitInfo, @isstruct);
 
 
 % Info to screen
-p.addParamValue('progressbar', false, @islogical);
+p.addParameter('progressbar', false, @islogical);
 
 
 % Parse and validate filenamevars
