@@ -11,17 +11,23 @@ rho_S = params.rho_solid;
 cp = params.cp;
 cs = params.cs;
 thick = params.thickness;
-d1 = params.distanceTx;
-fres = 0.5*params.cp/params.thickness; %#ok<*NASGU>
-refl = params.reflection;
-alpha = params.alpha;
+zTx = params.distanceTx;
+al_dB = params.alphaLambda_dB;
+alphaPlate = params.alpha_plate;
+reflection = params.reflection;
+perfReflection = params.perfectReflection;
 prgbar = params.progressbar;
 
 
 %% Samplings stuff
 f = params.f;
-thetamax = params.thetamax;
-thetamin = -alpha;
+thetamax = pi/2;
+thetamin = -pi/2 + alphaPlate;
+
+
+%% Check sanity of parameters and give warnings or errors
+% TODO: Implement sanity checks. Throw errors.
+assert(al_dB >=0, 'asm:paramerror', 'The damping must be a positive number.');
 
 
 % ASCII Progress bar
@@ -32,9 +38,8 @@ if prgbar
     tm = t0;
 end
 
-
-nf = length(f);
 X = zeros(size(f));
+nf = length(f);
 for i = 1:nf
     % ASCII Progress bar
     if prgbar
@@ -46,11 +51,11 @@ for i = 1:nf
         progress(i/nf, sprintf('%i/%i (%s)', i, nf, prgstr));
     end
     
-    w = 2*pi*f(i);
-    k = w/c_F;
-    fun = @(theta_z) integrand(...
-        theta_z, f(i), k, d1, aTx, aRx, c_F,...
-        refl, rho_F, rho_S, cp, cs, thick);
+    
+    fun = @(theta_z ) integrand(...
+        theta_z, f(i), aTx, aRx, zTx, c_F, rho_F,...
+    reflection, perfReflection, al_dB, rho_S, cp, cs, thick, alphaPlate);
+
     X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
     
 end
@@ -59,10 +64,15 @@ end
 end
 
 
-function I = integrand(theta_z, f, k, d1,...
-   aTx, aRx, c_F, refl, rho_F, rho_S, c_Lr, c_Sr, thick)
+function I = integrand(theta_z, f,...
+    aRx, aTx, z1, c_F, rho_F,...
+    reflection, perfectReflection,...
+    al_dB, rho_S, c_Lr, c_Sr, thick, alphaPlate)
+
+
 %% Angular frequency and total length of wave vector
 w = 2*pi*f;
+k = w./c_F;
 
 
 %% Transmitter spatial spectrum
@@ -73,7 +83,9 @@ PhiTx = 2*pi*aTx^2*W;
 
 
 %% Receiver spatial spectrum
-theta_rx = 2*alpha - theta_z;
+% See confluence page on Angular Spectrum Method for details on the
+% relations between the angles
+theta_rx = 2*alphaPlate - theta_z;
 q_rx = sin(theta_rx);
 kr_rx = k*q_rx;
 xx = kr_rx*aRx;
@@ -82,26 +94,54 @@ W(xx==0) = 0.5;
 PhiRx = 2*pi*aRx^2*W;
 
 
-%% Reflection/Transmission coefficient
-theta_plate = alpha - theta_z;
-q = sin(theta_plate);
-if refl
-    Plate = reflectionCoefficientAnalytical(f, q,...
-        thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
+%% Plate response, angular
+% See confluence page on Angular Spectrum Method for details on the
+% relations between the angles
+theta_plate = theta_z - alphaPlate;
+
+
+%% Loss in plate
+% Multiply with wave length and convert from dB to linear
+% Loss parameter
+if al_dB ~= 0
+    % log(10)/10 = 0.2303
+    alphaL = al_dB*0.2303*f/c_F;
 else
-    [~, Plate] = reflectionCoefficientAnalytical(f, q,...
-        thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
+    alphaL = 0;
+end
+
+
+%% Reflection/Transmission coefficient
+if perfectReflection
+
+    % If perfect reflection the reflection coefficient is just 1
+    Plate = ones(size(theta_z));
+    
+else
+
+    if reflection
+        
+        % Reflection coefficient is used
+        Plate = reflectionCoefficientAnalytical(f, sin(theta_plate),...
+            thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
+
+    else
+        
+        % Transmission coefficient is used
+        [~, Plate] = reflectionCoefficientAnalytical(f, sin(theta_plate),...
+            thick, rho_F, rho_S, c_Lr, c_Sr, c_F, alphaL);
+        
+    end
+    
 end
 
 
 %% Phase shift from transmitter to plate and from plate to receiver
-z = d1 + d1*cos(2*alpha);
-x = -d1*sin(2*alpha);
+z = z1 + z1*cos(2*alphaPlate);
+x = -z1*sin(2*alphaPlate);
 Phase = exp(1i*k*(cos(theta_z)*z + sin(theta_z)*x));
 
-
-%% Final integrand
-I = k*cos(theta_z).*cos(theta_z-2*alpha).*Plate.*PhiRx.*PhiTx.*Phase;
+I = k*cos(theta_z).*cos(theta_z + 2*alphaPlate).*Plate.*PhiRx.*PhiTx.*Phase;
 
 if any(isnan(I))
     fprintf('NaN value detected at frequency %f and angle %f\n', f, theta_z(isnan(I)));
