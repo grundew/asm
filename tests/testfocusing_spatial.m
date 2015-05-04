@@ -1,4 +1,5 @@
-%% Script based unit test for the angular spectrum of a focused transducer
+% Script based unit test for the angular spectrum of a focused transducer
+% Here common test variables are defined
 % For visual inspection only
 disp('This test is for visual inspection only');
 
@@ -27,9 +28,11 @@ r = 0:dr:rmax;
 z = zmin:dz:zmax;
 
 [Z_, R_] = meshgrid(z, r);
+[Z, R] = meshgrid(z, [-fliplr(r(r>0)), r]);
 P_ = zeros(size(Z_));
 
-%% Compute
+
+% Compute pressure
 len = length(z);
 nnn  = progress('init', 'Wait');
 tic       % only if not already called
@@ -45,18 +48,17 @@ for ii = 1:len
     tt = ceil((toc-t0)*(len-ii)/ii);
     progress(ii/len, sprintf('%i/%i (ETA: %ds)', ii, len, tt));
     
-    X = focusedTxASM(z(ii), k_rho, a, F, k, c, nr);
-    % X = focusedDucer(z(ii), k_rho, a, F, k, c);
+    X = focusedSourceASM(z(ii), k_rho, a, F, k, c, nr);
     for jj = 1:length(r)
         P_(jj, ii) = trapz(k_rho, X.*k_rho.*besselj(0, k_rho.*r(jj))); 
     end
 end
 
-%% Mirror the solution around r=0
+% Mirror the solution around r=0
 P = [flipud(P_(r>0, :)); P_];
-[Z, R] = meshgrid(z, [-fliplr(r(r>0)), r]);
 
-%% Plot the pressure
+
+%% Pressure, visual inspection
 figure
 pcolor(Z*1e3, R*1e3, abs(P))
 shading interp

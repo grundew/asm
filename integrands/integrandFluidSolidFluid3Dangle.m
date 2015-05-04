@@ -1,4 +1,4 @@
-function I = integrandFluidSolidFluid_withAngle(gamma, f, aRx, aTx,...
+function I = integrandFluidSolidFluid3Dangle(gamma, f, aRx, aTx,...
     c, rho, d, model, alpha)
 % I = integrandFluidSolidFluid_withAngle(theta, f, aRx, aTx, c, rho, d, model, alpha)
 %   orofinoIntegrand is the integrand in equation (28) in Ref. 1. This is
@@ -32,28 +32,29 @@ rho = model.fluid(1).density;
 w = 2*pi*f;
 k = w./c;
 
+
 %% Transmitter spatial spectrum
 q = sin(gamma);
 p = sqrt(1-q.^2);
 kx = k*q;
 PhiTx = planePistonPressureAngularSpectrum(kx, aTx, c, rho);
 
+
 %% Receiver spatial spectrum
 % See confluence page on Angular Spectrum Method for details on the
 % relations between the angles
-gamma_rx = gamma - 2*alpha;
+gamma_rx = 2*alpha - gamma;
 q_rx = sin(gamma_rx);
 kx = k*q_rx;
 PhiRx = planePistonPressureAngularSpectrum(kx, aRx, c, rho);
+
 
 %% Plate response, angular
 % See confluence page on Angular Spectrum Method for details on the
 % relations between the angles
 theta = gamma - alpha;
-theta(idltgamma) = alpha - gamma(idltgamma);
 R = reflectionTransmissionCoffecientAnalytical(f, theta, model);
-% R = fluidSolidFluidReflectionCoefficient(f, theta, model);
-% R = R.';
+
 
 %% Phase shift from transmitter to plate and from plate to receiver
 z = d + d*cos(2*alpha);
@@ -69,4 +70,3 @@ if any(isnan(I))
 end
 
 end
-

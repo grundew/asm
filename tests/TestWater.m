@@ -27,7 +27,7 @@ classdef TestWater < matlab.unittest.TestCase
                 'rho_fluid', 1000, 'f', f, 'savemat', true);
             this.params = p;
             tic;
-            this.V = computeAsmIntegral(@integrandFluidSolidFluid_planepiston, p);
+            this.V = computeAsmIntegral(@integralFluidSolidFluid, p);
             this.cputime = toc;
         end
         

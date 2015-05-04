@@ -150,7 +150,7 @@ Phase = exp(1i*kz*(zTx + zRx));
 
 
 %% Assemble integrand
-I = rho_F*c_F*Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p.^2;
+I = Plate.*k.*q.*dispRx.*PhiRx.*PhiTx.*Phase.*k.*p.^2;
 
 
 end

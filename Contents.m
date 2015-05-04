@@ -2,7 +2,6 @@
 % Version 100 13-oct-2014
 %
 %
-%
 % computeAsmIntegral() is the main function that integrates the specified
 % function wrt the $\theta_z$ angle. It takes a function handle and a
 % parameter struct as input.
@@ -32,13 +31,13 @@
 %
 % Example:
 % p = generateAsmConfig('air', 'steel', 'distanceRx', 10e-2);
-% func = @integrand_fluidSolidFluid_planepiston;
+% func = @integralFluidSolidFluid;
 % [V, f] = computeAsmIntegral(func, p, 'MaxIntervalCount', 2000);
 %
 %
 %
 % See also quadgk, generateAsmConfig, computeAsmIntegral,
-% integrands/Contents
+% asm/integrands
 %
 %
 %

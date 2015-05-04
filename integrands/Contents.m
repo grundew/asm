@@ -3,14 +3,14 @@
 %
 % Functions that compute the integrands.
 %
-% integral* functions are called by the computeAsmIntegral and handles the
-%           model parameters, and then performes the integral for all the
-%           frequencies. The integrands are defined in the integrand*
-%           functions.
+% integral* functions are passed to the computeAsmIntegral as function handles
+%           and handles the model parameters, and then performes the integral
+%           for all the frequencies. The integrands are defined in the integrand*
+%           functions or in the subfunctions.
 %
 %
 % Parameter handling functions:
-% integralFluidSolidFluid - Computes the integrand for an axial symmetric
+% integralFluidSolidFluid - Computes the integral for an axial symmetric
 %                           model using
 %                           integrandFluidSolidFluidAxialSymmetric. Handles
 %                           point sources, plane pistons and focused
@@ -18,6 +18,13 @@
 %                           reflector, fluid-solid-fluid model transmission
 %                           or reflection, where the fluids on each side of
 %                           the solid are identical.
+% 
+% integralFluidSolidFluidMisalignment2D - Computes the integral for an
+%                           axial symmetric model with a misalignment of
+%                           the solid plate. Handles plane piston
+%                           transmitter end receiver. The plate model can
+%                           be a perfect reflector or a solid plate
+%                           embedded in a fluid.
 %
 %
 % Integrands:
@@ -26,13 +33,8 @@
 %             integralFluidSolidFluid. Plate is either embedded in a fluid
 %             or a perfect reflector.
 %
-% integrandFluidSolidFluid2Dangle
-%             Integrand for 2D model with misalignment between plate and
-%             transducers. Only plane piston. Note that this function
-%             should be integrated from $-pi/2$ to $pi/2$.
-%
-% integrandFluidSolidFluid_withAngle
-%             3D model with misaligned plate. Not implemented properly.
+% integrandFluidSolidFluid3Dangle
+%             3D model with misaligned plate. Not tested.
 %
 %
 % Sources:
