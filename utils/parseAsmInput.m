@@ -35,7 +35,11 @@ function [result, p] = parseAsmInput(varargin)
 % reflection  - If true, the reflection coefficient - true  - NA
 %                is used, otherwise the 
 %                transmission coefficient is used
-% alpha_plate - Misalignment between transmitter and - 0    - radians
+% perfectReflection - If true, the reflection       - false - NA
+%                      coefficient is set to 1.
+%                      Overrides the reflection
+%                      parameter.
+% gamma  - Misalignment between transmitter and - 0    - radians
 %                the solid plate
 %
 % Sampling and integration parameters
@@ -65,7 +69,7 @@ def_distanceRx = 40e-3; % m
 def_displaceRx = 0; % m;
 def_reflection = true;
 def_perfectReflection = false;
-def_alpha_plate = 0;
+def_gamma = 0;
 def_focusTx = 0; % Focal distance (m)
 def_focusRx = 0; % Focal distance (m)
 
@@ -120,7 +124,7 @@ p.addParameter('distanceRx', def_distanceRx, validatorsgtz);
 p.addParameter('displaceRx', def_displaceRx, validatorsgoretz);
 p.addParameter('reflection', def_reflection, @islogical);
 p.addParameter('perfectReflection', def_perfectReflection, @islogical);
-p.addParameter('alpha_plate', def_alpha_plate, validatorfuncreal);
+p.addParameter('gamma', def_gamma, validatorfuncreal);
 p.addParameter('focusTx', def_focusTx, validatorsgoretz);
 p.addParameter('focusRx', def_focusRx, validatorsgoretz);
 

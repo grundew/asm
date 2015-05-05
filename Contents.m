@@ -9,7 +9,7 @@
 % Additional parameter-value inputs are sent to the integration function,
 % quadgk. See the online MATLAB documentation for quadgk for details.
 % 
-% The functions in the <matlab:help('intergands/Content') integrands> 
+% The functions in the <matlab:help('intergands/Content') integrals> 
 % subfolder defines the function that is integrated in computeAsmIntegral.
 %
 %
@@ -37,7 +37,7 @@
 %
 %
 % See also quadgk, generateAsmConfig, computeAsmIntegral,
-% asm/integrands
+% asm/integrals
 %
 %
 %

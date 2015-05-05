@@ -1,11 +1,11 @@
-% asm/integrands
+% asm/integrals
 % Version 100 13-oct-2014
 %
-% Functions that compute the integrands.
+% Functions that compute the integrals.
 %
 % integral* functions are passed to the computeAsmIntegral as function handles
 %           and handles the model parameters, and then performes the integral
-%           for all the frequencies. The integrands are defined in the integrand*
+%           for all the frequencies. The integrands are defined in the integrands*
 %           functions or in the subfunctions.
 %
 %

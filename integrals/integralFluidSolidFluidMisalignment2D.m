@@ -13,7 +13,7 @@ cs = params.cs;
 thick = params.thickness;
 zTx = params.distanceTx;
 al_dB = params.alphaLambda_dB;
-alphaPlate = params.alpha_plate;
+gamma = params.gamma;
 reflection = params.reflection;
 perfReflection = params.perfectReflection;
 prgbar = params.progressbar;
@@ -22,7 +22,7 @@ prgbar = params.progressbar;
 %% Samplings stuff
 f = params.f;
 thetamax = pi/2;
-thetamin = -pi/2 + alphaPlate;
+thetamin = -pi/2 + gamma;
 
 
 %% Check sanity of parameters and give warnings or errors
@@ -54,7 +54,7 @@ for i = 1:nf
     
     fun = @(theta_z ) integrand(...
         theta_z, f(i), aTx, aRx, zTx, c_F, rho_F,...
-    reflection, perfReflection, al_dB, rho_S, cp, cs, thick, alphaPlate);
+    reflection, perfReflection, al_dB, rho_S, cp, cs, thick, gamma);
 
     X(i) = quadgk(fun, thetamin, thetamax, varargin{:});
     
@@ -67,7 +67,7 @@ end
 function I = integrand(theta_z, f,...
     aRx, aTx, z1, c_F, rho_F,...
     reflection, perfectReflection,...
-    al_dB, rho_S, c_Lr, c_Sr, thick, alphaPlate)
+    al_dB, rho_S, c_Lr, c_Sr, thick, gamma)
 
 
 %% Angular frequency and total length of wave vector
@@ -85,7 +85,7 @@ PhiTx = 2*pi*aTx^2*W;
 %% Receiver spatial spectrum
 % See confluence page on Angular Spectrum Method for details on the
 % relations between the angles
-theta_rx = 2*alphaPlate - theta_z;
+theta_rx = 2*gamma - theta_z;
 q_rx = sin(theta_rx);
 kr_rx = k*q_rx;
 xx = kr_rx*aRx;
@@ -97,7 +97,7 @@ PhiRx = 2*pi*aRx^2*W;
 %% Plate response, angular
 % See confluence page on Angular Spectrum Method for details on the
 % relations between the angles
-theta_plate = theta_z - alphaPlate;
+theta_plate = theta_z - gamma;
 
 
 %% Loss in plate
@@ -137,11 +137,11 @@ end
 
 
 %% Phase shift from transmitter to plate and from plate to receiver
-z = z1 + z1*cos(2*alphaPlate);
-x = -z1*sin(2*alphaPlate);
+z = z1 + z1*cos(2*gamma);
+x = -z1*sin(2*gamma);
 Phase = exp(1i*k*(cos(theta_z)*z + sin(theta_z)*x));
 
-I = k*cos(theta_z).*cos(theta_z + 2*alphaPlate).*Plate.*PhiRx.*PhiTx.*Phase;
+I = k*cos(theta_z).*cos(theta_z + 2*gamma).*Plate.*PhiRx.*PhiTx.*Phase;
 
 if any(isnan(I))
     fprintf('NaN value detected at frequency %f and angle %f\n', f, theta_z(isnan(I)));
