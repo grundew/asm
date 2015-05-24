@@ -14,7 +14,5 @@ Implemented features
 References
 ---
 
-> See [Downloads](https://bitbucket.org/halfwave/angularspectrummethod/downloads) for pdf version of the article
-
 [Evaluation of angle-dependent spectral distortion for infinite, planar elastic media via angular spectrum decomposition - Donald P. Orofino and Peder C. Pedersen - J. Acoust. Soc. Am. 93 (3), March 1993](http://dx.doi.org/10.1121/1.405408)
 
